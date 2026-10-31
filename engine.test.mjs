@@ -19,3 +19,15 @@ test('Месячный взнос и доходность дают ожидае�
 test('Инфляция индексирует расходы и цель каждый месяц',()=>{const p={...plain,initial:10000000,salary:0,housing:10000,living:0,leisure:0,inflation:12,goal:100000,rate:0};const row=simulate(p).rows[1];const monthlyIndex=1.12**(1/12);const expectedExpenses=10000*Array.from({length:12},(_,i)=>monthlyIndex**(i+1)).reduce((a,b)=>a+b,0);assert.ok(Math.abs(row.expenses-expectedExpenses)<.01);assert.ok(Math.abs(row.prices-1.12)<1e-10);assert.ok(Math.abs(row.goal-112000)<1e-8);});
 test('Доход индексируется после завершения года',()=>{const p={...plain,initial:0,salary:100000,housing:0,living:0,leisure:0,growth:10};const r=simulate(p).rows;assert.equal(r[1].income,1200000);assert.ok(Math.abs(r[2].income-1320000)<.01);assert.ok(Math.abs(r[3].income-1452000)<.01);});
 test('Цель сравнивается с накоплениями, приведёнными к будущим ценам',()=>{const p={...plain,initial:0,salary:10000,housing:0,living:0,leisure:0,inflation:12,goal:110000};const r=simulate(p);assert.ok(Math.abs(r.rows[1].balance-120000)<.01);assert.ok(Math.abs(r.rows[1].goal-123200)<.01);assert.equal(r.reached,2);});
+
+test('Годовые платежи распределяются по месяцам, разовая трата учитывается один раз',()=>{
+  const r=simulate({...plain,salary:0,housing:0,living:0,leisure:0,initial:0,annual:12000,oneTime:5000,years:10});
+  assert.equal(r.rows[1].expenses,17000);
+  assert.equal(r.rows[2].expenses,12000);
+  assert.equal(r.final.balance,-125000);
+});
+test('Старые сохранённые параметры получают нулевые новые расходы',()=>{
+  const p=normalize(plain);
+  assert.equal(p.annual,0);
+  assert.equal(p.oneTime,0);
+});

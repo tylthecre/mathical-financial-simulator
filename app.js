@@ -33,13 +33,13 @@
   function render(){
     params=M.normalize(params);result=M.simulate(params,scenario);
     const baseline=M.simulate({...params,decision:'none'},scenario),uncertain=M.distribution(params);
-    const expense=params.housing+params.living+params.leisure, factor=params.decision==='save'?.9:1, spent=expense*factor, free=params.salary-spent;
+    const expense=params.housing+params.living+params.leisure+params.annual/12, factor=params.decision==='save'?.9:1, spent=expense*factor, free=params.salary-spent;
     text('future-year',startYear+params.years+' ↗');
     text('income-metric',money(params.salary));text('expense-metric',money(spent));
     text('final-capital',money(mode==='real'?result.final.real:result.final.balance));text('capital-subtitle',`${outcomes[scenario]} сценарий · конец ${startYear+params.years} года`);text('chart-unit',mode==='real'?'Покупательная способность':'Номинальные суммы');chart(result.rows);
     const share=n=>pct(n/Math.max(params.salary,spent,1)*100);
-    $('#allocation').innerHTML=`<div class="tile tile-saving"><b>${money(Math.max(0,free))}</b><span>остаётся на накопления · ${share(Math.max(0,free))}</span></div><div class="tile tile-housing"><b>${share(params.housing*factor)}</b><span>жильё</span></div><div class="tile-other"><div class="tile tile-living"><b>${share(params.living*factor)}</b><span>еда и быт</span></div><div class="tile tile-leisure"><b>${share(params.leisure*factor)}</b><span>досуг</span></div></div>`;
-    text('budget-note',free<0?`Дефицит: ${money(-free,false)}/мес. Расходы превышают доход; проценты показаны от расходов.`:'Доли бюджета на старте · размеры блоков условные');
+    $('#allocation').innerHTML=`<div class="tile tile-saving"><b>${money(Math.max(0,free))}</b><span>остаётся на накопления · ${share(Math.max(0,free))}</span></div><div class="tile tile-housing"><b>${share(params.housing*factor)}</b><span>жильё</span></div><div class="tile-other"><div class="tile tile-living"><b>${share((params.living+params.annual/12)*factor)}</b><span>еда, быт и годовые траты</span></div><div class="tile tile-leisure"><b>${share(params.leisure*factor)}</b><span>досуг</span></div></div>`;
+    text('budget-note',free<0?`Дефицит: ${money(-free,false)}/мес. Расходы превышают доход; проценты показаны от расходов.`:`В расходах учтена 1/12 годовых платежей${params.oneTime ? ' · разовая трата '+money(params.oneTime,false)+' учтена в первый месяц прогноза' : ''}. Размеры блоков условные.`);
     text('goal-title',params.goalName);text('goal-amount',`${money(params.goal,false)} в сегодняшних ценах`);
     const progress=Math.max(0,Math.min(100,result.final.real/params.goal*100));$('#goal-progress').style.width=progress+'%';
     text('goal-result',result.reached!==null?result.reached===0?'Цель доступна уже сейчас':`Впервые доступна в ${startYear+result.reached}`:`${Math.round(progress)}% цели к ${startYear+params.years}`);
@@ -54,7 +54,7 @@
     document.querySelectorAll('[data-decision]').forEach(b=>b.classList.toggle('active',b.dataset.decision===params.decision));
     renderSaved();persist();
   }
-  function editorBalance(){const f=$('#settings-form').elements;const free=Number(f.salary.value)-Number(f.housing.value)-Number(f.living.value)-Number(f.leisure.value);text('editor-balance',(free>=0?'Остаётся ':'Не хватает ')+money(Math.abs(free),false)+'/мес.');}
+  function editorBalance(){const f=$('#settings-form').elements;const free=Number(f.salary.value)-Number(f.housing.value)-Number(f.living.value)-Number(f.leisure.value)-Number(f.annual.value)/12;text('editor-balance',(free>=0?'Остаётся ':'Не хватает ')+money(Math.abs(free),false)+'/мес.');}
   function editor(section){const form=$('#settings-form');for(const [key,val] of Object.entries(params)){const field=form.elements.namedItem(key);if(field)field.value=val;}$('.advanced-settings').open=false;editorBalance();$('#editor').showModal();$('#editor').scrollTop=0;if(section==='goals'){$('#goals-fields').scrollIntoView({block:'nearest'});form.elements.goalName.focus({preventScroll:true});}else{form.elements.salary.focus({preventScroll:true});}}
   $('#settings-form').addEventListener('input',editorBalance);
   $('#settings-form').addEventListener('invalid',e=>{const parent=e.target.closest('details');if(parent)parent.open=true;},true);

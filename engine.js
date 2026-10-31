@@ -1,8 +1,8 @@
 /* Mathical — прозрачная учебная модель. Без внешних запросов. */
 (function (root) {
   'use strict';
-  const defaults = { salary: 100000, housing: 25000, living: 20000, leisure: 10000, initial: 200000, growth: 6, inflation: 5, rate: 7, years: 15, goal: 3000000, goalName: 'Первый взнос на квартиру', decision: 'none' };
-  const bounds = { salary: [0,10000000], housing: [0,10000000], living: [0,10000000], leisure: [0,10000000], initial: [0,1000000000], growth: [-20,30], inflation: [0,30], rate: [-20,30], years: [10,20], goal: [1,1000000000] };
+  const defaults = { salary: 100000, housing: 25000, living: 20000, leisure: 10000, annual: 0, oneTime: 0, initial: 200000, growth: 6, inflation: 5, rate: 7, years: 15, goal: 3000000, goalName: 'Первый взнос на квартиру', decision: 'none' };
+  const bounds = { salary: [0,10000000], housing: [0,10000000], living: [0,10000000], leisure: [0,10000000], annual: [0,120000000], oneTime: [0,1000000000], initial: [0,1000000000], growth: [-20,30], inflation: [0,30], rate: [-20,30], years: [10,20], goal: [1,1000000000] };
   function normalize(input) {
     const p = { ...defaults, ...input };
     delete p.profession; // Drop obsolete presets from previously saved plans.
@@ -15,7 +15,7 @@
   function random(seed) { let a = seed >>> 0; return () => { a += 0x6D2B79F5; let t = Math.imul(a ^ a >>> 15, 1 | a); t ^= t + Math.imul(t ^ t >>> 7, 61 | t); return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
   function simulate(input, scenario = 'base', seed = 42) {
     const p = normalize(input), rng = random(seed);
-    let balance = p.initial, prices = 1, salary = p.salary, spending = p.housing + p.living + p.leisure;
+    let balance = p.initial, prices = 1, salary = p.salary, spending = p.housing + p.living + p.leisure + p.annual / 12;
     const rows = [{year:0,balance,real:balance,prices,goal:p.goal,income:0,expenses:0,interest:0,event:''}];
     let reached = balance >= p.goal ? 0 : null;
     for (let year = 1; year <= p.years; year++) {
@@ -31,6 +31,7 @@
         prices *= monthlyInflation;
         const pay = month <= lost ? 0 : salary * (p.decision === 'education' && year >= 3 ? 1.15 : 1);
         let cost = spending * prices * (p.decision === 'save' ? .9 : 1);
+        if (year === 1 && month === 1) cost += p.oneTime;
         if (p.decision === 'education' && year === 2 && month === 1) { cost += 120000*prices; event = 'Обучение: 120 тыс. ₽ в начальных ценах'; }
         if (p.decision === 'car' && year >= 3) { cost += 8000*prices; if (year === 3 && month === 1) { cost += 900000*prices; event = 'Покупка автомобиля'; } }
         const earned = Math.max(0,balance)*monthlyRate;
