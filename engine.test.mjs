@@ -31,3 +31,9 @@ test('Старые сохранённые параметры получают н
   assert.equal(p.annual,0);
   assert.equal(p.oneTime,0);
 });
+
+test('Именованные годовые платежи прибавляются к общей сумме',()=>{
+  const r=simulate({...plain,salary:0,housing:0,living:0,leisure:0,initial:0,annual:1200,annualItems:[{name:'Страховка',amount:12000}],years:10});
+  assert.equal(r.rows[1].expenses,13200);
+  assert.equal(r.final.balance,-132000);
+});

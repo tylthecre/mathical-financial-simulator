@@ -73,3 +73,5 @@ legend{font-size:16px;color:#c4ceb5}
   .dialog-footer>span{max-width:170px}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+.health-section{margin-top:28px;color:#eef1e4}.health-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}.health-grid>div{background:#1b1e17;border:1px solid #35392e;border-radius:16px;padding:18px}.health-grid span,.health-grid strong{display:block}.health-grid span{font-size:15px;color:#b9c4ad}.health-grid strong{font-size:22px;margin-top:8px}.health-section>p{color:#b9c4ad;font-size:15px;line-height:1.5}.annual-items{margin:10px 0}.annual-items p{font-size:16px;color:#c4ceb5}.annual-items p span{font-size:14px}.annual-item{display:flex;gap:8px;margin:8px 0;align-items:center}.annual-item input{background:#252a20;padding:12px;border-radius:10px;font-size:16px;min-width:0}.annual-item .annual-name{flex:2}.annual-item .annual-amount{flex:1}.annual-item button{background:#383d31;color:#fff;border-radius:10px;padding:12px;font-size:14px}@media(max-width:650px){.health-grid{grid-template-columns:1fr}.annual-item{flex-wrap:wrap}.annual-item .annual-name{flex:1 1 100%}}

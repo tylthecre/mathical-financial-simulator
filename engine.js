@@ -7,6 +7,7 @@
     const p = { ...defaults, ...input };
     delete p.profession; // Drop obsolete presets from previously saved plans.
     for (const [key,[min,max]] of Object.entries(bounds)) { const n = Number(p[key]); p[key] = Number.isFinite(n) ? Math.min(max,Math.max(min,n)) : defaults[key]; }
+    p.annualItems = Array.isArray(p.annualItems) ? p.annualItems.slice(0,50).filter(x => x && typeof x === 'object').map(x => ({name:String(x.name || '').slice(0,80), amount:Math.min(120000000,Math.max(0,Number(x.amount) || 0))})) : [];
     p.years = Math.round(p.years);
     p.goalName = String(p.goalName || defaults.goalName).slice(0,80);
     if (!['none','save','education','car'].includes(p.decision)) p.decision = 'none';
@@ -15,7 +16,7 @@
   function random(seed) { let a = seed >>> 0; return () => { a += 0x6D2B79F5; let t = Math.imul(a ^ a >>> 15, 1 | a); t ^= t + Math.imul(t ^ t >>> 7, 61 | t); return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
   function simulate(input, scenario = 'base', seed = 42) {
     const p = normalize(input), rng = random(seed);
-    let balance = p.initial, prices = 1, salary = p.salary, spending = p.housing + p.living + p.leisure + p.annual / 12;
+    let balance = p.initial, prices = 1, salary = p.salary, spending = p.housing + p.living + p.leisure + (p.annual + p.annualItems.reduce((sum,x)=>sum+x.amount,0)) / 12;
     const rows = [{year:0,balance,real:balance,prices,goal:p.goal,income:0,expenses:0,interest:0,event:''}];
     let reached = balance >= p.goal ? 0 : null;
     for (let year = 1; year <= p.years; year++) {
