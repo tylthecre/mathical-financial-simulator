@@ -2,7 +2,7 @@
 (function (root) {
   'use strict';
   const defaults = { salary: 100000, housing: 25000, living: 20000, leisure: 10000, annual: 0, oneTime: 0, initial: 200000, growth: 6, inflation: 5, rate: 7, years: 15, goal: 3000000, goalName: 'Первый взнос на квартиру', decision: 'none' };
-  const bounds = { salary: [0,10000000], housing: [0,10000000], living: [0,10000000], leisure: [0,10000000], annual: [0,120000000], oneTime: [0,1000000000], initial: [0,1000000000], growth: [-20,30], inflation: [0,30], rate: [-20,30], years: [10,20], goal: [1,1000000000] };
+  const bounds = { salary: [0,10000000], housing: [0,10000000], living: [0,10000000], leisure: [0,10000000], annual: [0,120000000], oneTime: [0,1000000000], initial: [0,1000000000], growth: [-20,30], inflation: [0,30], rate: [-20,30], years: [1,50], goal: [1,1000000000] };
   function normalize(input) {
     const p = { ...defaults, ...input };
     delete p.profession; // Drop obsolete presets from previously saved plans.

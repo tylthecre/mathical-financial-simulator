@@ -135,3 +135,5 @@ legend{font-size:16px;color:#c4ceb5}
 @media(prefers-reduced-motion:reduce){.heading::before,.heading,.strategy-row,.dashboard-grid,.health-section,.decisions-section,.wordmark span,.chart rect[fill="#ffb647"]{animation:none!important}.decision{transition:none!important}}
 /* Свечение не должно расширять страницу. */
 body{overflow-x:hidden}
+
+.horizon-custom{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px;font-size:15px;color:#eeeaff}.horizon-custom-field{display:inline-flex;align-items:center;gap:6px;background:#ffffff1c;border-radius:14px;padding:5px 10px;color:#fff}.horizon-custom-field input{width:55px;min-width:0;color:#fff;font-size:18px;font-weight:600;text-align:center}.horizon-custom small{font-size:14px;color:#e0dcff}@media(max-width:650px){.horizon-custom{margin-top:12px}.horizon-custom-field input{font-size:18px}}
