@@ -36,10 +36,11 @@
     const y=v=>225-(v-min)/(max-min)*205;
     const zero=y(0), width=390;
     const ticks=[min, (max+min)/2,max];
-    let svg=`<svg viewBox="0 0 ${width} 255" role="img" aria-label="Капитал от ${startYear} до ${startYear+params.years}, ${mode==='real'?'в сегодняшних':'в будущих'} рублях"><title>Капитал по годам</title><defs><clipPath id="capital-plot-clip"><rect x="46" y="20" width="343" height="205"/></clipPath></defs>`;
+    const trackClips=points.map((_,i)=>`<clipPath id="capital-track-${i}"><rect x="${50+i*57}" y="${y(max)}" width="44" height="205" rx="22"/></clipPath>`).join('');
+    let svg=`<svg viewBox="0 0 ${width} 255" role="img" aria-label="Капитал от ${startYear} до ${startYear+params.years}, ${mode==='real'?'в сегодняшних':'в будущих'} рублях"><title>Капитал по годам</title><defs><clipPath id="capital-plot-clip"><rect x="46" y="20" width="343" height="205"/></clipPath>${trackClips}</defs>`;
     ticks.forEach(v=>{svg+=`<line x1="46" y1="${y(v)}" x2="389" y2="${y(v)}" stroke="#ddd3a5" stroke-dasharray="3 4"/><text x="0" y="${y(v)+3}" font-size="12" fill="#807653">${money(v).replace(/₽/g,'')}</text>`;});
     svg+=`<line x1="46" y1="${zero}" x2="389" y2="${zero}" stroke="#9c926c"/>`;
-    points.forEach((r,i)=>{const v=values[i],x=50+i*57, yy=y(v), h=v===0?0:Math.max(2,Math.abs(zero-yy)); svg+=`<g clip-path="url(#capital-plot-clip)"><rect x="${x}" y="${y(max)}" width="44" height="${205}" rx="22" fill="#e7ddb0"/><rect x="${x}" y="${v>=0?zero-h:zero}" width="44" height="${h}" rx="${Math.min(22,h/2)}" fill="${v<0?'#d46485':'#ffb647'}"><title>${startYear+r.year}: ${money(v,false)}</title></rect></g><text x="${x+22}" y="249" text-anchor="middle" fill="#756d50" font-size="12">${startYear+r.year}</text>`;});
+    points.forEach((r,i)=>{const v=values[i],x=50+i*57, yy=y(v), h=v===0?0:Math.max(2,Math.abs(zero-yy)); svg+=`<g clip-path="url(#capital-plot-clip)"><rect x="${x}" y="${y(max)}" width="44" height="${205}" rx="22" fill="#e7ddb0"/><g clip-path="url(#capital-track-${i})"><rect x="${x}" y="${v>=0?zero-h:zero}" width="44" height="${h}" rx="${Math.min(22,h/2)}" fill="${v<0?'#d46485':'#ffb647'}"><title>${startYear+r.year}: ${money(v,false)}</title></rect></g></g><text x="${x+22}" y="249" text-anchor="middle" fill="#756d50" font-size="12">${startYear+r.year}</text>`;});
     svg+='</svg>'; $('#capital-chart').innerHTML=svg;
   }
   function renderSaved(){
