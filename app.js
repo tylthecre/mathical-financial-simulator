@@ -20,7 +20,7 @@
     let start = null;
     const tick = time => {
       if (start === null) start = time;
-      const progress = Math.min(1, (time - start) / 1400);
+      const progress = Math.min(1, (time - start) / 1800);
       text('final-capital', money(value * (1 - Math.pow(1 - progress, 3))));
       if (progress < 1) capitalFrame = requestAnimationFrame(tick);
       else capitalFrame = 0;

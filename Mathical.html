@@ -110,6 +110,33 @@ legend{font-size:16px;color:#c4ceb5}
 .health-section{animation-delay:.22s}
 .decisions-section{animation-delay:.27s}
 @media(prefers-reduced-motion:reduce){.panel,.decision,.dark-button,.apply-button{transition:none!important}}
+
+/* Оформление основного симулятора по визуальному языку landing.html */
+.heading h1{font-size:clamp(40px,6vw,76px);font-weight:500;letter-spacing:-3px;line-height:1.04;margin:0 0 22px}
+.heading p{font-size:21px;line-height:1.55;color:#b4bca6;max-width:620px}
+.heading::before{left:auto;right:-120px;top:-40px;width:560px;height:560px;background:radial-gradient(circle,#6150ee66,transparent 68%);filter:blur(10px);animation:mathical-drift 12s ease-in-out infinite alternate}
+@keyframes mathical-drift{to{transform:translate(-60px,50px) scale(1.12)}}
+.wordmark span{animation-duration:14s}
+.panel{border-radius:32px;padding:30px}
+.capital h2,.cashflow h2{font-size:22px;font-weight:600;letter-spacing:-.6px}
+.big-number{font-size:clamp(40px,5.2vw,58px);letter-spacing:-2.4px}
+.chart-subtitle{font-size:16px;color:#5f5a3e}
+.decision{border-radius:24px;padding:26px;transition:transform .25s,border-color .25s,background .25s,box-shadow .25s}
+.decision:hover{transform:translateY(-6px);border-color:var(--lime)}
+.decision strong{font-size:20px;font-weight:500;line-height:1.25}
+.decision small,.decision[data-decision="none"]::after,.decision[data-decision="save"]::after{font-size:16px;line-height:1.5}
+.segmented button,.toggle button{transition:background .2s,box-shadow .2s}
+.segmented button:hover,.toggle button:hover{box-shadow:0 6px 18px #00000024}
+.apply-button{font-size:18px;font-weight:600;border-radius:30px}
+.apply-button:hover{box-shadow:0 12px 36px #def2493a}
+@keyframes mathical-appear{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+.heading,.strategy-row,.dashboard-grid,.health-section,.decisions-section{animation-duration:.9s;animation-timing-function:cubic-bezier(.2,.8,.2,1)}
+.chart rect[fill="#ffb647"]{animation-duration:1.4s;animation-timing-function:cubic-bezier(.2,.8,.2,1)}
+@media(max-width:1100px){.panel{padding:28px}.decision{padding:20px}}
+@media(max-width:650px){.heading h1{font-size:40px;letter-spacing:-1.6px;line-height:1.08;max-width:none}.heading p{font-size:19px;max-width:none}.panel{padding:24px}.decision{padding:20px;min-height:104px}.decision strong{font-size:18px}.decision small,.decision[data-decision="none"]::after,.decision[data-decision="save"]::after{font-size:15px}.big-number{font-size:40px}}
+@media(prefers-reduced-motion:reduce){.heading::before,.heading,.strategy-row,.dashboard-grid,.health-section,.decisions-section,.wordmark span,.chart rect[fill="#ffb647"]{animation:none!important}.decision{transition:none!important}}
+/* Свечение не должно расширять страницу. */
+body{overflow-x:hidden}
 </style></head><body>
 <header class="topbar"><a href="#" class="wordmark" aria-label="Mathical главная">mathical<span>✳</span></a><span class="top-caption">Финансовый симулятор</span></header>
 <main class="shell" id="overview">
@@ -214,7 +241,7 @@ legend{font-size:16px;color:#c4ceb5}
     let start = null;
     const tick = time => {
       if (start === null) start = time;
-      const progress = Math.min(1, (time - start) / 1400);
+      const progress = Math.min(1, (time - start) / 1800);
       text('final-capital', money(value * (1 - Math.pow(1 - progress, 3))));
       if (progress < 1) capitalFrame = requestAnimationFrame(tick);
       else capitalFrame = 0;
