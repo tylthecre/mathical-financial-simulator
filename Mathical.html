@@ -76,6 +76,15 @@ legend{font-size:16px;color:#c4ceb5}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 
 .health-section{margin-top:28px;color:#eef1e4}.health-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}.health-grid>div{background:#1b1e17;border:1px solid #35392e;border-radius:16px;padding:18px}.health-grid span,.health-grid strong{display:block}.health-grid span{font-size:15px;color:#b9c4ad}.health-grid strong{font-size:22px;margin-top:8px}.health-section>p{color:#b9c4ad;font-size:15px;line-height:1.5}.annual-items{margin:10px 0}.annual-items p{font-size:16px;color:#c4ceb5}.annual-items p span{font-size:14px}.annual-item{display:flex;gap:8px;margin:8px 0;align-items:center}.annual-item input{background:#252a20;padding:12px;border-radius:10px;font-size:16px;min-width:0}.annual-item .annual-name{flex:2}.annual-item .annual-amount{flex:1}.annual-item button{background:#383d31;color:#fff;border-radius:10px;padding:12px;font-size:14px}@media(max-width:650px){.health-grid{grid-template-columns:1fr}.annual-item{flex-wrap:wrap}.annual-item .annual-name{flex:1 1 100%}}
+
+/* Мягкое появление и движение показателей */
+@keyframes mathical-appear{from{opacity:.65}to{opacity:1}}
+@keyframes mathical-bar{from{transform:scaleY(.05)}to{transform:scaleY(1)}}
+@keyframes mathical-mark{to{transform:rotate(360deg)}}
+.heading,.strategy-row,.dashboard-grid,.health-section,.decisions-section{animation:mathical-appear .65s ease-out both}
+.wordmark span{display:inline-block;animation:mathical-mark 18s linear infinite}
+.chart rect[fill="#ffb647"]{transform-box:fill-box;transform-origin:center bottom;animation:mathical-bar .8s cubic-bezier(.2,.8,.2,1) both}
+@media(prefers-reduced-motion:reduce){.heading,.strategy-row,.dashboard-grid,.health-section,.decisions-section,.wordmark span,.chart rect[fill="#ffb647"]{animation:none!important}}
 </style></head><body>
 <header class="topbar"><a href="#" class="wordmark" aria-label="Mathical главная">mathical<span>✳</span></a><span class="top-caption">Финансовый симулятор</span></header>
 <main class="shell" id="overview">
@@ -170,6 +179,23 @@ legend{font-size:16px;color:#c4ceb5}
   function money(n,compact=true){return new Intl.NumberFormat('ru-RU',{style:'currency',currency:'RUB',maximumFractionDigits:compact?1:0,...(compact?{notation:'compact'}:{})}).format(n);}
   const pct=n=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:1}).format(n)+'%';
   function text(id,value){$('#'+id).textContent=value;}
+  let firstCapitalRender = true, capitalFrame = 0;
+  function showCapital(value) {
+    if (capitalFrame) cancelAnimationFrame(capitalFrame);
+    text('final-capital', money(value));
+    const animate = firstCapitalRender && Number.isFinite(value) && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    firstCapitalRender = false;
+    if (!animate) return;
+    let start = null;
+    const tick = time => {
+      if (start === null) start = time;
+      const progress = Math.min(1, (time - start) / 900);
+      text('final-capital', money(value * (1 - Math.pow(1 - progress, 3))));
+      if (progress < 1) capitalFrame = requestAnimationFrame(tick);
+      else capitalFrame = 0;
+    };
+    capitalFrame = requestAnimationFrame(tick);
+  }
   function toast(message){text('toast',message);$('#toast').classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('#toast').classList.remove('show'),3500);}
   function chart(rows) {
     const indices=Array.from({length:6},(_,i)=>Math.round(i*params.years/5));
@@ -201,7 +227,7 @@ legend{font-size:16px;color:#c4ceb5}
     text('health-reserve',params.housing > 0 ? new Intl.NumberFormat('ru-RU',{maximumFractionDigits:1}).format(reserve/(params.housing*factor))+' мес.' : 'Укажи расходы на жильё');
     text('future-year',startYear+params.years+' ↗');
     text('income-metric',money(params.salary));text('expense-metric',money(spent));
-    text('final-capital',money(mode==='real'?result.final.real:result.final.balance));text('capital-subtitle',`${outcomes[scenario]} сценарий · конец ${startYear+params.years} года`);text('chart-unit',mode==='real'?'Покупательная способность':'Номинальные суммы');chart(result.rows);
+    showCapital(mode==='real'?result.final.real:result.final.balance);text('capital-subtitle',`${outcomes[scenario]} сценарий · конец ${startYear+params.years} года`);text('chart-unit',mode==='real'?'Покупательная способность':'Номинальные суммы');chart(result.rows);
     const share=n=>pct(n/Math.max(params.salary,spent,1)*100);
     $('#allocation').innerHTML=`<div class="tile tile-saving"><b>${money(Math.max(0,free))}</b><span>остаётся на накопления · ${share(Math.max(0,free))}</span></div><div class="tile tile-housing"><b>${share(params.housing*factor)}</b><span>жильё</span></div><div class="tile-other"><div class="tile tile-living"><b>${share((params.living+annualTotal/12)*factor)}</b><span>еда, быт и годовые траты</span></div><div class="tile tile-leisure"><b>${share(params.leisure*factor)}</b><span>досуг</span></div></div>`;
     text('budget-note',free<0?`Дефицит: ${money(-free,false)}/мес. Расходы превышают доход; проценты показаны от расходов.`:`В расходах учтена 1/12 годовых платежей${params.oneTime ? ' · разовая трата '+money(params.oneTime,false)+' учтена в первый месяц прогноза' : ''}. Размеры блоков условные.`);

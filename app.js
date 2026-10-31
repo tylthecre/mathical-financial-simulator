@@ -10,6 +10,23 @@
   function money(n,compact=true){return new Intl.NumberFormat('ru-RU',{style:'currency',currency:'RUB',maximumFractionDigits:compact?1:0,...(compact?{notation:'compact'}:{})}).format(n);}
   const pct=n=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:1}).format(n)+'%';
   function text(id,value){$('#'+id).textContent=value;}
+  let firstCapitalRender = true, capitalFrame = 0;
+  function showCapital(value) {
+    if (capitalFrame) cancelAnimationFrame(capitalFrame);
+    text('final-capital', money(value));
+    const animate = firstCapitalRender && Number.isFinite(value) && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    firstCapitalRender = false;
+    if (!animate) return;
+    let start = null;
+    const tick = time => {
+      if (start === null) start = time;
+      const progress = Math.min(1, (time - start) / 900);
+      text('final-capital', money(value * (1 - Math.pow(1 - progress, 3))));
+      if (progress < 1) capitalFrame = requestAnimationFrame(tick);
+      else capitalFrame = 0;
+    };
+    capitalFrame = requestAnimationFrame(tick);
+  }
   function toast(message){text('toast',message);$('#toast').classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('#toast').classList.remove('show'),3500);}
   function chart(rows) {
     const indices=Array.from({length:6},(_,i)=>Math.round(i*params.years/5));
@@ -41,7 +58,7 @@
     text('health-reserve',params.housing > 0 ? new Intl.NumberFormat('ru-RU',{maximumFractionDigits:1}).format(reserve/(params.housing*factor))+' мес.' : 'Укажи расходы на жильё');
     text('future-year',startYear+params.years+' ↗');
     text('income-metric',money(params.salary));text('expense-metric',money(spent));
-    text('final-capital',money(mode==='real'?result.final.real:result.final.balance));text('capital-subtitle',`${outcomes[scenario]} сценарий · конец ${startYear+params.years} года`);text('chart-unit',mode==='real'?'Покупательная способность':'Номинальные суммы');chart(result.rows);
+    showCapital(mode==='real'?result.final.real:result.final.balance);text('capital-subtitle',`${outcomes[scenario]} сценарий · конец ${startYear+params.years} года`);text('chart-unit',mode==='real'?'Покупательная способность':'Номинальные суммы');chart(result.rows);
     const share=n=>pct(n/Math.max(params.salary,spent,1)*100);
     $('#allocation').innerHTML=`<div class="tile tile-saving"><b>${money(Math.max(0,free))}</b><span>остаётся на накопления · ${share(Math.max(0,free))}</span></div><div class="tile tile-housing"><b>${share(params.housing*factor)}</b><span>жильё</span></div><div class="tile-other"><div class="tile tile-living"><b>${share((params.living+annualTotal/12)*factor)}</b><span>еда, быт и годовые траты</span></div><div class="tile tile-leisure"><b>${share(params.leisure*factor)}</b><span>досуг</span></div></div>`;
     text('budget-note',free<0?`Дефицит: ${money(-free,false)}/мес. Расходы превышают доход; проценты показаны от расходов.`:`В расходах учтена 1/12 годовых платежей${params.oneTime ? ' · разовая трата '+money(params.oneTime,false)+' учтена в первый месяц прогноза' : ''}. Размеры блоков условные.`);

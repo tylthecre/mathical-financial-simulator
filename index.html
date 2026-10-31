@@ -1,234 +1,29 @@
 <!doctype html>
-<html lang="ru">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#10110f">
-<meta name="description" content="Mathical — финансовый симулятор жизненных решений. Измени цифры сегодня, посмотри, что будет завтра.">
-<title>mathical — твоё финансовое будущее</title>
-<style>
-:root{font-family:"Segoe UI",Arial,Helvetica,sans-serif;--bg:#10110f;--cream:#fff6c5;--pink:#ed7bdb;--purple:#6150ee;--lime:#def249;--orange:#ffb647;--text:#f3f4e9;--muted:#b4bca6;color-scheme:dark}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--text);font-size:18px;line-height:1.55;overflow-x:hidden}
-a{color:inherit}
-a:focus-visible,button:focus-visible{outline:3px solid #a991ff;outline-offset:4px}
-.wrap{max-width:1200px;margin:auto;padding:0 32px}
-
-/* шапка */
-header{display:flex;align-items:center;justify-content:space-between;height:92px}
-.wordmark{font-size:35px;font-weight:900;letter-spacing:-2px;color:var(--pink);text-decoration:none}
-.wordmark span{font-size:28px;margin-left:3px;display:inline-block;animation:spin 14s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.btn{display:inline-flex;align-items:center;gap:14px;border-radius:30px;padding:15px 26px;font-size:18px;font-weight:600;text-decoration:none;transition:transform .2s,background .2s,box-shadow .2s;min-height:52px}
-.btn-lime{background:var(--lime);color:#1d2614}
-.btn-lime:hover{transform:translateY(-3px);box-shadow:0 12px 36px #def2493a}
-.btn-lime .arrow{transition:transform .2s}
-.btn-lime:hover .arrow{transform:translate(4px,-4px)}
-.btn-line{border:2px solid #4a5040;color:var(--text)}
-.btn-line:hover{background:#1f221a;transform:translateY(-3px)}
-
-/* главный экран */
-.hero{display:grid;grid-template-columns:1.1fr 1fr;gap:48px;align-items:center;padding:40px 0 90px;position:relative}
-.glow{position:absolute;right:-120px;top:-40px;width:560px;height:560px;border-radius:50%;background:radial-gradient(circle,#6150ee66,transparent 68%);filter:blur(10px);z-index:-1;animation:drift 12s ease-in-out infinite alternate}
-@keyframes drift{to{transform:translate(-60px,50px) scale(1.12)}}
-h1{font-size:clamp(40px,6vw,76px);font-weight:500;letter-spacing:-3px;line-height:1.04;margin:0 0 22px}
-h1 em{font-style:normal;color:var(--pink)}
-.lead{font-size:21px;color:var(--muted);max-width:520px;margin:0 0 34px}
-.actions{display:flex;gap:14px;flex-wrap:wrap}
-.hero-card{background:var(--cream);color:#191b14;border-radius:32px;padding:30px}
-.hero-card h2{margin:0;font-size:22px;font-weight:600;letter-spacing:-.6px}
-.hero-card .sub{font-size:16px;color:#5f5a3e;margin-top:4px}
-.big{font-size:clamp(40px,5.2vw,58px);font-weight:700;letter-spacing:-2.4px;margin:18px 0 4px;white-space:nowrap}
-.bars{display:flex;align-items:flex-end;gap:12px;height:190px;margin-top:20px}
-.bar{flex:1;height:100%;background:#e7ddb0;border-radius:30px;display:flex;align-items:flex-end;overflow:hidden}
-.bar i{display:block;width:100%;border-radius:30px;background:var(--orange);height:0;transition:height 1.4s cubic-bezier(.2,.8,.2,1)}
-.years{display:flex;gap:12px;margin-top:8px;font-size:16px;color:#6e684a}
-.years span{flex:1;text-align:center}
-
-/* входная анимация главного экрана */
-.in{opacity:0;transform:translateY(30px);animation:rise .9s cubic-bezier(.2,.8,.2,1) forwards}
-@keyframes rise{to{opacity:1;transform:none}}
-
-/* появление блоков при прокрутке */
-.reveal{opacity:1;transform:none;transition:opacity .8s ease,transform .8s cubic-bezier(.2,.8,.2,1);transition-delay:var(--d,0s)}
-.js .reveal{opacity:0;transform:translateY(40px)}
-.js .reveal.show{opacity:1;transform:none}
-
-/* разделы */
-section{padding:50px 0}
-h2.title{font-size:clamp(30px,4vw,46px);font-weight:500;letter-spacing:-1.6px;line-height:1.1;margin:0 0 12px}
-.section-lead{font-size:19px;color:var(--muted);max-width:620px;margin:0 0 36px}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-.card{border-radius:28px;padding:28px;min-height:220px;display:flex;flex-direction:column;transition:transform .25s}
-.card:hover{transform:translateY(-6px)}
-.step-num{font-size:46px;font-weight:700;letter-spacing:-2px;line-height:1}
-.card h3{font-size:24px;font-weight:600;letter-spacing:-.7px;margin:auto 0 8px;line-height:1.15}
-.card p{margin:0;font-size:17px;line-height:1.5}
-.c-purple{background:var(--purple);color:#fff}
-.c-pink{background:var(--pink);color:#2b0f26}
-.c-lime{background:var(--lime);color:#1d2614}
-
-/* решения */
-.decision{background:#1b1e17;border:1px solid #35392e;border-radius:24px;padding:26px;transition:transform .25s,border-color .25s}
-.decision:hover{transform:translateY(-6px);border-color:var(--lime)}
-.decision h3{margin:0 0 16px;font-size:20px;font-weight:500;line-height:1.25;min-height:50px}
-.delta{font-size:34px;font-weight:700;letter-spacing:-1.3px;white-space:nowrap}
-.plus{color:var(--lime)}.minus{color:var(--pink)}
-.decision p{margin:6px 0 0;font-size:16px;color:var(--muted)}
-
-/* сценарии */
-.scen{background:var(--cream);color:#191b14;border-radius:32px;padding:34px}
-.row{display:grid;grid-template-columns:170px 1fr 130px;align-items:center;gap:18px;padding:14px 0}
-.row+.row{border-top:1px solid #e0d6a3}
-.row b{font-size:19px;font-weight:600}
-.track{height:34px;background:#e7ddb0;border-radius:34px;overflow:hidden}
-.track i{display:block;height:100%;width:0;border-radius:34px;transition:width 1.5s cubic-bezier(.2,.8,.2,1)}
-.row .val{font-size:22px;font-weight:700;text-align:right;letter-spacing:-.6px;white-space:nowrap}
-.note{font-size:16px;color:#6e684a;margin:18px 0 0}
-
-/* призыв */
-.cta{background:var(--purple);border-radius:36px;padding:60px 40px;text-align:center;color:#fff;margin:40px 0 20px}
-.cta h2{font-size:clamp(32px,4.6vw,56px);font-weight:500;letter-spacing:-2px;line-height:1.08;margin:0 0 14px}
-.cta p{font-size:19px;color:#ddd8ff;margin:0 auto 30px;max-width:520px}
-footer{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;padding:24px 0 40px;color:var(--muted);font-size:16px}
-
-@media(max-width:980px){.hero{grid-template-columns:1fr;gap:36px;padding-bottom:50px}.grid4{grid-template-columns:1fr 1fr}.grid3{grid-template-columns:1fr}.card{min-height:190px}}
-@media(max-width:650px){.wrap{padding:0 18px}header{height:76px}.wordmark{font-size:30px}header .btn{padding:12px 18px;font-size:16px}.lead{font-size:19px}.grid4{grid-template-columns:1fr}.decision h3{min-height:0}.row{grid-template-columns:1fr auto;gap:8px 12px}.row .track{grid-column:1/-1;order:3}.scen{padding:24px}.cta{padding:44px 22px;border-radius:28px}.hero-card{padding:24px}}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.in,.reveal,.js .reveal{opacity:1;transform:none}}
-</style>
-</head>
-<body>
-<div class="wrap">
-  <header>
-    <a class="wordmark" href="#" aria-label="Mathical">mathical<span>✳</span></a>
-    <a class="btn btn-lime" href="Mathical.html">Открыть симулятор <span class="arrow">↗</span></a>
-  </header>
-
-  <main>
-    <div class="hero">
-      <div class="glow" aria-hidden="true"></div>
-      <div>
-        <h1 class="in" style="animation-delay:.1s">Твоё финансовое <em>будущее.</em></h1>
-        <p class="lead in" style="animation-delay:.3s">Измени цифры сегодня. Посмотри, что будет завтра: сколько накопится за 10, 15 или 20 лет и когда хватит на твою цель.</p>
-        <div class="actions in" style="animation-delay:.5s">
-          <a class="btn btn-lime" href="Mathical.html">Попробовать <span class="arrow">↗</span></a>
-          <a class="btn btn-line" href="#how">Как это работает</a>
-        </div>
-      </div>
-      <div class="hero-card in" style="animation-delay:.45s" aria-label="Пример расчёта">
-        <h2>Капитал через 15 лет</h2>
-        <div class="sub">Пример: доход 100 000 ₽, расходы 55 000 ₽, накопления 200 000 ₽</div>
-        <div class="big"><span data-count="10417133">10 417 133</span> ₽</div>
-        <div class="sub">в сегодняшних рублях, с учётом инфляции</div>
-        <div class="bars" id="bars" aria-hidden="true"></div>
-        <div class="years" aria-hidden="true"><span>0</span><span>3</span><span>6</span><span>9</span><span>12</span><span>15 лет</span></div>
-      </div>
-    </div>
-
-    <section id="how">
-      <h2 class="title reveal">Три шага до понятной картины</h2>
-      <p class="section-lead reveal" style="--d:.1s">Не нужно разбираться в финансах заранее. Модель объясняет каждое допущение рядом с результатом.</p>
-      <div class="grid3">
-        <div class="card c-purple reveal"><div class="step-num">1</div><h3>Введи бюджет</h3><p>Доход, расходы на жильё, быт и досуг, уже накопленное и цель, на которую копишь.</p></div>
-        <div class="card c-pink reveal" style="--d:.12s"><div class="step-num">2</div><h3>Выбери срок и сценарий</h3><p>10, 15 или 20 лет. Базовый, благоприятный или стрессовый вариант будущего.</p></div>
-        <div class="card c-lime reveal" style="--d:.24s"><div class="step-num">3</div><h3>Проверь решения</h3><p>Что изменится, если тратить меньше, выучиться или купить машину. Результат виден сразу.</p></div>
-      </div>
-    </section>
-
-    <section>
-      <h2 class="title reveal">А что, если…</h2>
-      <p class="section-lead reveal" style="--d:.1s">Разница с обычным планом через 15 лет в сегодняшних рублях. На примере того же бюджета.</p>
-      <div class="grid4">
-        <div class="decision reveal"><h3>Тратить на 10% меньше</h3><div class="delta plus">+<span data-count="1.14" data-dec="2">1,14</span> млн</div><p>Экономия копится годами</p></div>
-        <div class="decision reveal" style="--d:.1s"><h3>Вложиться в обучение</h3><div class="delta plus">+<span data-count="2.62" data-dec="2">2,62</span> млн</div><p>120 тыс. ₽ и доход выше на 15%</p></div>
-        <div class="decision reveal" style="--d:.2s"><h3>Купить автомобиль</h3><div class="delta minus">−<span data-count="2.56" data-dec="2">2,56</span> млн</div><p>900 тыс. ₽ и 8 тыс. ₽ в месяц</p></div>
-        <div class="decision reveal" style="--d:.3s"><h3>Ничего не менять</h3><div class="delta">10,42 млн</div><p>Точка отсчёта для сравнения</p></div>
-      </div>
-    </section>
-
-    <section>
-      <h2 class="title reveal">Три варианта будущего</h2>
-      <p class="section-lead reveal" style="--d:.1s">Цены растут, доходность меняется, бывают месяцы без дохода. Смотри на диапазон, а не на одну цифру.</p>
-      <div class="scen reveal" id="scen">
-        <div class="row"><b>Стрессовый</b><div class="track"><i data-w="22.6" style="background:var(--pink)"></i></div><div class="val">4,2 млн</div></div>
-        <div class="row"><b>Базовый</b><div class="track"><i data-w="56.5" style="background:var(--orange)"></i></div><div class="val">10,4 млн</div></div>
-        <div class="row"><b>Благоприятный</b><div class="track"><i data-w="100" style="background:var(--lime)"></i></div><div class="val">18,4 млн</div></div>
-        <p class="note">Капитал через 15 лет в сегодняшних рублях. Учебная модель с условными допущениями, а не прогноз.</p>
-      </div>
-    </section>
-
-    <div class="cta reveal">
-      <h2>Начни с одной цифры</h2>
-      <p>Открой симулятор, введи свой доход и посмотри, когда хватит на цель.</p>
-      <a class="btn btn-lime" href="Mathical.html">Открыть симулятор <span class="arrow">↗</span></a>
-    </div>
-  </main>
-
-  <footer><span>Учебная модель, а не финансовый прогноз.</span><span>mathical ✳</span></footer>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#10110f"><meta name="description" content="Mathical — финансовый симулятор жизненных решений."><title>mathical — финансовый симулятор</title><link rel="stylesheet" href="styles.css"></head><body>
+<header class="topbar"><a href="#" class="wordmark" aria-label="Mathical главная">mathical<span>✳</span></a><span class="top-caption">Финансовый симулятор</span></header>
+<main class="shell" id="overview">
+<div class="heading"><div><h1>Твоё финансовое <span>будущее.</span></h1><p>Измени цифры сегодня. Посмотри, что будет завтра.</p></div></div>
+<section class="strategy-row" aria-label="Настройки плана">
+<button class="budget-entry" data-edit="income" aria-label="Изменить бюджет"><span class="budget-entry-top"><span>Мой бюджет</span><span class="edit-hint">Изменить ↗</span></span><span class="budget-figures"><span><small>Доход в месяц</small><strong id="income-metric"></strong></span><span class="budget-divider"></span><span><small>Расходы в месяц</small><strong id="expense-metric"></strong></span></span></button>
+<div class="horizon"><span class="micro">Срок планирования</span><div class="horizon-line"><div class="segmented" id="years"><button data-years="10">10 лет</button><button class="selected" data-years="15">15 лет</button><button data-years="20">20 лет</button></div><span class="future-year" id="future-year"></span></div></div></section>
+<div class="dashboard-grid">
+<section class="panel capital"><h2>Капитал во времени</h2><div class="chart-toolbar"><div class="toggle" id="money-mode"><button class="selected" data-mode="real">Сегодняшние ₽</button><button data-mode="nominal">Будущие ₽</button></div><label class="sr-only" for="scenario">Сценарий</label><select id="scenario"><option value="base">Базовый</option><option value="optimistic">Благоприятный</option><option value="stress">Стрессовый</option></select></div><div class="big-number" id="final-capital"></div><div class="chart-subtitle" id="capital-subtitle"></div><div id="capital-chart" class="chart" role="img" aria-label="График капитала по годам"></div><div class="chart-foot"><span><i class="dot orange"></i>Капитал</span><span id="chart-unit"></span></div></section>
+<section class="panel cashflow"><h2>Ежемесячный бюджет</h2><div class="allocation" id="allocation" title="Размеры блоков условные; точные доли указаны внутри"></div><p class="small-note" id="budget-note"></p></section>
+<section class="panel goal-card"><div class="panel-head"><span class="goal-label">Моя цель</span><button class="round-icon" data-edit="goals" aria-label="Изменить цель">↗</button></div><span class="goal-symbol" aria-hidden="true">◎</span><h2 id="goal-title"></h2><p id="goal-amount"></p><div class="goal-progress"><div id="goal-progress"></div></div><div class="goal-result" id="goal-result"></div><span class="goal-caption">С учётом роста цен</span></section>
 </div>
+<section class="health-section" aria-labelledby="health-title"><h2 id="health-title">Финансовое здоровье</h2><div class="health-grid"><div><span>Остаток в месяц</span><strong id="health-free"></strong></div><div><span>Доля сбережений</span><strong id="health-rate"></strong></div><div><span>Запас на жильё</span><strong id="health-reserve"></strong></div></div><p>Запас рассчитан по расходам на жильё и коммунальные услуги. Другие обязательные траты не учитываются.</p></section><section id="decisions" class="decisions-section"><div class="section-heading"><h2>А что, если…</h2></div><div class="decision-list"><button data-decision="none" class="decision active"><strong>Ничего не менять</strong></button><button data-decision="save" class="decision"><strong>Тратить на 10% меньше</strong></button><button data-decision="education" class="decision"><strong>Вложиться в обучение</strong><small>120 тыс. ₽ · доход +15%</small></button><button data-decision="car" class="decision"><strong>Купить автомобиль</strong><small>900 тыс. ₽ + 8 тыс. ₽/мес.</small></button></div><div class="insight" id="decision-insight" aria-live="polite"></div></section>
+<details class="more-details"><summary>Сравнение и подробные расчёты <span>＋</span></summary><div class="bottom-grid">
+<section class="panel uncertainty"><h2>Диапазон результатов</h2><p>160 учебных траекторий · в сегодняшних рублях</p><div class="range-values"><div><span>10-й перцентиль</span><b id="p10"></b></div><div><span>Медиана</span><b id="p50"></b></div><div><span>90-й перцентиль</span><b id="p90"></b></div></div><div class="uncertainty-line"><span></span></div><p id="probability"></p></section>
+<section id="compare" class="panel compare"><h2>Сохранённые варианты</h2><div id="saved-list"></div><button class="dark-button" id="save-bottom">Сохранить вариант <span>+</span></button><span class="small-note" id="storage-status" role="status"></span></section></div>
+<details class="year-details"><summary>Таблица по годам <span>＋</span></summary><div class="table-scroll"><table><thead><tr><th>Год</th><th>Доход</th><th>Расходы</th><th>Доход на капитал</th><th>Капитал</th><th>В сегодняшних ₽</th></tr></thead><tbody id="year-table"></tbody></table></div></details><div class="detail-actions"><button class="text-button" id="export">Скачать CSV ↗</button><button class="text-button" id="reset">Сбросить параметры</button></div></details>
+<footer><p>Учебная модель, а не прогноз.</p><button class="text-button" id="method-button">Как считается</button></footer>
+</main>
+<dialog id="editor" aria-labelledby="editor-title"><form id="settings-form"><div class="dialog-header"><div><span class="editor-kicker">ТВОЙ ПЛАН</span><h2 id="editor-title">Всё начинается с бюджета.</h2></div><button type="button" class="close" data-close="editor" aria-label="Закрыть">×</button></div>
+<div class="budget-editor-grid"><fieldset id="income-fields" class="income-group"><legend>Доходы и накопления</legend><label class="money-field featured-field"><span>Доход в месяц</span><span class="input-wrap"><input aria-label="Доход в месяц" name="salary" type="number" min="0" max="10000000" step="1" required><span>₽</span></span></label><label class="money-field "><span>Уже накоплено</span><span class="input-wrap"><input aria-label="Уже накоплено" name="initial" type="number" min="0" max="1000000000" step="1" required><span>₽</span></span></label><p class="field-note">Доход после налогов</p></fieldset>
+<fieldset id="expenses-fields" class="expenses-group"><legend>Расходы в месяц</legend><label class="money-field "><span>Жильё и коммунальные</span><span class="input-wrap"><input aria-label="Жильё и коммунальные" name="housing" type="number" min="0" max="10000000" step="1" required><span>₽</span></span></label><label class="money-field "><span>Еда, транспорт и быт</span><span class="input-wrap"><input aria-label="Еда, транспорт и быт" name="living" type="number" min="0" max="10000000" step="1" required><span>₽</span></span></label><label class="money-field "><span>Досуг и покупки</span><span class="input-wrap"><input aria-label="Досуг и покупки" name="leisure" type="number" min="0" max="10000000" step="1" required><span>₽</span></span></label><label class="money-field"><span>Нерегулярные расходы за год</span><span class="input-wrap"><input aria-label="Нерегулярные расходы за год" name="annual" type="number" min="0" max="120000000" step="1" required><span>₽</span></span></label><p class="field-note">Общая сумма без списка. В бюджет попадёт одна двенадцатая суммы.</p><div class="annual-items"><p>Отдельные годовые платежи <span>(необязательно)</span></p><div id="annual-items-list"></div><button type="button" class="text-button" id="add-annual-item">+ Добавить платёж</button><p class="field-note">Эти платежи добавляются к общей сумме выше.</p></div><label class="money-field"><span>Разовая трата в начале плана</span><span class="input-wrap"><input aria-label="Разовая трата в начале плана" name="oneTime" type="number" min="0" max="1000000000" step="1" required><span>₽</span></span></label><p class="field-note">Сумма списывается один раз в первом месяце прогноза.</p></fieldset></div>
 
-<script src="engine.js"></script>
-<script>
-(function(){
-  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var fmt = function(n, d){ return n.toLocaleString('ru-RU', {minimumFractionDigits:d, maximumFractionDigits:d}); };
-
-  /* Примеры и график используют ту же модель, что и симулятор. */
-  var model = window.Mathical, base = model ? model.simulate(model.defaults) : null;
-  var heights = [8, 22, 40, 62, 82, 100];
-  if (base) {
-    var baseline = base.final.real;
-    var values = [0,3,6,9,12,15].map(function(year){return Math.max(0,base.rows[year].real);});
-    var max = Math.max.apply(null, values) || 1;
-    heights = values.map(function(v){return Math.max(1, v/max*100);});
-    document.querySelector('.hero-card [data-count]').dataset.count = baseline;
-    var choices = ['save','education','car'];
-    document.querySelectorAll('.decision [data-count]').forEach(function(el,i){
-      el.dataset.count = Math.abs(model.simulate(Object.assign({},model.defaults,{decision:choices[i]})).final.real-baseline)/1000000;
-    });
-    document.querySelector('.decision .delta:not(.plus):not(.minus)').textContent = fmt(baseline/1000000,2)+' млн';
-    var scenarios=['stress','base','optimistic'].map(function(k){return model.simulate(model.defaults,k).final.real;});
-    var scale=Math.max.apply(null,scenarios) || 1;
-    document.querySelectorAll('.scen .row').forEach(function(row,i){row.querySelector('.val').textContent=fmt(scenarios[i]/1000000,1)+' млн';row.querySelector('[data-w]').dataset.w=Math.max(0,scenarios[i]/scale*100);});
-  }
-  /* Столбики растут по очереди. */
-  var bars = document.getElementById('bars');
-  heights.forEach(function(){ var b = document.createElement('div'); b.className = 'bar'; b.innerHTML = '<i></i>'; bars.appendChild(b); });
-  function growBars(){ bars.querySelectorAll('i').forEach(function(el, i){ setTimeout(function(){ el.style.height = heights[i] + '%'; }, 700 + i * 140); }); }
-
-  /* счётчики: цифры растут на глазах */
-  function count(el){
-    var to = parseFloat(el.dataset.count), d = parseInt(el.dataset.dec || '0', 10);
-    if (reduce) { el.textContent = fmt(to, d); return; }
-    var t0 = null, dur = 1800;
-    function tick(t){ if (!t0) t0 = t; var p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3);
-      el.textContent = fmt(to * e, d); if (p < 1) requestAnimationFrame(tick); else el.textContent = fmt(to, d); }
-    requestAnimationFrame(tick);
-  }
-
-  var heroCount = document.querySelector('.hero-card [data-count]');
-  setTimeout(function(){ count(heroCount); growBars(); }, reduce ? 0 : 500);
-  
-
-  /* плавное появление блоков при прокрутке */
-  if (!('IntersectionObserver' in window)) {
-    document.querySelectorAll('.reveal [data-count]').forEach(count);
-    document.querySelectorAll('[data-w]').forEach(function(b){b.style.width=b.dataset.w+'%';});
-    return;
-  }
-  document.documentElement.classList.add('js');
-  var io = new IntersectionObserver(function(entries){
-    entries.forEach(function(en){
-      if (!en.isIntersecting) return;
-      var el = en.target; el.classList.add('show'); io.unobserve(el);
-      el.querySelectorAll('[data-count]').forEach(count);
-      el.querySelectorAll('[data-w]').forEach(function(b, i){ setTimeout(function(){ b.style.width = b.dataset.w + '%'; }, i * 200); });
-    });
-  }, {threshold: .2});
-  document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
-})();
-</script>
-</body>
-</html>
+<fieldset id="goals-fields" class="goal-fields"><legend>На что копим</legend><label class="money-field goal-name"><span>Название цели</span><input aria-label="Название цели" name="goalName" maxlength="80" required></label><label class="money-field "><span>Стоимость сегодня</span><span class="input-wrap"><input aria-label="Стоимость сегодня" name="goal" type="number" min="1" max="1000000000" step="1" required><span>₽</span></span></label></fieldset>
+<details class="advanced-settings"><summary>Инфляция и рост доходов <span>＋</span></summary><div class="rates-grid"><label class="money-field"><span>Инфляция в год</span><span class="input-wrap"><input aria-label="Инфляция в год" name="inflation" type="number" min="0" max="30" step="0.1" required><span>%</span></span></label><label class="money-field"><span>Рост дохода в год</span><span class="input-wrap"><input aria-label="Рост дохода в год" name="growth" type="number" min="-20" max="30" step="0.1" required><span>%</span></span></label><label class="money-field"><span>Доходность накоплений</span><span class="input-wrap"><input aria-label="Доходность накоплений" name="rate" type="number" min="-20" max="30" step="0.1" required><span>%</span></span></label></div></details>
+<div class="dialog-footer"><span id="editor-balance" aria-live="polite"></span><button class="apply-button" type="submit">Применить <span>↗</span></button></div></form></dialog>
+<dialog id="method"><div class="dialog-header"><div><span class="eyebrow">ПОНЯТНАЯ МАТЕМАТИКА</span><h2>Как устроен mathical</h2></div><button class="close" data-close="method" aria-label="Закрыть">×</button></div><div class="method-content"><p>Это финансовый симулятор жизненных решений для школьников и начинающих. Он помогает увидеть связь между сегодняшним бюджетом и долгосрочными целями.</p><h3>От месяца к месяцу</h3><p>Капитал = предыдущий капитал + доход на положительный остаток + зарплата − расходы. Годовая доходность переводится в месячную по формуле (1 + ставка)^(1/12) − 1. В конце года зарплата индексируется на заданный процент.</p><p>Регулярные расходы и годовые платежи, распределённые равномерно по месяцам, растут вместе с инфляцией. Разовая трата списывается в первом месяце один раз. Стоимость цели также растёт с инфляцией. «Сегодняшние рубли» — капитал, разделённый на накопленный индекс цен. Отрицательный капитал означает дефицит финансирования; проценты по кредиту не моделируются. Доходность задаётся после предполагаемых налогов и комиссий.</p><h3>Три варианта будущего</h3><p>Базовый использует твои параметры. Благоприятный: инфляция ниже на 1,5 п. п. (не ниже нуля), рост зарплаты выше на 1 п. п., доходность выше на 2 п. п. Стрессовый: инфляция выше на 2 п. п., рост зарплаты ниже на 1 п. п., доходность ниже на 3 п. п. и три месяца без зарплаты в начале четвёртого года.</p><h3>Неопределённость</h3><p>В каждом из 160 прогонов ежегодные отклонения равномерны: инфляция ±2 п. п. (не ниже нуля), рост зарплаты ±1 п. п., доходность ±6 п. п. Вероятность двухмесячного перерыва в доходах — 8% в каждом году. Это условные учебные допущения, не оценка рынка. Случайная последовательность фиксирована для честного сравнения решений.</p><p>10-й и 90-й перцентили ограничивают центральные 80% полученных результатов. Доля достижения цели относится к концу выбранного срока и только к этой модели; она не является гарантией или реальной вероятностью.</p><h3>Жизненные решения</h3><p>Экономия уменьшает все регулярные расходы на 10%. Обучение оплачивается в начале второго года, повышение зарплаты на 15% действует с третьего. Автомобиль покупается в начале третьего года, затем требует 8 тыс. ₽ в месяц в исходных ценах; стоимость автомобиля как актива не учитывается. Цель — порог накоплений, покупка автоматически не совершается.</p><h3>Границы модели</h3><p>Не учитываются пенсия, ипотека, отдельные налоги, стоимость имущества и взаимосвязь рыночных показателей. Настройки и сохранённые варианты остаются в этом браузере, если он разрешает локальное хранение.</p><h3>О проекте и аналогах</h3><p>Инновационность проекта — в сочетании понятных жизненных решений, объяснения их последствий и наглядного сравнения для учебной аудитории. Финансовые симуляторы уже существуют; отсутствие аналогов не заявляется.</p><p><a href="https://fincult.info/" target="_blank" rel="noopener">Финансовая культура Банка России</a> · <a href="https://projectionlab.com/" target="_blank" rel="noopener">Пример аналога: ProjectionLab</a></p></div></dialog>
+<div class="toast" id="toast" role="status"></div><script src="engine.js"></script><script src="app.js"></script></body></html>
