@@ -84,3 +84,28 @@ legend{font-size:16px;color:#c4ceb5}
 .wordmark span{display:inline-block;animation:mathical-mark 18s linear infinite}
 .chart rect[fill="#ffb647"]{transform-box:fill-box;transform-origin:center bottom;animation:mathical-bar .8s cubic-bezier(.2,.8,.2,1) both}
 @media(prefers-reduced-motion:reduce){.heading,.strategy-row,.dashboard-grid,.health-section,.decisions-section,.wordmark span,.chart rect[fill="#ffb647"]{animation:none!important}}
+
+/* Визуальные акценты по мотивам лендинга. Геометрия блоков не меняется. */
+.heading{position:relative;isolation:isolate}
+.heading::before{content:"";position:absolute;z-index:-1;pointer-events:none;left:25%;top:-100px;width:min(560px,80vw);height:270px;background:radial-gradient(ellipse,#6150ee40 0%,transparent 70%);filter:blur(18px)}
+.heading h1{font-weight:600}
+.heading h1 span{text-shadow:0 0 35px #ed7bdb35}
+.wordmark{text-shadow:0 0 26px #ed7bdb32}
+.budget-entry,.horizon{background-image:linear-gradient(125deg,#776af342 0%,transparent 65%);box-shadow:0 14px 36px #6150ee1f}
+.panel{box-shadow:0 14px 40px #0000001c;transition:box-shadow .25s ease}
+.panel:hover{box-shadow:0 18px 46px #0000003b}
+.goal-card{background-image:linear-gradient(135deg,#ffffff1a,transparent 60%)}
+.goal-symbol{text-shadow:0 0 25px #7d246d25}
+.goal-progress>div{box-shadow:0 0 12px #20241940}
+.chart rect[fill="#ffb647"]{filter:drop-shadow(0 5px 8px #ffb64738)}
+.decision{box-shadow:0 10px 25px #0000001a}
+.decision:hover{box-shadow:0 0 0 1px #def24930,0 12px 30px #00000035}
+.decision.active{box-shadow:0 0 20px #def2491c}
+.dark-button,.apply-button{transition:background .2s,box-shadow .2s}
+.dark-button:hover,.apply-button:hover{box-shadow:0 8px 24px #00000030}
+@keyframes mathical-appear{from{opacity:.45;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.strategy-row{animation-delay:.08s}
+.dashboard-grid{animation-delay:.16s}
+.health-section{animation-delay:.22s}
+.decisions-section{animation-delay:.27s}
+@media(prefers-reduced-motion:reduce){.panel,.decision,.dark-button,.apply-button{transition:none!important}}
