@@ -51,7 +51,7 @@
     showCapital(mode==='real'?result.final.real:result.final.balance);text('capital-subtitle',`${outcomes[scenario]} сценарий · конец ${startYear+params.years} года`);text('chart-unit',mode==='real'?'Покупательная способность':'Номинальные суммы');$('#capital-chart').innerHTML=makeChart(result.rows,{years:params.years,mode,startYear});
     const share=n=>pct(n/Math.max(params.salary,spent,1)*100);
     $('#allocation').classList.toggle('has-loan',loan.principal>0);
-    $('#allocation').innerHTML=`<div class="tile tile-saving"><b>${money(Math.max(0,free))}</b><span>остаётся на накопления · ${share(Math.max(0,free))}</span></div><div class="tile tile-housing"><b>${share(params.housing*factor)}</b><span>жильё</span></div><div class="tile-other${loan.principal>0?' with-loan':''}"><div class="tile tile-living"><b>${share((params.living+annualTotal/12)*factor)}</b><span>еда, быт и годовые траты</span></div><div class="tile tile-leisure"><b>${share(params.leisure*factor)}</b><span>досуг</span></div>${loan.principal>0?`<div class="tile tile-loan"><b>${share(loan.payment)}</b><span>кредит</span></div>`:''}</div></div>`;
+    $('#allocation').innerHTML=`<div class="tile tile-saving"><b>${money(Math.max(0,free))}</b><span>остаётся на накопления · ${share(Math.max(0,free))}</span></div><div class="tile tile-housing"><b>${share(params.housing*factor)}</b><span>жильё</span></div><div class="tile-other${loan.principal>0?' with-loan':''}"><div class="tile tile-living"><b>${share((params.living+annualTotal/12)*factor)}</b><span>еда, быт и годовые траты</span></div><div class="tile tile-leisure"><b>${share(params.leisure*factor)}</b><span>досуг</span></div>${loan.principal>0?`<div class="tile tile-loan"><b>${share(loan.payment)}</b><span>кредит</span></div>`:''}</div>`;
     text('budget-note',free<0?`Дефицит: ${money(-free,false)}/мес. Расходы превышают доход; проценты показаны от расходов.`:`В расходах учтена 1/12 годовых платежей${params.oneTime ? ' · разовая трата '+money(params.oneTime,false)+' учтена в первый месяц прогноза' : ''}. Размеры блоков условные.`);
     $('#loan-empty').hidden=loan.principal>0;
     $('#loan-metrics').hidden=loan.principal<=0;
@@ -60,7 +60,7 @@
     text('goal-title',params.goalName);text('goal-amount',`${money(params.goal,false)} в сегодняшних ценах`);
     const goal=M.goalPlan(params), monthly=Math.max(0,Math.ceil(goal.monthly-1e-7));
     text('goal-monthly',money(monthly,false)+'/мес.');
-    const comparison=monthly===0?'К сроку достаточно начальных накоплений.':free<0?'Сейчас расходы превышают доход.':monthly>free?'Не хватает '+money(Math.ceil(monthly-free),false)+'/мес. к текущему остатку.':'Текущего остатка хватает на этот взнос.';
+    const comparison=monthly===0?'К сроку достаточно начальных накоплений.':free<0?'Сейчас расходы превышают доход.':monthly>free?'Не хватает '+money(Math.ceil(monthly-free),false)+'/мес. к остатку на старте плана.':'Остатка на старте плана хватает на этот взнос.';
     text('goal-compare',`Срок: ${yearsLabel(params.goalYears)}. ${comparison}`);
     const progress=Math.max(0,Math.min(100,result.final.real/params.goal*100));$('#goal-progress').style.width=progress+'%';
     text('goal-result',result.reached!==null?result.reached===0?'Цель доступна уже сейчас':`Впервые доступна в ${startYear+result.reached}`:`${Math.round(progress)}% цели к ${startYear+params.years}`);
