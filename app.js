@@ -123,7 +123,7 @@
   $('#reset').onclick=()=>{params={...M.defaults};mode='real';scenario='base';$('#scenario').value='base';render();toast('Начальные параметры восстановлены');};
   $('#share-image').onclick=()=>{
     const canvas=document.createElement('canvas');canvas.width=1200;canvas.height=630;const ctx=canvas.getContext('2d');
-    ctx.fillStyle='#141610';ctx.fillRect(0,0,1200,630);ctx.fillStyle='#ed7bdb';ctx.font='700 48px Onest, sans-serif';ctx.fillText('mathical ✳',70,90);
+    ctx.fillStyle='#141610';ctx.fillRect(0,0,1200,630);ctx.fillStyle='#ed7bdb';ctx.font='700 48px Onest, sans-serif';ctx.fillText('mathical',70,90);ctx.save();ctx.translate(285,72);ctx.strokeStyle='#ed7bdb';ctx.lineWidth=3;ctx.lineCap='round';for(let i=0;i<4;i++){ctx.rotate(Math.PI/4);ctx.beginPath();ctx.moveTo(-14,0);ctx.lineTo(14,0);ctx.stroke();}ctx.restore();
     ctx.fillStyle='#fff6c5';ctx.font='500 35px Onest, sans-serif';ctx.fillText('Мой финансовый план',70,190);
     ctx.font='500 30px Onest, sans-serif';ctx.fillText(`Через ${yearsLabel(params.years)} мой капитал`,70,280);
     ctx.fillStyle='#def249';ctx.font='700 84px Onest, sans-serif';ctx.fillText(money(mode==='real'?result.final.real:result.final.balance),70,385,1060);
