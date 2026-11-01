@@ -8,6 +8,12 @@
   try { const data=JSON.parse(localStorage.getItem('mathical-v1') || 'null'); if(data && typeof data==='object') { params=M.normalize(data.params); saved=Array.isArray(data.saved)?data.saved.slice(0,3).filter(x=>x && x.params).map(x=>({...x,params:M.normalize(x.params),scenario:['base','optimistic','stress'].includes(x.scenario)?x.scenario:'base'})):[]; } } catch {storageOK=false;}
   function persist(){try{localStorage.setItem('mathical-v1',JSON.stringify({params,saved}));storageOK=true;}catch{storageOK=false;} $('#storage-status').textContent=storageOK?'':'Браузер запретил хранение. Скачать расчёт можно в CSV.';}
   const {money,yearsLabel,pct}=globalThis.MathicalFormat;
+  const themeButton=$('#theme-toggle');
+  let themePreference=null;try{themePreference=localStorage.getItem('mathical-theme');}catch{}
+  const themeMedia=window.matchMedia('(prefers-color-scheme: light)');
+  function applyTheme(){const light=themePreference?themePreference==='light':themeMedia.matches;document.body.classList.toggle('theme-light',light);themeButton.textContent=light?'Тёмная тема':'Светлая тема';}
+  themeButton.onclick=()=>{themePreference=document.body.classList.contains('theme-light')?'dark':'light';try{localStorage.setItem('mathical-theme',themePreference);}catch{} applyTheme();};
+  themeMedia.addEventListener('change',()=>{if(!themePreference)applyTheme();});applyTheme();
   const makeChart=globalThis.MathicalChart;
   function text(id,value){$('#'+id).textContent=value;}
   let firstCapitalRender = true, capitalFrame = 0;
@@ -51,7 +57,7 @@
     text('health-note',healthNote+(params.oneTime>0?' Разовая трата вычтена из накоплений.':''));
     text('future-year',startYear+params.years+' ↗');
     text('income-metric',money(params.salary));text('expense-metric',money(spent));
-    showCapital(mode==='real'?result.final.real:result.final.balance);text('capital-subtitle',`${outcomes[scenario]} сценарий · конец ${startYear+params.years} года`);text('chart-unit',mode==='real'?'Покупательная способность':'Номинальные суммы');$('#capital-chart').innerHTML=makeChart(result.rows,{years:params.years,mode,startYear,bands:uncertain.bands,goal:params.goal}); const chartYear=$('#chart-year');chartYear.max=params.years;chartYear.value=params.years;updateChartYear();
+    showCapital(mode==='real'?result.final.real:result.final.balance);text('capital-subtitle',`${outcomes[scenario]} сценарий · конец ${startYear+params.years} года`);text('chart-unit',mode==='real'?'Покупательная способность':'Номинальные суммы');$('#capital-chart').innerHTML=makeChart(result.rows,{years:params.years,mode,startYear,bands:uncertain.bands,goal:params.goal,showBand:scenario==='base'}); $('#chart-band-legend').hidden=scenario!=='base';text('chart-goal-note',$('#capital-chart svg').dataset.goalStatus); const chartYear=$('#chart-year');chartYear.max=params.years;chartYear.value=params.years;updateChartYear();
     const share=n=>pct(n/Math.max(params.salary,spent,1)*100);
     const categories=[['Накопления',Math.max(0,free),'saving'],['Жильё',params.housing*factor,'housing'],['Еда и быт',(params.living+annualTotal/12)*factor,'living'],['Досуг',params.leisure*factor,'leisure'],...(loan.principal>0?[['Кредит',loan.payment,'loan']]:[])];
     const total=categories.reduce((sum,x)=>sum+x[1],0);
@@ -115,6 +121,16 @@
   function save(){if(saved.length>=3){toast('Можно сохранить три варианта. Удали один, чтобы добавить новый.');return;}saved.push({params:{...params},scenario});renderSaved();persist();toast('Вариант добавлен к сравнению');}
   $('#save-bottom').onclick=save;
   $('#reset').onclick=()=>{params={...M.defaults};mode='real';scenario='base';$('#scenario').value='base';render();toast('Начальные параметры восстановлены');};
+  $('#share-image').onclick=()=>{
+    const canvas=document.createElement('canvas');canvas.width=1200;canvas.height=630;const ctx=canvas.getContext('2d');
+    ctx.fillStyle='#141610';ctx.fillRect(0,0,1200,630);ctx.fillStyle='#ed7bdb';ctx.font='700 48px Onest, sans-serif';ctx.fillText('mathical ✳',70,90);
+    ctx.fillStyle='#fff6c5';ctx.font='500 35px Onest, sans-serif';ctx.fillText('Мой финансовый план',70,190);
+    ctx.font='500 30px Onest, sans-serif';ctx.fillText(`Через ${yearsLabel(params.years)} мой капитал`,70,280);
+    ctx.fillStyle='#def249';ctx.font='700 84px Onest, sans-serif';ctx.fillText(money(mode==='real'?result.final.real:result.final.balance),70,385,1060);
+    ctx.fillStyle='#d7dccc';ctx.font='400 27px Onest, sans-serif';ctx.fillText((mode==='real'?'В сегодняшних рублях':'В будущих рублях')+' · '+outcomes[scenario]+' сценарий',70,450,1060);
+    ctx.font='400 23px Onest, sans-serif';ctx.fillText('Учебная модель, а не финансовый прогноз',70,550);
+    canvas.toBlob(blob=>{if(!blob){toast('Не удалось создать изображение');return;}const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='mathical-plan.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('Картинка подготовлена для скачивания');},'image/png');
+  };
   $('#export').onclick=()=>{const quote=s=>'"'+String(s).replaceAll('"','""')+'"';const rows=[['Mathical — учебный расчёт'],['Сценарий',outcomes[scenario]],['Решение',decisions[params.decision]],['Цель',params.goalName,params.goal],['Начальный год',startYear],...Object.entries(params).filter(([k])=>typeof params[k]==='number'),['Год','Доход','Расход','Доход на капитал','Капитал номинальный','Капитал в сегодняшних рублях','Цена цели','Событие'],...result.rows.map(r=>[startYear+r.year,...[r.income,r.expenses,r.interest,r.balance,r.real,r.goal].map(n=>Math.round(n)),r.event])];const blob=new Blob(['\uFEFF'+rows.map(r=>r.map(quote).join(';')).join('\r\n')],{type:'text/csv;charset=utf-8;'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`mathical-${startYear}-${startYear+params.years}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('Расчёт подготовлен для скачивания');};
   render();
 })();
