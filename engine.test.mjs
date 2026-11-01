@@ -30,6 +30,7 @@ test('Старые сохранённые параметры получают н
   const p=normalize(plain);
   assert.equal(p.annual,0);
   assert.equal(p.oneTime,0);
+  assert.equal(p.essentialOther,0);
 });
 
 test('Именованные годовые платежи прибавляются к общей сумме',()=>{
@@ -39,3 +40,20 @@ test('Именованные годовые платежи прибавляют�
 });
 
 test('Горизонт ограничивается диапазоном от 1 до 50 лет',()=>{assert.equal(normalize({years:0}).years,1);assert.equal(normalize({years:51}).years,50);assert.equal(normalize({years:7}).years,7);});
+
+
+test('Запас учитывает жильё и необходимую часть уже введённых расходов',()=>{
+  const p={...plain,initial:200000,oneTime:0,essentialOther:15000};
+  const h=globalThis.Mathical.financialHealth(p);
+  assert.equal(h.essential,40000);
+  assert.equal(h.reserveMonths,5);
+  assert.equal(simulate(p).final.balance,simulate({...p,essentialOther:0}).final.balance);
+});
+test('Запас не делится на ноль и классификация не превышает расходы',()=>{
+  const m=globalThis.Mathical;
+  assert.equal(m.financialHealth({...plain,housing:0,living:0,leisure:0,annual:0,essentialOther:0}).reserveMonths,null);
+  assert.equal(m.normalize({...plain,essentialOther:999999}).essentialOther,25000);
+  const h=m.financialHealth({...plain,initial:200000,oneTime:20000,essentialOther:15000,decision:'save'});
+  assert.equal(h.essential,36000);
+  assert.equal(h.reserveMonths,5);
+});

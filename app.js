@@ -40,8 +40,11 @@
     const expense=params.housing+params.living+params.leisure+annualTotal/12, factor=params.decision==='save'?.9:1, spent=expense*factor, free=params.salary-spent;
     text('health-free',money(free,false)+'/мес.');
     text('health-rate',params.salary <= 0 ? 'Нет дохода' : free < 0 ? 'Нет сбережений' : pct(free/params.salary*100));
-    const reserve=Math.max(0,params.initial-params.oneTime);
-    text('health-reserve',params.housing > 0 ? new Intl.NumberFormat('ru-RU',{maximumFractionDigits:1}).format(reserve/(params.housing*factor))+' мес.' : 'Укажи расходы на жильё');
+    const health=M.financialHealth(params);
+    text('health-essential',money(health.essential,false)+'/мес.');
+    text('health-reserve',health.reserveMonths === null ? 'Укажи расходы' : new Intl.NumberFormat('ru-RU',{maximumFractionDigits:1}).format(health.reserveMonths)+' мес.');
+    const healthNote=params.essentialOther > 0 ? 'На старте плана: жильё и указанная часть остальных расходов. Без будущих доходов и инфляции.' : params.housing > 0 ? 'Сейчас учтено только жильё. Другие обязательные расходы можно указать в бюджете.' : 'Укажи обязательные расходы в бюджете, чтобы рассчитать запас.';
+    text('health-note',healthNote+(params.oneTime>0?' Разовая трата вычтена из накоплений.':''));
     text('future-year',startYear+params.years+' ↗');
     text('income-metric',money(params.salary));text('expense-metric',money(spent));
     showCapital(mode==='real'?result.final.real:result.final.balance);text('capital-subtitle',`${outcomes[scenario]} сценарий · конец ${startYear+params.years} года`);text('chart-unit',mode==='real'?'Покупательная способность':'Номинальные суммы');$('#capital-chart').innerHTML=makeChart(result.rows,{years:params.years,mode,startYear});
@@ -67,10 +70,22 @@
   function readAnnualItems(){return [...document.querySelectorAll('.annual-item')].map(row=>({name:row.querySelector('.annual-name').value.trim(),amount:Number(row.querySelector('.annual-amount').value)||0})).filter(x=>x.name || x.amount);}
   function addAnnualItem(item={name:'',amount:0}){const row=document.createElement('div');row.className='annual-item';const name=document.createElement('input');name.className='annual-name';name.placeholder='Название платежа';name.setAttribute('aria-label','Название годового платежа');name.maxLength=80;name.value=item.name;const amount=document.createElement('input');amount.className='annual-amount';amount.type='number';amount.min='0';amount.max='120000000';amount.step='1';amount.required=true;amount.setAttribute('aria-label','Сумма годового платежа');amount.value=item.amount;const remove=document.createElement('button');remove.type='button';remove.textContent='Удалить';remove.onclick=()=>{row.remove();editorBalance();};row.append(name,amount,remove);$('#annual-items-list').append(row);}
   $('#add-annual-item').onclick=()=>{if(document.querySelectorAll('.annual-item').length<50)addAnnualItem();};
-  function editorBalance(){const f=$('#settings-form').elements;const free=Number(f.salary.value)-Number(f.housing.value)-Number(f.living.value)-Number(f.leisure.value)-(Number(f.annual.value)+readAnnualItems().reduce((sum,x)=>sum+x.amount,0))/12;text('editor-balance',(free>=0?'Остаётся ':'Не хватает ')+money(Math.abs(free),false)+'/мес.');}
+  function editorBalance(){
+    const f=$('#settings-form').elements;
+    const annual=Number(f.annual.value)+readAnnualItems().reduce((sum,x)=>sum+x.amount,0);
+    const other=Number(f.living.value)+Number(f.leisure.value)+annual/12;
+    const essential=f.essentialOther;
+    const error=Number(essential.value)>other+1e-7 ? 'Сумма не может превышать остальные расходы в месяц: '+money(other,false)+'.' : '';
+    essential.setCustomValidity(error);
+    essential.setAttribute('aria-invalid',String(Boolean(error)));
+    $('#essential-error').textContent=error;
+    $('#essential-error').hidden=!error;
+    const free=Number(f.salary.value)-Number(f.housing.value)-other;
+    text('editor-balance',(free>=0?'Остаётся ':'Не хватает ')+money(Math.abs(free),false)+'/мес.');
+  }
   function editor(section){const form=$('#settings-form');for(const [key,val] of Object.entries(params)){const field=form.elements.namedItem(key);if(field)field.value=val;}$('#annual-items-list').replaceChildren();params.annualItems.forEach(addAnnualItem);$('.advanced-settings').open=false;editorBalance();$('#editor').showModal();$('#editor').scrollTop=0;if(section==='goals'){$('#goals-fields').scrollIntoView({block:'nearest'});form.elements.goalName.focus({preventScroll:true});}else{form.elements.salary.focus({preventScroll:true});}}
   $('#settings-form').addEventListener('input',editorBalance);
-  $('#settings-form').addEventListener('invalid',e=>{const parent=e.target.closest('details');if(parent)parent.open=true;},true);
+  $('#settings-form').addEventListener('invalid',e=>{const parent=e.target.closest('details');if(parent)parent.open=true;e.target.scrollIntoView({block:'center'});},true);
   document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>editor(b.dataset.edit));
   document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>$('#'+b.dataset.close).close());
   document.querySelectorAll('[data-years]').forEach(b=>b.onclick=()=>{params.years=Number(b.dataset.years);render();});
