@@ -37,26 +37,36 @@
     params=M.normalize(params);result=M.simulate(params,scenario);
     const baseline=M.simulate({...params,decision:'none'},scenario),uncertain=M.distribution(params);
     const annualTotal=params.annual+params.annualItems.reduce((sum,x)=>sum+x.amount,0);
-    const expense=params.housing+params.living+params.leisure+annualTotal/12, factor=params.decision==='save'?.9:1, spent=expense*factor, free=params.salary-spent;
+    const loan=M.loanTerms(params);
+    const expense=params.housing+params.living+params.leisure+annualTotal/12, factor=params.decision==='save'?.9:1, spent=expense*factor+loan.payment, free=params.salary-spent;
     text('health-free',money(free,false)+'/мес.');
     text('health-rate',params.salary <= 0 ? 'Нет дохода' : free < 0 ? 'Нет сбережений' : pct(free/params.salary*100));
     const health=M.financialHealth(params);
     text('health-essential',money(health.essential,false)+'/мес.');
     text('health-reserve',health.reserveMonths === null ? 'Укажи расходы' : new Intl.NumberFormat('ru-RU',{maximumFractionDigits:1}).format(health.reserveMonths)+' мес.');
-    const healthNote=params.essentialOther > 0 ? 'На старте плана: жильё и указанная часть остальных расходов. Без будущих доходов и инфляции.' : params.housing > 0 ? 'Сейчас учтено только жильё. Другие обязательные расходы можно указать в бюджете.' : 'Укажи обязательные расходы в бюджете, чтобы рассчитать запас.';
+    const healthNote=params.essentialOther > 0 ? 'На старте плана: жильё, указанная часть остальных расходов'+(loan.principal>0?' и кредит':'')+'. Без будущих доходов и инфляции.' : (params.housing>0 || loan.principal>0) ? 'В расчёте: '+(params.housing>0?'жильё':'')+(params.housing>0 && loan.principal>0?' и ':'')+(loan.principal>0?'кредит':'')+'. Другие обязательные расходы можно указать в бюджете.' : 'Укажи обязательные расходы в бюджете, чтобы рассчитать запас.';
     text('health-note',healthNote+(params.oneTime>0?' Разовая трата вычтена из накоплений.':''));
     text('future-year',startYear+params.years+' ↗');
     text('income-metric',money(params.salary));text('expense-metric',money(spent));
     showCapital(mode==='real'?result.final.real:result.final.balance);text('capital-subtitle',`${outcomes[scenario]} сценарий · конец ${startYear+params.years} года`);text('chart-unit',mode==='real'?'Покупательная способность':'Номинальные суммы');$('#capital-chart').innerHTML=makeChart(result.rows,{years:params.years,mode,startYear});
     const share=n=>pct(n/Math.max(params.salary,spent,1)*100);
-    $('#allocation').innerHTML=`<div class="tile tile-saving"><b>${money(Math.max(0,free))}</b><span>остаётся на накопления · ${share(Math.max(0,free))}</span></div><div class="tile tile-housing"><b>${share(params.housing*factor)}</b><span>жильё</span></div><div class="tile-other"><div class="tile tile-living"><b>${share((params.living+annualTotal/12)*factor)}</b><span>еда, быт и годовые траты</span></div><div class="tile tile-leisure"><b>${share(params.leisure*factor)}</b><span>досуг</span></div></div>`;
+    $('#allocation').classList.toggle('has-loan',loan.principal>0);
+    $('#allocation').innerHTML=`<div class="tile tile-saving"><b>${money(Math.max(0,free))}</b><span>остаётся на накопления · ${share(Math.max(0,free))}</span></div><div class="tile tile-housing"><b>${share(params.housing*factor)}</b><span>жильё</span></div><div class="tile-other${loan.principal>0?' with-loan':''}"><div class="tile tile-living"><b>${share((params.living+annualTotal/12)*factor)}</b><span>еда, быт и годовые траты</span></div><div class="tile tile-leisure"><b>${share(params.leisure*factor)}</b><span>досуг</span></div>${loan.principal>0?`<div class="tile tile-loan"><b>${share(loan.payment)}</b><span>кредит</span></div>`:''}</div></div>`;
     text('budget-note',free<0?`Дефицит: ${money(-free,false)}/мес. Расходы превышают доход; проценты показаны от расходов.`:`В расходах учтена 1/12 годовых платежей${params.oneTime ? ' · разовая трата '+money(params.oneTime,false)+' учтена в первый месяц прогноза' : ''}. Размеры блоков условные.`);
+    $('#loan-empty').hidden=loan.principal>0;
+    $('#loan-metrics').hidden=loan.principal<=0;
+    $('#loan-note').hidden=loan.principal<=0;
+    if(loan.principal>0){text('loan-payment',money(loan.payment,false));text('loan-overpayment',money(loan.overpayment,false));text('loan-ratio',params.salary>0?pct(loan.payment/params.salary*100):'Нет дохода');}
     text('goal-title',params.goalName);text('goal-amount',`${money(params.goal,false)} в сегодняшних ценах`);
+    const goal=M.goalPlan(params), monthly=Math.max(0,Math.ceil(goal.monthly-1e-7));
+    text('goal-monthly',money(monthly,false)+'/мес.');
+    const comparison=monthly===0?'К сроку достаточно начальных накоплений.':free<0?'Сейчас расходы превышают доход.':monthly>free?'Не хватает '+money(Math.ceil(monthly-free),false)+'/мес. к текущему остатку.':'Текущего остатка хватает на этот взнос.';
+    text('goal-compare',`Срок: ${yearsLabel(params.goalYears)}. ${comparison}`);
     const progress=Math.max(0,Math.min(100,result.final.real/params.goal*100));$('#goal-progress').style.width=progress+'%';
     text('goal-result',result.reached!==null?result.reached===0?'Цель доступна уже сейчас':`Впервые доступна в ${startYear+result.reached}`:`${Math.round(progress)}% цели к ${startYear+params.years}`);
     if(result.reached!==null&&result.final.real<params.goal) text('goal-result',`Достигнута ранее, но к концу срока денег не хватает`);
     const delta=result.final.real-baseline.final.real;
-    const desc={none:'',save:'Все регулярные расходы ниже на 10% с первого месяца.',education:'Оплата в начале 2-го года; зарплата выше на 15% с 3-го года. Эффект повышения задан как учебное допущение.',car:'Покупка в начале 3-го года, затем содержание. Цена автомобиля как актива не входит в капитал.'};
+    const desc={none:'',save:'Регулярные расходы ниже на 10%; платёж по кредиту не меняется.',education:'Оплата в начале 2-го года; зарплата выше на 15% с 3-го года. Эффект повышения задан как учебное допущение.',car:'Покупка в начале 3-го года, затем содержание. Цена автомобиля как актива не входит в капитал.'};
     text('decision-insight',`${desc[params.decision]}${params.decision==='none'?'':` Разница через ${yearsLabel(params.years)}: ${delta>=0?'+':''}${money(delta,false)} в сегодняшних рублях.`}`);
     text('p10',money(uncertain.low));text('p50',money(uncertain.median));text('p90',money(uncertain.high));text('probability',`Цель достигнута в ${Math.round(uncertain.success*100)}% учебных прогонов к концу срока. Не гарантия результата.`);
     $('#year-table').innerHTML=result.rows.map(r=>`<tr><td>${startYear+r.year}${r.event?' *':''}</td><td>${money(r.income,false)}</td><td>${money(r.expenses,false)}</td><td>${money(r.interest,false)}</td><td>${money(r.balance,false)}</td><td>${money(r.real,false)}</td></tr>${r.event?`<tr><td colspan="6" style="text-align:left;color:#c0ba95">* ${r.event}</td></tr>`:''}`).join('');
@@ -80,10 +90,11 @@
     essential.setAttribute('aria-invalid',String(Boolean(error)));
     $('#essential-error').textContent=error;
     $('#essential-error').hidden=!error;
-    const free=Number(f.salary.value)-Number(f.housing.value)-other;
+    const loan=M.loanTerms({loanPrincipal:f.loanPrincipal.value,loanRate:f.loanRate.value,loanMonths:f.loanMonths.value});
+    const free=Number(f.salary.value)-Number(f.housing.value)-other-loan.payment;
     text('editor-balance',(free>=0?'Остаётся ':'Не хватает ')+money(Math.abs(free),false)+'/мес.');
   }
-  function editor(section){const form=$('#settings-form');for(const [key,val] of Object.entries(params)){const field=form.elements.namedItem(key);if(field)field.value=val;}$('#annual-items-list').replaceChildren();params.annualItems.forEach(addAnnualItem);$('.advanced-settings').open=false;editorBalance();$('#editor').showModal();$('#editor').scrollTop=0;if(section==='goals'){$('#goals-fields').scrollIntoView({block:'nearest'});form.elements.goalName.focus({preventScroll:true});}else{form.elements.salary.focus({preventScroll:true});}}
+  function editor(section){const form=$('#settings-form');for(const [key,val] of Object.entries(params)){const field=form.elements.namedItem(key);if(field)field.value=val;}$('#annual-items-list').replaceChildren();params.annualItems.forEach(addAnnualItem);document.querySelectorAll('#editor .advanced-settings').forEach(d=>d.open=false);editorBalance();$('#editor').showModal();$('#editor').scrollTop=0;if(section==='goals'){$('#goals-fields').scrollIntoView({block:'nearest'});form.elements.goalName.focus({preventScroll:true});}else if(section==='credit'){$('#credit-settings').open=true;$('#credit-settings').scrollIntoView({block:'center'});form.elements.loanPrincipal.focus({preventScroll:true});}else{form.elements.salary.focus({preventScroll:true});}}
   $('#settings-form').addEventListener('input',editorBalance);
   $('#settings-form').addEventListener('invalid',e=>{const parent=e.target.closest('details');if(parent)parent.open=true;e.target.scrollIntoView({block:'center'});},true);
   document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>editor(b.dataset.edit));

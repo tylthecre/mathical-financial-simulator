@@ -57,3 +57,39 @@ test('Запас не делится на ноль и классификация
   assert.equal(h.essential,36000);
   assert.equal(h.reserveMonths,5);
 });
+
+test('Кредит без процентов: равный платёж и нулевая переплата',()=>{
+  const loan=globalThis.Mathical.loanTerms({loanPrincipal:120000,loanRate:0,loanMonths:12});
+  assert.equal(loan.payment,10000); assert.equal(loan.overpayment,0);
+});
+test('Аннуитетный кредит: платёж и остаток долга',()=>{
+  const loan=globalThis.Mathical.loanTerms({loanPrincipal:100000,loanRate:12,loanMonths:12});
+  assert.ok(Math.abs(loan.payment-8884.8788678)<0.001);
+  assert.ok(Math.abs(loan.overpayment-6618.5464)<0.01);
+});
+test('Кредит списывается только в течение срока и входит в обязательные расходы',()=>{
+  const p={...plain,salary:0,housing:0,living:0,leisure:0,initial:24000,loanPrincipal:12000,loanRate:0,loanMonths:12};
+  const r=simulate(p); assert.equal(r.rows[1].expenses,12000); assert.equal(r.rows[2].expenses,0);
+  assert.equal(globalThis.Mathical.financialHealth(p).essential,1000);
+});
+test('Цель: ежемесячный взнос с инфляцией и без процентов',()=>{
+  const plan=globalThis.Mathical.goalPlan({...plain,initial:0,goal:120000,goalYears:1,inflation:10,rate:0});
+  assert.ok(Math.abs(plan.monthly-11000)<1e-6); assert.equal(plan.months,12);
+});
+test('Цель: учитываются накопления и разовая трата',()=>{
+  const p={...plain,initial:100000,oneTime:20000,goal:140000,goalYears:1,inflation:0,rate:0};
+  assert.ok(Math.abs(globalThis.Mathical.goalPlan(p).monthly-5000)<1e-6);
+  assert.equal(globalThis.Mathical.goalPlan({...p,initial:200000}).monthly,0);
+});
+
+test('Взнос на цель с доходностью и инфляцией приводит к нужной сумме',()=>{
+  const p={...plain,initial:100000,oneTime:0,goal:200000,goalYears:1,inflation:5,rate:12};
+  const plan=globalThis.Mathical.goalPlan(p), r=1.12**(1/12)-1;
+  let balance=100000; for(let i=0;i<12;i++) balance+=Math.max(0,balance)*r+plan.monthly;
+  assert.ok(Math.abs(balance-210000)<0.0001);
+});
+test('Экономия не уменьшает кредитный платёж',()=>{
+  const p={...plain,loanPrincipal:12000,loanRate:0,loanMonths:12};
+  const a=simulate({...p,decision:'none'}), b=simulate({...p,decision:'save'});
+  assert.equal(a.rows[1].expenses-b.rows[1].expenses,60000);
+});

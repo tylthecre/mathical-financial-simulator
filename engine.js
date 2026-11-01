@@ -1,8 +1,8 @@
 /* Mathical — прозрачная учебная модель. Без внешних запросов. */
 (function (root) {
   'use strict';
-  const defaults = { salary: 100000, housing: 25000, living: 20000, leisure: 10000, annual: 0, oneTime: 0, essentialOther: 0, initial: 200000, growth: 6, inflation: 5, rate: 7, years: 15, goal: 3000000, goalName: 'Первый взнос на квартиру', decision: 'none' };
-  const bounds = { salary: [0,10000000], housing: [0,10000000], living: [0,10000000], leisure: [0,10000000], annual: [0,120000000], oneTime: [0,1000000000], essentialOther: [0,1000000000], initial: [0,1000000000], growth: [-20,30], inflation: [0,30], rate: [-20,30], years: [1,50], goal: [1,1000000000] };
+  const defaults = { salary: 100000, housing: 25000, living: 20000, leisure: 10000, annual: 0, oneTime: 0, essentialOther: 0, initial: 200000, growth: 6, inflation: 5, rate: 7, years: 15, goal: 3000000, goalYears: 5, loanPrincipal: 0, loanRate: 0, loanMonths: 12, goalName: 'Первый взнос на квартиру', decision: 'none' };
+  const bounds = { salary: [0,10000000], housing: [0,10000000], living: [0,10000000], leisure: [0,10000000], annual: [0,120000000], oneTime: [0,1000000000], essentialOther: [0,1000000000], initial: [0,1000000000], growth: [-20,30], inflation: [0,30], rate: [-20,30], years: [1,50], goal: [1,1000000000], goalYears: [1,50], loanPrincipal: [0,1000000000], loanRate: [0,100], loanMonths: [1,600] };
   function normalize(input) {
     const p = { ...defaults, ...input };
     delete p.profession; // Drop obsolete presets from previously saved plans.
@@ -11,14 +11,40 @@
     const otherSpending = p.living + p.leisure + (p.annual + p.annualItems.reduce((sum,x)=>sum+x.amount,0)) / 12;
     p.essentialOther = Math.min(p.essentialOther, otherSpending);
     p.years = Math.round(p.years);
+    p.goalYears = Math.round(p.goalYears);
+    p.loanMonths = Math.round(p.loanMonths);
     p.goalName = String(p.goalName || defaults.goalName).slice(0,80);
     if (!['none','save','education','car'].includes(p.decision)) p.decision = 'none';
     return p;
   }
+  // Аннуитет: равный ежемесячный платёж, годовая ставка / 12.
+  function loanTerms(input) {
+    const p = normalize(input), principal = p.loanPrincipal, months = p.loanMonths;
+    const rate = p.loanRate / 1200;
+    const payment = principal === 0 ? 0 : rate === 0 ? principal / months : principal * rate / -Math.expm1(-months * Math.log1p(rate));
+    return {principal, months, payment, total:payment * months, overpayment:Math.max(0,payment * months - principal)};
+  }
+  // Фиксированный номинальный взнос в конце месяца для цели на выбранный срок.
+  function goalPlan(input) {
+    const p = normalize(input), months = p.goalYears * 12;
+    const target = p.goal * Math.pow(1 + p.inflation / 100, p.goalYears);
+    const monthlyRate = Math.pow(1 + p.rate / 100, 1 / 12) - 1;
+    const starting = p.initial - p.oneTime;
+    function projected(contribution) {
+      let balance = starting;
+      for (let i=0; i<months; i++) balance += Math.max(0,balance) * monthlyRate + contribution;
+      return balance;
+    }
+    if (projected(0) >= target) return {monthly:0,target,months};
+    let low=0, high=Math.max(1,target/months);
+    while (projected(high) < target) high *= 2;
+    for (let i=0; i<60; i++) { const mid=(low+high)/2; if(projected(mid)>=target) high=mid; else low=mid; }
+    return {monthly:high,target,months};
+  }
   function financialHealth(input) {
     const p = normalize(input);
     const factor = p.decision === 'save' ? .9 : 1;
-    const essential = (p.housing + p.essentialOther) * factor;
+    const essential = (p.housing + p.essentialOther) * factor + loanTerms(p).payment;
     const available = Math.max(0, p.initial - p.oneTime);
     return {essential, available, reserveMonths: essential > 0 ? available / essential : null};
   }
@@ -26,6 +52,7 @@
   function simulate(input, scenario = 'base', seed = 42) {
     const p = normalize(input), rng = random(seed);
     let balance = p.initial, prices = 1, salary = p.salary, spending = p.housing + p.living + p.leisure + (p.annual + p.annualItems.reduce((sum,x)=>sum+x.amount,0)) / 12;
+    const loan = loanTerms(p);
     const rows = [{year:0,balance,real:balance,prices,goal:p.goal,income:0,expenses:0,interest:0,event:''}];
     let reached = balance >= p.goal ? 0 : null;
     for (let year = 1; year <= p.years; year++) {
@@ -41,6 +68,7 @@
         prices *= monthlyInflation;
         const pay = month <= lost ? 0 : salary * (p.decision === 'education' && year >= 3 ? 1.15 : 1);
         let cost = spending * prices * (p.decision === 'save' ? .9 : 1);
+        if ((year-1)*12+month <= loan.months) cost += loan.payment;
         if (year === 1 && month === 1) cost += p.oneTime;
         if (p.decision === 'education' && year === 2 && month === 1) { cost += 120000*prices; event = 'Обучение: 120 тыс. ₽ в начальных ценах'; }
         if (p.decision === 'car' && year >= 3) { cost += 8000*prices; if (year === 3 && month === 1) { cost += 900000*prices; event = 'Покупка автомобиля'; } }
@@ -60,5 +88,5 @@
     const q = n => values[Math.floor((values.length-1)*n)];
     return {low:q(.1),median:q(.5),high:q(.9),success:runs.filter(r=>r.final.real>=normalize(input).goal).length/count,count};
   }
-  root.Mathical = {defaults,bounds,normalize,financialHealth,simulate,distribution};
+  root.Mathical = {defaults,bounds,normalize,loanTerms,goalPlan,financialHealth,simulate,distribution};
 })(globalThis);

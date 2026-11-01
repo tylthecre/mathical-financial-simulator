@@ -37,7 +37,7 @@ h2{font-size:22px}
 .decision strong{font-size:17px}
 .decision small{font-size:15px;color:#aeb69f}
 .decision[data-decision="none"]::after{content:"Параметры как сейчас"}
-.decision[data-decision="save"]::after{content:"Все расходы −10%"}
+.decision[data-decision="save"]::after{content:"Расходы −10%, кроме кредита"}
 .decision[data-decision="none"]::after,.decision[data-decision="save"]::after{display:block;margin-top:6px;font-size:14px;line-height:1.4;color:#939b85}
 .decision.active small,.decision.active::after{color:#c9db7a}
 .insight{font-size:17px;color:#d3dcc3}
@@ -195,3 +195,37 @@ body{overflow-x:hidden}
 
 #editor .field-error{grid-column:1/-1;margin:0;color:#ffb7bc;font-size:15px;line-height:1.4}
 #editor .field-error[hidden]{display:none}
+
+/* План цели и действующий кредит */
+.goal-plan{margin-top:20px;padding-top:16px;border-top:1px solid #7d246d45}
+.goal-plan span,.goal-plan strong{display:block}
+.goal-plan span{font-size:16px;color:#5e1f51}
+.goal-plan strong{font-size:24px;line-height:1.2;margin-top:6px}
+.goal-plan p{font-size:16px;line-height:1.45;margin:8px 0 0;color:#5e1f51}
+.credit-section{margin-top:28px;padding:24px;border:1px solid #35392e;border-radius:24px;background:#1b1e17;color:#eef1e4}
+.credit-header{display:flex;justify-content:space-between;align-items:center;gap:16px}
+.credit-header p,.credit-section>p{font-size:16px;line-height:1.5;color:#b9c4ad;margin:8px 0 0}
+.credit-edit{flex:none;background:#def249;color:#1d2614;border-radius:25px;padding:12px 18px;min-height:44px;font-size:16px;font-weight:600}
+.credit-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:20px}
+.credit-metrics[hidden],.credit-section>p[hidden]{display:none}
+.credit-metrics>div{background:#252a20;border-radius:14px;padding:16px;min-width:0}
+.credit-metrics span,.credit-metrics strong{display:block}
+.credit-metrics span{font-size:15px;color:#b9c4ad}
+.credit-metrics strong{font-size:21px;margin-top:7px;overflow-wrap:anywhere}
+.credit-section .credit-note{font-size:15px}
+.tile-other.with-loan{grid-template-rows:repeat(3,1fr)}
+.tile-loan{background:#d4ecc5;color:#1d2614}
+#editor .goal-fields{grid-template-columns:1.25fr 1fr .75fr}
+#editor #credit-settings{margin-top:0}
+#editor .credit-form-note{margin-top:12px;color:#bdc8b1}
+@media(max-width:1100px){.goal-card .goal-plan{grid-column:1/-1}}
+@media(max-width:650px){.credit-section{padding:20px}.credit-header{align-items:flex-start}.credit-metrics{grid-template-columns:1fr}.goal-plan strong{font-size:22px}#editor .goal-fields{grid-template-columns:1fr}}
+
+/* Дополнительная категория кредита расширяет блок бюджета. */
+.allocation.has-loan{height:auto;grid-template-rows:130px auto}
+.allocation.has-loan .tile-housing{min-height:304px}
+.allocation.has-loan .tile-other.with-loan .tile{min-height:96px}
+@media(max-width:650px){.allocation.has-loan{grid-template-rows:110px auto}}
+/* На узком экране год не выходит за карточку срока. */
+@media(max-width:650px){.horizon-line{gap:8px}.horizon .segmented{flex:1;min-width:0;gap:2px}.horizon .segmented button{flex:1;padding:10px 8px}.horizon .future-year{font-size:20px;flex:none}}
+@media(max-width:380px){.horizon-line{flex-wrap:wrap}.horizon .segmented{flex-basis:100%}}

@@ -38,7 +38,7 @@ h2{font-size:22px}
 .decision strong{font-size:17px}
 .decision small{font-size:15px;color:#aeb69f}
 .decision[data-decision="none"]::after{content:"Параметры как сейчас"}
-.decision[data-decision="save"]::after{content:"Все расходы −10%"}
+.decision[data-decision="save"]::after{content:"Расходы −10%, кроме кредита"}
 .decision[data-decision="none"]::after,.decision[data-decision="save"]::after{display:block;margin-top:6px;font-size:14px;line-height:1.4;color:#939b85}
 .decision.active small,.decision.active::after{color:#c9db7a}
 .insight{font-size:17px;color:#d3dcc3}
@@ -196,6 +196,40 @@ body{overflow-x:hidden}
 
 #editor .field-error{grid-column:1/-1;margin:0;color:#ffb7bc;font-size:15px;line-height:1.4}
 #editor .field-error[hidden]{display:none}
+
+/* План цели и действующий кредит */
+.goal-plan{margin-top:20px;padding-top:16px;border-top:1px solid #7d246d45}
+.goal-plan span,.goal-plan strong{display:block}
+.goal-plan span{font-size:16px;color:#5e1f51}
+.goal-plan strong{font-size:24px;line-height:1.2;margin-top:6px}
+.goal-plan p{font-size:16px;line-height:1.45;margin:8px 0 0;color:#5e1f51}
+.credit-section{margin-top:28px;padding:24px;border:1px solid #35392e;border-radius:24px;background:#1b1e17;color:#eef1e4}
+.credit-header{display:flex;justify-content:space-between;align-items:center;gap:16px}
+.credit-header p,.credit-section>p{font-size:16px;line-height:1.5;color:#b9c4ad;margin:8px 0 0}
+.credit-edit{flex:none;background:#def249;color:#1d2614;border-radius:25px;padding:12px 18px;min-height:44px;font-size:16px;font-weight:600}
+.credit-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:20px}
+.credit-metrics[hidden],.credit-section>p[hidden]{display:none}
+.credit-metrics>div{background:#252a20;border-radius:14px;padding:16px;min-width:0}
+.credit-metrics span,.credit-metrics strong{display:block}
+.credit-metrics span{font-size:15px;color:#b9c4ad}
+.credit-metrics strong{font-size:21px;margin-top:7px;overflow-wrap:anywhere}
+.credit-section .credit-note{font-size:15px}
+.tile-other.with-loan{grid-template-rows:repeat(3,1fr)}
+.tile-loan{background:#d4ecc5;color:#1d2614}
+#editor .goal-fields{grid-template-columns:1.25fr 1fr .75fr}
+#editor #credit-settings{margin-top:0}
+#editor .credit-form-note{margin-top:12px;color:#bdc8b1}
+@media(max-width:1100px){.goal-card .goal-plan{grid-column:1/-1}}
+@media(max-width:650px){.credit-section{padding:20px}.credit-header{align-items:flex-start}.credit-metrics{grid-template-columns:1fr}.goal-plan strong{font-size:22px}#editor .goal-fields{grid-template-columns:1fr}}
+
+/* Дополнительная категория кредита расширяет блок бюджета. */
+.allocation.has-loan{height:auto;grid-template-rows:130px auto}
+.allocation.has-loan .tile-housing{min-height:304px}
+.allocation.has-loan .tile-other.with-loan .tile{min-height:96px}
+@media(max-width:650px){.allocation.has-loan{grid-template-rows:110px auto}}
+/* На узком экране год не выходит за карточку срока. */
+@media(max-width:650px){.horizon-line{gap:8px}.horizon .segmented{flex:1;min-width:0;gap:2px}.horizon .segmented button{flex:1;padding:10px 8px}.horizon .future-year{font-size:20px;flex:none}}
+@media(max-width:380px){.horizon-line{flex-wrap:wrap}.horizon .segmented{flex-basis:100%}}
 </style></head><body>
 <header class="topbar"><a href="#" class="wordmark" aria-label="Mathical главная">mathical<span>✳</span></a><span class="top-caption">Финансовый симулятор</span></header>
 <main class="shell" id="overview">
@@ -206,9 +240,9 @@ body{overflow-x:hidden}
 <div class="dashboard-grid">
 <section class="panel capital"><h2>Капитал во времени</h2><div class="chart-toolbar"><div class="toggle" id="money-mode"><button class="selected" data-mode="real">Сегодняшние ₽</button><button data-mode="nominal">Будущие ₽</button></div><label class="sr-only" for="scenario">Сценарий</label><select id="scenario"><option value="base">Базовый</option><option value="optimistic">Благоприятный</option><option value="stress">Стрессовый</option></select></div><div class="big-number" id="final-capital"></div><div class="chart-subtitle" id="capital-subtitle"></div><div id="capital-chart" class="chart" role="img" aria-label="График капитала по годам"></div><div class="chart-foot"><span><i class="dot orange"></i>Капитал</span><span id="chart-unit"></span></div></section>
 <section class="panel cashflow"><h2>Ежемесячный бюджет</h2><div class="allocation" id="allocation" title="Размеры блоков условные; точные доли указаны внутри"></div><p class="small-note" id="budget-note"></p></section>
-<section class="panel goal-card"><div class="panel-head"><span class="goal-label">Моя цель</span><button class="round-icon" data-edit="goals" aria-label="Изменить цель">↗</button></div><span class="goal-symbol" aria-hidden="true">◎</span><h2 id="goal-title"></h2><p id="goal-amount"></p><div class="goal-progress"><div id="goal-progress"></div></div><div class="goal-result" id="goal-result"></div><span class="goal-caption">С учётом роста цен</span></section>
+<section class="panel goal-card"><div class="panel-head"><span class="goal-label">Моя цель</span><button class="round-icon" data-edit="goals" aria-label="Изменить цель">↗</button></div><span class="goal-symbol" aria-hidden="true">◎</span><h2 id="goal-title"></h2><p id="goal-amount"></p><div class="goal-progress"><div id="goal-progress"></div></div><div class="goal-result" id="goal-result"></div><div class="goal-plan"><span>Чтобы накопить к сроку</span><strong id="goal-monthly"></strong><p id="goal-compare"></p><p>Все накопления — на цель. Инфляция и доходность учтены; сценарии — нет.</p></div></section>
 </div>
-<section class="health-section" aria-labelledby="health-title"><h2 id="health-title">Финансовое здоровье</h2><div class="health-grid"><div><span>Остаток в месяц</span><strong id="health-free"></strong></div><div><span>Доля сбережений</span><strong id="health-rate"></strong></div><div><span>Обязательные расходы</span><strong id="health-essential"></strong></div><div><span>Запас средств</span><strong id="health-reserve"></strong></div></div><p id="health-note"></p></section><section id="decisions" class="decisions-section"><div class="section-heading"><h2>А что, если…</h2></div><div class="decision-list"><button data-decision="none" class="decision active"><strong>Ничего не менять</strong></button><button data-decision="save" class="decision"><strong>Тратить на 10% меньше</strong></button><button data-decision="education" class="decision"><strong>Вложиться в обучение</strong><small>120 тыс. ₽ · доход +15%</small></button><button data-decision="car" class="decision"><strong>Купить автомобиль</strong><small>900 тыс. ₽ + 8 тыс. ₽/мес.</small></button></div><div class="insight" id="decision-insight" aria-live="polite"></div></section>
+<section class="health-section" aria-labelledby="health-title"><h2 id="health-title">Финансовое здоровье</h2><div class="health-grid"><div><span>Остаток в месяц</span><strong id="health-free"></strong></div><div><span>Доля сбережений</span><strong id="health-rate"></strong></div><div><span>Обязательные расходы</span><strong id="health-essential"></strong></div><div><span>Запас средств</span><strong id="health-reserve"></strong></div></div><p id="health-note"></p></section><section class="credit-section" aria-labelledby="credit-title"><div class="credit-header"><div><h2 id="credit-title">Кредит</h2><p>Учти действующий долг в своём бюджете.</p></div><button class="credit-edit" type="button" data-edit="credit">Настроить ↗</button></div><p id="loan-empty">Добавь остаток долга, ставку и срок, чтобы увидеть платёж.</p><div id="loan-metrics" class="credit-metrics" hidden><div><span>Платёж в месяц</span><strong id="loan-payment"></strong></div><div><span>Оставшиеся проценты</span><strong id="loan-overpayment"></strong></div><div><span>Доля дохода</span><strong id="loan-ratio"></strong></div></div><p id="loan-note" class="credit-note" hidden>Равные платежи; комиссии и страховка не учтены. Долг не прибавляется к капиталу и не вычитается из него.</p></section><section id="decisions" class="decisions-section"><div class="section-heading"><h2>А что, если…</h2></div><div class="decision-list"><button data-decision="none" class="decision active"><strong>Ничего не менять</strong></button><button data-decision="save" class="decision"><strong>Тратить на 10% меньше</strong></button><button data-decision="education" class="decision"><strong>Вложиться в обучение</strong><small>120 тыс. ₽ · доход +15%</small></button><button data-decision="car" class="decision"><strong>Купить автомобиль</strong><small>900 тыс. ₽ + 8 тыс. ₽/мес.</small></button></div><div class="insight" id="decision-insight" aria-live="polite"></div></section>
 <details class="more-details"><summary>Сравнение и подробные расчёты <span>＋</span></summary><div class="bottom-grid">
 <section class="panel uncertainty"><h2>Диапазон результатов</h2><p>160 учебных траекторий · в сегодняшних рублях</p><div class="range-values"><div><span>10-й перцентиль</span><b id="p10"></b></div><div><span>Медиана</span><b id="p50"></b></div><div><span>90-й перцентиль</span><b id="p90"></b></div></div><div class="uncertainty-line"><span></span></div><p id="probability"></p></section>
 <section id="compare" class="panel compare"><h2>Сохранённые варианты</h2><div id="saved-list"></div><button class="dark-button" id="save-bottom">Сохранить вариант <span>+</span></button><span class="small-note" id="storage-status" role="status"></span></section></div>
@@ -229,16 +263,16 @@ body{overflow-x:hidden}
 <label class="money-field expense-annual"><span>Нерегулярные расходы за год</span><span class="input-wrap"><input aria-label="Нерегулярные расходы за год" name="annual" type="number" min="0" max="120000000" step="1" required><span>₽/год</span></span></label>
 <label class="money-field expense-once"><span>Разовая трата в начале плана</span><span class="input-wrap"><input aria-label="Разовая трата в начале плана" name="oneTime" type="number" min="0" max="1000000000" step="1" required><span>₽</span></span></label>
 <div class="annual-items"><p>Отдельные годовые платежи <span>(необязательно)</span></p><div id="annual-items-list"></div><button type="button" class="text-button" id="add-annual-item">+ Добавить платёж</button><p class="field-note">Добавляются к годовой сумме выше.</p></div></fieldset>
-<fieldset id="essential-fields" class="essential-fields"><legend>Обязательные расходы</legend><label class="money-field"><span>Необходимое из остальных расходов</span><span class="input-wrap"><input aria-label="Необходимое из остальных расходов" aria-describedby="essential-hint essential-error" name="essentialOther" type="number" min="0" max="1000000000" step="1" required><span>₽/мес.</span></span></label><p class="field-note" id="essential-hint">Укажи необходимую часть уже введённых расходов на быт, досуг и годовые платежи. Жильё учитывается отдельно.</p><p class="field-error" id="essential-error" role="alert" hidden></p></fieldset></div>
-<fieldset id="goals-fields" class="goal-fields"><legend>На что копим</legend><label class="money-field goal-name"><span>Название цели</span><input aria-label="Название цели" name="goalName" maxlength="80" required></label><label class="money-field"><span>Стоимость сегодня</span><span class="input-wrap"><input aria-label="Стоимость сегодня" name="goal" type="number" min="1" max="1000000000" step="1" required><span>₽</span></span></label></fieldset>
+<fieldset id="essential-fields" class="essential-fields"><legend>Обязательные расходы</legend><label class="money-field"><span>Необходимое из остальных расходов</span><span class="input-wrap"><input aria-label="Необходимое из остальных расходов" aria-describedby="essential-hint essential-error" name="essentialOther" type="number" min="0" max="1000000000" step="1" required><span>₽/мес.</span></span></label><p class="field-note" id="essential-hint">Укажи необходимую часть уже введённых расходов на быт, досуг и годовые платежи. Жильё учитывается отдельно.</p><p class="field-error" id="essential-error" role="alert" hidden></p></fieldset><details class="advanced-settings" id="credit-settings"><summary>Кредит <span>＋</span></summary><div class="rates-grid"><label class="money-field"><span>Остаток долга</span><span class="input-wrap"><input aria-label="Остаток долга" name="loanPrincipal" type="number" min="0" max="1000000000" step="1" required><span>₽</span></span></label><label class="money-field"><span>Ставка в год</span><span class="input-wrap"><input aria-label="Ставка кредита в год" name="loanRate" type="number" min="0" max="100" step="0.01" required><span>%</span></span></label><label class="money-field"><span>Осталось месяцев</span><span class="input-wrap"><input aria-label="Осталось месяцев по кредиту" name="loanMonths" type="number" min="1" max="600" step="1" required><span>мес.</span></span></label></div><p class="field-note credit-form-note">Платёж добавится к бюджету. Не включай его повторно в другие расходы.</p></details></div>
+<fieldset id="goals-fields" class="goal-fields"><legend>На что копим</legend><label class="money-field goal-name"><span>Название цели</span><input aria-label="Название цели" name="goalName" maxlength="80" required></label><label class="money-field"><span>Стоимость сегодня</span><span class="input-wrap"><input aria-label="Стоимость сегодня" name="goal" type="number" min="1" max="1000000000" step="1" required><span>₽</span></span></label><label class="money-field"><span>Срок цели, лет</span><span class="input-wrap"><input aria-label="Срок цели в годах" name="goalYears" type="number" min="1" max="50" step="1" required></span></label></fieldset>
 <details class="advanced-settings"><summary>Инфляция и рост доходов <span>＋</span></summary><div class="rates-grid"><label class="money-field"><span>Инфляция в год</span><span class="input-wrap"><input aria-label="Инфляция в год" name="inflation" type="number" min="0" max="30" step="0.1" required><span>%</span></span></label><label class="money-field"><span>Рост дохода в год</span><span class="input-wrap"><input aria-label="Рост дохода в год" name="growth" type="number" min="-20" max="30" step="0.1" required><span>%</span></span></label><label class="money-field"><span>Доходность накоплений</span><span class="input-wrap"><input aria-label="Доходность накоплений" name="rate" type="number" min="-20" max="30" step="0.1" required><span>%</span></span></label></div></details>
 <div class="dialog-footer"><span id="editor-balance" aria-live="polite"></span><button class="apply-button" type="submit">Применить <span>↗</span></button></div></form></dialog>
-<dialog id="method"><div class="dialog-header"><div><span class="eyebrow">ПОНЯТНАЯ МАТЕМАТИКА</span><h2>Как устроен mathical</h2></div><button class="close" data-close="method" aria-label="Закрыть">×</button></div><div class="method-content"><p>Это финансовый симулятор жизненных решений для школьников и начинающих. Он помогает увидеть связь между сегодняшним бюджетом и долгосрочными целями.</p><h3>От месяца к месяцу</h3><p>Капитал = предыдущий капитал + доход на положительный остаток + зарплата − расходы. Годовая доходность переводится в месячную по формуле (1 + ставка)^(1/12) − 1. В конце года зарплата индексируется на заданный процент.</p><p>Регулярные расходы и годовые платежи, распределённые равномерно по месяцам, растут вместе с инфляцией. Разовая трата списывается в первом месяце один раз. Стоимость цели также растёт с инфляцией. «Сегодняшние рубли» — капитал, разделённый на накопленный индекс цен. Отрицательный капитал означает дефицит финансирования; проценты по кредиту не моделируются. Доходность задаётся после предполагаемых налогов и комиссий.</p><h3>Три варианта будущего</h3><p>Базовый использует твои параметры. Благоприятный: инфляция ниже на 1,5 п. п. (не ниже нуля), рост зарплаты выше на 1 п. п., доходность выше на 2 п. п. Стрессовый: инфляция выше на 2 п. п., рост зарплаты ниже на 1 п. п., доходность ниже на 3 п. п. и три месяца без зарплаты в начале четвёртого года.</p><h3>Неопределённость</h3><p>В каждом из 160 прогонов ежегодные отклонения равномерны: инфляция ±2 п. п. (не ниже нуля), рост зарплаты ±1 п. п., доходность ±6 п. п. Вероятность двухмесячного перерыва в доходах — 8% в каждом году. Это условные учебные допущения, не оценка рынка. Случайная последовательность фиксирована для честного сравнения решений.</p><p>10-й и 90-й перцентили ограничивают центральные 80% полученных результатов. Доля достижения цели относится к концу выбранного срока и только к этой модели; она не является гарантией или реальной вероятностью.</p><h3>Жизненные решения</h3><p>Экономия уменьшает все регулярные расходы на 10%. Обучение оплачивается в начале второго года, повышение зарплаты на 15% действует с третьего. Автомобиль покупается в начале третьего года, затем требует 8 тыс. ₽ в месяц в исходных ценах; стоимость автомобиля как актива не учитывается. Цель — порог накоплений, покупка автоматически не совершается.</p><h3>Границы модели</h3><p>Не учитываются пенсия, ипотека, отдельные налоги, стоимость имущества и взаимосвязь рыночных показателей. Настройки и сохранённые варианты остаются в этом браузере, если он разрешает локальное хранение.</p><h3>О проекте и аналогах</h3><p>Инновационность проекта — в сочетании понятных жизненных решений, объяснения их последствий и наглядного сравнения для учебной аудитории. Финансовые симуляторы уже существуют; отсутствие аналогов не заявляется.</p><p><a href="https://fincult.info/" target="_blank" rel="noopener">Финансовая культура Банка России</a> · <a href="https://projectionlab.com/" target="_blank" rel="noopener">Пример аналога: ProjectionLab</a></p></div></dialog>
+<dialog id="method"><div class="dialog-header"><div><span class="eyebrow">ПОНЯТНАЯ МАТЕМАТИКА</span><h2>Как устроен mathical</h2></div><button class="close" data-close="method" aria-label="Закрыть">×</button></div><div class="method-content"><p>Это финансовый симулятор жизненных решений для школьников и начинающих. Он помогает увидеть связь между сегодняшним бюджетом и долгосрочными целями.</p><h3>От месяца к месяцу</h3><p>Капитал = предыдущий капитал + доход на положительный остаток + зарплата − расходы. Годовая доходность переводится в месячную по формуле (1 + ставка)^(1/12) − 1. В конце года зарплата индексируется на заданный процент.</p><p>Регулярные расходы и годовые платежи, распределённые равномерно по месяцам, растут вместе с инфляцией. Разовая трата списывается в первом месяце один раз. Стоимость цели также растёт с инфляцией. «Сегодняшние рубли» — капитал, разделённый на накопленный индекс цен. Отрицательный капитал означает дефицит финансирования; проценты на отрицательный баланс не начисляются. Доходность задаётся после предполагаемых налогов и комиссий.</p><h3>Три варианта будущего</h3><p>Базовый использует твои параметры. Благоприятный: инфляция ниже на 1,5 п. п. (не ниже нуля), рост зарплаты выше на 1 п. п., доходность выше на 2 п. п. Стрессовый: инфляция выше на 2 п. п., рост зарплаты ниже на 1 п. п., доходность ниже на 3 п. п. и три месяца без зарплаты в начале четвёртого года.</p><h3>Неопределённость</h3><p>В каждом из 160 прогонов ежегодные отклонения равномерны: инфляция ±2 п. п. (не ниже нуля), рост зарплаты ±1 п. п., доходность ±6 п. п. Вероятность двухмесячного перерыва в доходах — 8% в каждом году. Это условные учебные допущения, не оценка рынка. Случайная последовательность фиксирована для честного сравнения решений.</p><p>10-й и 90-й перцентили ограничивают центральные 80% полученных результатов. Доля достижения цели относится к концу выбранного срока и только к этой модели; она не является гарантией или реальной вероятностью.</p><h3>Цель и кредит</h3><p>Взнос для цели предполагает равную сумму в конце каждого месяца, всю начальную сумму за вычетом разовой траты и заданные инфляцию и доходность. Сценарии и будущие изменения бюджета в этом отдельном расчёте не учитываются. Кредит рассчитывается равными платежами по остатку долга; годовая ставка делится на 12, платёж учитывается в бюджете до окончания срока. Остаток долга не прибавляется к капиталу и не вычитается из него. Комиссии, страховки, изменение ставок и досрочные погашения не включены.</p><h3>Жизненные решения</h3><p>Экономия уменьшает регулярные расходы на 10%, кроме платежа по кредиту. Обучение оплачивается в начале второго года, повышение зарплаты на 15% действует с третьего. Автомобиль покупается в начале третьего года, затем требует 8 тыс. ₽ в месяц в исходных ценах; стоимость автомобиля как актива не учитывается. Цель — порог накоплений, покупка автоматически не совершается.</p><h3>Границы модели</h3><p>Не учитываются пенсия, отдельные налоги, стоимость имущества, ипотечные сборы и взаимосвязь рыночных показателей. Настройки и сохранённые варианты остаются в этом браузере, если он разрешает локальное хранение.</p><h3>О проекте и аналогах</h3><p>Инновационность проекта — в сочетании понятных жизненных решений, объяснения их последствий и наглядного сравнения для учебной аудитории. Финансовые симуляторы уже существуют; отсутствие аналогов не заявляется.</p><p><a href="https://fincult.info/" target="_blank" rel="noopener">Финансовая культура Банка России</a> · <a href="https://projectionlab.com/" target="_blank" rel="noopener">Пример аналога: ProjectionLab</a></p></div></dialog>
 <div class="toast" id="toast" role="status"></div><script>/* Mathical — прозрачная учебная модель. Без внешних запросов. */
 (function (root) {
   'use strict';
-  const defaults = { salary: 100000, housing: 25000, living: 20000, leisure: 10000, annual: 0, oneTime: 0, essentialOther: 0, initial: 200000, growth: 6, inflation: 5, rate: 7, years: 15, goal: 3000000, goalName: 'Первый взнос на квартиру', decision: 'none' };
-  const bounds = { salary: [0,10000000], housing: [0,10000000], living: [0,10000000], leisure: [0,10000000], annual: [0,120000000], oneTime: [0,1000000000], essentialOther: [0,1000000000], initial: [0,1000000000], growth: [-20,30], inflation: [0,30], rate: [-20,30], years: [1,50], goal: [1,1000000000] };
+  const defaults = { salary: 100000, housing: 25000, living: 20000, leisure: 10000, annual: 0, oneTime: 0, essentialOther: 0, initial: 200000, growth: 6, inflation: 5, rate: 7, years: 15, goal: 3000000, goalYears: 5, loanPrincipal: 0, loanRate: 0, loanMonths: 12, goalName: 'Первый взнос на квартиру', decision: 'none' };
+  const bounds = { salary: [0,10000000], housing: [0,10000000], living: [0,10000000], leisure: [0,10000000], annual: [0,120000000], oneTime: [0,1000000000], essentialOther: [0,1000000000], initial: [0,1000000000], growth: [-20,30], inflation: [0,30], rate: [-20,30], years: [1,50], goal: [1,1000000000], goalYears: [1,50], loanPrincipal: [0,1000000000], loanRate: [0,100], loanMonths: [1,600] };
   function normalize(input) {
     const p = { ...defaults, ...input };
     delete p.profession; // Drop obsolete presets from previously saved plans.
@@ -247,14 +281,40 @@ body{overflow-x:hidden}
     const otherSpending = p.living + p.leisure + (p.annual + p.annualItems.reduce((sum,x)=>sum+x.amount,0)) / 12;
     p.essentialOther = Math.min(p.essentialOther, otherSpending);
     p.years = Math.round(p.years);
+    p.goalYears = Math.round(p.goalYears);
+    p.loanMonths = Math.round(p.loanMonths);
     p.goalName = String(p.goalName || defaults.goalName).slice(0,80);
     if (!['none','save','education','car'].includes(p.decision)) p.decision = 'none';
     return p;
   }
+  // Аннуитет: равный ежемесячный платёж, годовая ставка / 12.
+  function loanTerms(input) {
+    const p = normalize(input), principal = p.loanPrincipal, months = p.loanMonths;
+    const rate = p.loanRate / 1200;
+    const payment = principal === 0 ? 0 : rate === 0 ? principal / months : principal * rate / -Math.expm1(-months * Math.log1p(rate));
+    return {principal, months, payment, total:payment * months, overpayment:Math.max(0,payment * months - principal)};
+  }
+  // Фиксированный номинальный взнос в конце месяца для цели на выбранный срок.
+  function goalPlan(input) {
+    const p = normalize(input), months = p.goalYears * 12;
+    const target = p.goal * Math.pow(1 + p.inflation / 100, p.goalYears);
+    const monthlyRate = Math.pow(1 + p.rate / 100, 1 / 12) - 1;
+    const starting = p.initial - p.oneTime;
+    function projected(contribution) {
+      let balance = starting;
+      for (let i=0; i<months; i++) balance += Math.max(0,balance) * monthlyRate + contribution;
+      return balance;
+    }
+    if (projected(0) >= target) return {monthly:0,target,months};
+    let low=0, high=Math.max(1,target/months);
+    while (projected(high) < target) high *= 2;
+    for (let i=0; i<60; i++) { const mid=(low+high)/2; if(projected(mid)>=target) high=mid; else low=mid; }
+    return {monthly:high,target,months};
+  }
   function financialHealth(input) {
     const p = normalize(input);
     const factor = p.decision === 'save' ? .9 : 1;
-    const essential = (p.housing + p.essentialOther) * factor;
+    const essential = (p.housing + p.essentialOther) * factor + loanTerms(p).payment;
     const available = Math.max(0, p.initial - p.oneTime);
     return {essential, available, reserveMonths: essential > 0 ? available / essential : null};
   }
@@ -262,6 +322,7 @@ body{overflow-x:hidden}
   function simulate(input, scenario = 'base', seed = 42) {
     const p = normalize(input), rng = random(seed);
     let balance = p.initial, prices = 1, salary = p.salary, spending = p.housing + p.living + p.leisure + (p.annual + p.annualItems.reduce((sum,x)=>sum+x.amount,0)) / 12;
+    const loan = loanTerms(p);
     const rows = [{year:0,balance,real:balance,prices,goal:p.goal,income:0,expenses:0,interest:0,event:''}];
     let reached = balance >= p.goal ? 0 : null;
     for (let year = 1; year <= p.years; year++) {
@@ -277,6 +338,7 @@ body{overflow-x:hidden}
         prices *= monthlyInflation;
         const pay = month <= lost ? 0 : salary * (p.decision === 'education' && year >= 3 ? 1.15 : 1);
         let cost = spending * prices * (p.decision === 'save' ? .9 : 1);
+        if ((year-1)*12+month <= loan.months) cost += loan.payment;
         if (year === 1 && month === 1) cost += p.oneTime;
         if (p.decision === 'education' && year === 2 && month === 1) { cost += 120000*prices; event = 'Обучение: 120 тыс. ₽ в начальных ценах'; }
         if (p.decision === 'car' && year >= 3) { cost += 8000*prices; if (year === 3 && month === 1) { cost += 900000*prices; event = 'Покупка автомобиля'; } }
@@ -296,7 +358,7 @@ body{overflow-x:hidden}
     const q = n => values[Math.floor((values.length-1)*n)];
     return {low:q(.1),median:q(.5),high:q(.9),success:runs.filter(r=>r.final.real>=normalize(input).goal).length/count,count};
   }
-  root.Mathical = {defaults,bounds,normalize,financialHealth,simulate,distribution};
+  root.Mathical = {defaults,bounds,normalize,loanTerms,goalPlan,financialHealth,simulate,distribution};
 })(globalThis);
 </script><script>/* Форматирование значений для интерфейса. */
 (function(root){
@@ -368,26 +430,36 @@ body{overflow-x:hidden}
     params=M.normalize(params);result=M.simulate(params,scenario);
     const baseline=M.simulate({...params,decision:'none'},scenario),uncertain=M.distribution(params);
     const annualTotal=params.annual+params.annualItems.reduce((sum,x)=>sum+x.amount,0);
-    const expense=params.housing+params.living+params.leisure+annualTotal/12, factor=params.decision==='save'?.9:1, spent=expense*factor, free=params.salary-spent;
+    const loan=M.loanTerms(params);
+    const expense=params.housing+params.living+params.leisure+annualTotal/12, factor=params.decision==='save'?.9:1, spent=expense*factor+loan.payment, free=params.salary-spent;
     text('health-free',money(free,false)+'/мес.');
     text('health-rate',params.salary <= 0 ? 'Нет дохода' : free < 0 ? 'Нет сбережений' : pct(free/params.salary*100));
     const health=M.financialHealth(params);
     text('health-essential',money(health.essential,false)+'/мес.');
     text('health-reserve',health.reserveMonths === null ? 'Укажи расходы' : new Intl.NumberFormat('ru-RU',{maximumFractionDigits:1}).format(health.reserveMonths)+' мес.');
-    const healthNote=params.essentialOther > 0 ? 'На старте плана: жильё и указанная часть остальных расходов. Без будущих доходов и инфляции.' : params.housing > 0 ? 'Сейчас учтено только жильё. Другие обязательные расходы можно указать в бюджете.' : 'Укажи обязательные расходы в бюджете, чтобы рассчитать запас.';
+    const healthNote=params.essentialOther > 0 ? 'На старте плана: жильё, указанная часть остальных расходов'+(loan.principal>0?' и кредит':'')+'. Без будущих доходов и инфляции.' : (params.housing>0 || loan.principal>0) ? 'В расчёте: '+(params.housing>0?'жильё':'')+(params.housing>0 && loan.principal>0?' и ':'')+(loan.principal>0?'кредит':'')+'. Другие обязательные расходы можно указать в бюджете.' : 'Укажи обязательные расходы в бюджете, чтобы рассчитать запас.';
     text('health-note',healthNote+(params.oneTime>0?' Разовая трата вычтена из накоплений.':''));
     text('future-year',startYear+params.years+' ↗');
     text('income-metric',money(params.salary));text('expense-metric',money(spent));
     showCapital(mode==='real'?result.final.real:result.final.balance);text('capital-subtitle',`${outcomes[scenario]} сценарий · конец ${startYear+params.years} года`);text('chart-unit',mode==='real'?'Покупательная способность':'Номинальные суммы');$('#capital-chart').innerHTML=makeChart(result.rows,{years:params.years,mode,startYear});
     const share=n=>pct(n/Math.max(params.salary,spent,1)*100);
-    $('#allocation').innerHTML=`<div class="tile tile-saving"><b>${money(Math.max(0,free))}</b><span>остаётся на накопления · ${share(Math.max(0,free))}</span></div><div class="tile tile-housing"><b>${share(params.housing*factor)}</b><span>жильё</span></div><div class="tile-other"><div class="tile tile-living"><b>${share((params.living+annualTotal/12)*factor)}</b><span>еда, быт и годовые траты</span></div><div class="tile tile-leisure"><b>${share(params.leisure*factor)}</b><span>досуг</span></div></div>`;
+    $('#allocation').classList.toggle('has-loan',loan.principal>0);
+    $('#allocation').innerHTML=`<div class="tile tile-saving"><b>${money(Math.max(0,free))}</b><span>остаётся на накопления · ${share(Math.max(0,free))}</span></div><div class="tile tile-housing"><b>${share(params.housing*factor)}</b><span>жильё</span></div><div class="tile-other${loan.principal>0?' with-loan':''}"><div class="tile tile-living"><b>${share((params.living+annualTotal/12)*factor)}</b><span>еда, быт и годовые траты</span></div><div class="tile tile-leisure"><b>${share(params.leisure*factor)}</b><span>досуг</span></div>${loan.principal>0?`<div class="tile tile-loan"><b>${share(loan.payment)}</b><span>кредит</span></div>`:''}</div></div>`;
     text('budget-note',free<0?`Дефицит: ${money(-free,false)}/мес. Расходы превышают доход; проценты показаны от расходов.`:`В расходах учтена 1/12 годовых платежей${params.oneTime ? ' · разовая трата '+money(params.oneTime,false)+' учтена в первый месяц прогноза' : ''}. Размеры блоков условные.`);
+    $('#loan-empty').hidden=loan.principal>0;
+    $('#loan-metrics').hidden=loan.principal<=0;
+    $('#loan-note').hidden=loan.principal<=0;
+    if(loan.principal>0){text('loan-payment',money(loan.payment,false));text('loan-overpayment',money(loan.overpayment,false));text('loan-ratio',params.salary>0?pct(loan.payment/params.salary*100):'Нет дохода');}
     text('goal-title',params.goalName);text('goal-amount',`${money(params.goal,false)} в сегодняшних ценах`);
+    const goal=M.goalPlan(params), monthly=Math.max(0,Math.ceil(goal.monthly-1e-7));
+    text('goal-monthly',money(monthly,false)+'/мес.');
+    const comparison=monthly===0?'К сроку достаточно начальных накоплений.':free<0?'Сейчас расходы превышают доход.':monthly>free?'Не хватает '+money(Math.ceil(monthly-free),false)+'/мес. к текущему остатку.':'Текущего остатка хватает на этот взнос.';
+    text('goal-compare',`Срок: ${yearsLabel(params.goalYears)}. ${comparison}`);
     const progress=Math.max(0,Math.min(100,result.final.real/params.goal*100));$('#goal-progress').style.width=progress+'%';
     text('goal-result',result.reached!==null?result.reached===0?'Цель доступна уже сейчас':`Впервые доступна в ${startYear+result.reached}`:`${Math.round(progress)}% цели к ${startYear+params.years}`);
     if(result.reached!==null&&result.final.real<params.goal) text('goal-result',`Достигнута ранее, но к концу срока денег не хватает`);
     const delta=result.final.real-baseline.final.real;
-    const desc={none:'',save:'Все регулярные расходы ниже на 10% с первого месяца.',education:'Оплата в начале 2-го года; зарплата выше на 15% с 3-го года. Эффект повышения задан как учебное допущение.',car:'Покупка в начале 3-го года, затем содержание. Цена автомобиля как актива не входит в капитал.'};
+    const desc={none:'',save:'Регулярные расходы ниже на 10%; платёж по кредиту не меняется.',education:'Оплата в начале 2-го года; зарплата выше на 15% с 3-го года. Эффект повышения задан как учебное допущение.',car:'Покупка в начале 3-го года, затем содержание. Цена автомобиля как актива не входит в капитал.'};
     text('decision-insight',`${desc[params.decision]}${params.decision==='none'?'':` Разница через ${yearsLabel(params.years)}: ${delta>=0?'+':''}${money(delta,false)} в сегодняшних рублях.`}`);
     text('p10',money(uncertain.low));text('p50',money(uncertain.median));text('p90',money(uncertain.high));text('probability',`Цель достигнута в ${Math.round(uncertain.success*100)}% учебных прогонов к концу срока. Не гарантия результата.`);
     $('#year-table').innerHTML=result.rows.map(r=>`<tr><td>${startYear+r.year}${r.event?' *':''}</td><td>${money(r.income,false)}</td><td>${money(r.expenses,false)}</td><td>${money(r.interest,false)}</td><td>${money(r.balance,false)}</td><td>${money(r.real,false)}</td></tr>${r.event?`<tr><td colspan="6" style="text-align:left;color:#c0ba95">* ${r.event}</td></tr>`:''}`).join('');
@@ -411,10 +483,11 @@ body{overflow-x:hidden}
     essential.setAttribute('aria-invalid',String(Boolean(error)));
     $('#essential-error').textContent=error;
     $('#essential-error').hidden=!error;
-    const free=Number(f.salary.value)-Number(f.housing.value)-other;
+    const loan=M.loanTerms({loanPrincipal:f.loanPrincipal.value,loanRate:f.loanRate.value,loanMonths:f.loanMonths.value});
+    const free=Number(f.salary.value)-Number(f.housing.value)-other-loan.payment;
     text('editor-balance',(free>=0?'Остаётся ':'Не хватает ')+money(Math.abs(free),false)+'/мес.');
   }
-  function editor(section){const form=$('#settings-form');for(const [key,val] of Object.entries(params)){const field=form.elements.namedItem(key);if(field)field.value=val;}$('#annual-items-list').replaceChildren();params.annualItems.forEach(addAnnualItem);$('.advanced-settings').open=false;editorBalance();$('#editor').showModal();$('#editor').scrollTop=0;if(section==='goals'){$('#goals-fields').scrollIntoView({block:'nearest'});form.elements.goalName.focus({preventScroll:true});}else{form.elements.salary.focus({preventScroll:true});}}
+  function editor(section){const form=$('#settings-form');for(const [key,val] of Object.entries(params)){const field=form.elements.namedItem(key);if(field)field.value=val;}$('#annual-items-list').replaceChildren();params.annualItems.forEach(addAnnualItem);document.querySelectorAll('#editor .advanced-settings').forEach(d=>d.open=false);editorBalance();$('#editor').showModal();$('#editor').scrollTop=0;if(section==='goals'){$('#goals-fields').scrollIntoView({block:'nearest'});form.elements.goalName.focus({preventScroll:true});}else if(section==='credit'){$('#credit-settings').open=true;$('#credit-settings').scrollIntoView({block:'center'});form.elements.loanPrincipal.focus({preventScroll:true});}else{form.elements.salary.focus({preventScroll:true});}}
   $('#settings-form').addEventListener('input',editorBalance);
   $('#settings-form').addEventListener('invalid',e=>{const parent=e.target.closest('details');if(parent)parent.open=true;e.target.scrollIntoView({block:'center'});},true);
   document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>editor(b.dataset.edit));
