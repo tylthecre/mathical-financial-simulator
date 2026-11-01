@@ -137,3 +137,50 @@ legend{font-size:16px;color:#c4ceb5}
 body{overflow-x:hidden}
 
 .horizon-custom{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px;font-size:15px;color:#eeeaff}.horizon-custom-field{display:inline-flex;align-items:center;gap:6px;background:#ffffff1c;border-radius:14px;padding:5px 10px;color:#fff}.horizon-custom-field input{width:55px;min-width:0;color:#fff;font-size:18px;font-weight:600;text-align:center}.horizon-custom small{font-size:14px;color:#e0dcff}@media(max-width:650px){.horizon-custom{margin-top:12px}.horizon-custom-field input{font-size:18px}}
+
+/* Окно бюджета: компактные группы и закреплённое действие. */
+#editor{width:840px;max-width:calc(100% - 28px);max-height:92vh;padding:0;overflow-y:auto;scrollbar-gutter:stable;border-radius:24px}
+#settings-form{padding:30px 30px 0}
+#editor .dialog-header{align-items:center;gap:20px;margin-bottom:26px}
+#editor .dialog-header h2{margin-top:7px;line-height:1.15}
+#editor .close{display:grid;place-items:center;width:44px;height:44px;padding:0;line-height:1;font-size:25px;flex:none}
+#editor .budget-editor-grid{display:flex;flex-direction:column;gap:26px}
+#editor .income-group{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#editor .expenses-group{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+#editor .expenses-group>.money-field{grid-column:span 2}
+#editor .expenses-group>.expense-annual,#editor .expenses-group>.expense-once{grid-column:span 3}
+#editor .money-field{margin:0;min-height:88px;justify-content:center;flex-direction:column;align-items:stretch;gap:10px;padding:15px 16px}
+#editor .featured-field{padding:15px 16px}
+#editor .money-field>span:first-child{max-width:none;font-size:16px;line-height:1.35}
+#editor .input-wrap{width:100%}
+#editor .input-wrap input{font-size:22px;text-align:left}
+#editor .featured-field input{font-size:24px}
+#editor .input-wrap>span{white-space:nowrap;font-size:15px}
+#editor .field-note{grid-column:1/-1;margin:0;font-size:15px;line-height:1.4}
+#editor .annual-items{grid-column:1/-1;margin:0;padding:16px;background:#20251d;border-radius:14px}
+#editor .annual-items>p:first-child{margin:0 0 4px;font-size:16px;color:#edf1e6}
+#editor .annual-items>p span{font-size:15px;color:#b9c4ad}
+#editor #add-annual-item{font-size:16px;color:#def249;min-height:44px}
+#editor .annual-items .field-note{color:#a8b39a}
+#editor .goal-fields{display:grid;grid-template-columns:1.2fr 1fr;gap:12px;margin:26px 0 0}
+#editor .goal-name input{font-size:18px}
+#editor .advanced-settings{margin-top:24px}
+#editor .rates-grid{gap:12px}
+#editor .dialog-footer{position:sticky;bottom:0;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:16px;margin:24px -30px 0;padding:16px 30px;background:#191c16;border-top:1px solid #363b2d;box-shadow:0 -12px 24px #191c16e6}
+#editor .dialog-footer>span{font-size:16px;max-width:none;line-height:1.35}
+#editor .apply-button{flex:none;min-height:48px}
+@media(max-width:650px){
+  #editor{max-width:calc(100% - 20px);max-height:94vh;border-radius:20px}
+  #settings-form{padding:22px 18px 0}
+  #editor .dialog-header{margin-bottom:22px;align-items:flex-start}
+  #editor .dialog-header h2{max-width:none;font-size:24px}
+  #editor .budget-editor-grid{gap:22px}
+  #editor .expenses-group{grid-template-columns:1fr}
+  #editor .expenses-group>.money-field,#editor .expenses-group>.expense-annual,#editor .expenses-group>.expense-once{grid-column:auto}
+  #editor .annual-items{grid-column:auto}
+  #editor .goal-fields{grid-template-columns:1fr}
+  #editor .rates-grid{grid-template-columns:1fr}
+  #editor .dialog-footer{margin:22px -18px 0;padding:14px 18px}
+  #editor .dialog-footer>span{font-size:15px}
+}
+@media(max-width:380px){#editor .income-group{grid-template-columns:1fr}}
