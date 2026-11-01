@@ -93,3 +93,13 @@ test('Экономия не уменьшает кредитный платёж',
   const a=simulate({...p,decision:'none'}), b=simulate({...p,decision:'save'});
   assert.equal(a.rows[1].expenses-b.rows[1].expenses,60000);
 });
+
+
+test('Диапазон случайных сценариев рассчитан для каждого года', () => {
+  const d = distribution({...defaults, years: 5});
+  assert.equal(d.bands.length, 6);
+  for (const band of d.bands) { assert.ok(band.realLow <= band.realHigh); assert.ok(band.nominalLow <= band.nominalHigh); }
+  assert.equal(d.bands.at(-1).realLow, d.low);
+  assert.equal(d.bands.at(-1).realHigh, d.high);
+});
+

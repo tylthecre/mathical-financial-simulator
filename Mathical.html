@@ -230,16 +230,18 @@ body{overflow-x:hidden}
 /* На узком экране год не выходит за карточку срока. */
 @media(max-width:650px){.horizon-line{gap:8px}.horizon .segmented{flex:1;min-width:0;gap:2px}.horizon .segmented button{flex:1;padding:10px 8px}.horizon .future-year{font-size:20px;flex:none}}
 @media(max-width:380px){.horizon-line{flex-wrap:wrap}.horizon .segmented{flex-basis:100%}}
+/* График и понятная структура бюджета */
+:root{font-variant-numeric:tabular-nums}.chart{height:245px}.chart circle[data-year]{opacity:0}.chart circle.current{opacity:1;stroke:#fff6c5;stroke-width:2}.chart-control{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:14px;color:#514b31}.chart-control input{flex:1;min-width:75px;accent-color:#b75d13}.chart-control output{font-weight:600;white-space:nowrap}.allocation,.allocation.has-loan{display:block;height:auto;margin-top:24px}.budget-bar{display:flex;width:100%;height:22px;border-radius:12px;overflow:hidden;background:#e9dfb0}.budget-bar span{height:100%;min-width:0}.budget-saving{background:#d4ea30}.budget-housing{background:#ffb647}.budget-living{background:#ed7bdb}.budget-leisure{background:#6150ee}.budget-loan{background:#7dc7b0}.budget-legend{display:grid;gap:12px;margin-top:24px}.budget-legend>div{display:flex;justify-content:space-between;gap:12px;font-size:16px}.budget-legend>div>span{display:flex;align-items:center;gap:10px}.budget-key{width:13px;height:13px;border-radius:50%;display:inline-block;flex:none}.budget-legend strong{font-variant-numeric:tabular-nums}.capital-line{stroke-dasharray:1200;stroke-dashoffset:0;animation:draw-capital 1.2s ease-out both}@keyframes draw-capital{from{stroke-dashoffset:1200}to{stroke-dashoffset:0}}@media(prefers-reduced-motion:reduce){.capital-line{animation:none}}
 </style></head><body>
 <header class="topbar"><a href="#" class="wordmark" aria-label="Mathical главная">mathical<span>✳</span></a><span class="top-caption">Финансовый симулятор</span></header>
 <main class="shell" id="overview">
-<div class="heading"><div><h1>Твоё финансовое <span>будущее.</span></h1><p>Измени цифры сегодня. Посмотри, что будет завтра.</p></div></div>
+<div class="heading"><div><h1>Твоё финансовое <span>будущее.</span></h1><p>Это пример: укажи свои доходы, расходы и цель.</p></div></div>
 <section class="strategy-row" aria-label="Настройки плана">
 <button class="budget-entry" data-edit="income" aria-label="Изменить бюджет"><span class="budget-entry-top"><span>Мой бюджет</span><span class="edit-hint">Изменить ↗</span></span><span class="budget-figures"><span><small>Доход в месяц</small><strong id="income-metric"></strong></span><span class="budget-divider"></span><span><small>Расходы в месяц</small><strong id="expense-metric"></strong></span></span></button>
 <div class="horizon"><span class="micro">Срок планирования</span><div class="horizon-line"><div class="segmented" id="years"><button data-years="10">10 лет</button><button class="selected" data-years="15">15 лет</button><button data-years="20">20 лет</button></div><span class="future-year" id="future-year"></span></div><label class="horizon-custom" for="custom-years"><span>Свой срок</span><span class="horizon-custom-field"><input id="custom-years" type="number" inputmode="numeric" min="1" max="50" step="1" aria-describedby="horizon-hint"><span id="custom-years-unit">лет</span></span><small id="horizon-hint">от 1 до 50 лет</small></label></div></section>
 <div class="dashboard-grid">
-<section class="panel capital"><h2>Капитал во времени</h2><div class="chart-toolbar"><div class="toggle" id="money-mode"><button class="selected" data-mode="real">Сегодняшние ₽</button><button data-mode="nominal">Будущие ₽</button></div><label class="sr-only" for="scenario">Сценарий</label><select id="scenario"><option value="base">Базовый</option><option value="optimistic">Благоприятный</option><option value="stress">Стрессовый</option></select></div><div class="big-number" id="final-capital"></div><div class="chart-subtitle" id="capital-subtitle"></div><div id="capital-chart" class="chart" role="img" aria-label="График капитала по годам"></div><div class="chart-foot"><span><i class="dot orange"></i>Капитал</span><span id="chart-unit"></span></div></section>
-<section class="panel cashflow"><h2>Ежемесячный бюджет</h2><div class="allocation" id="allocation" title="Размеры блоков условные; точные доли указаны внутри"></div><p class="small-note" id="budget-note"></p></section>
+<section class="panel capital"><h2>Капитал во времени</h2><div class="chart-toolbar"><div class="toggle" id="money-mode"><button class="selected" data-mode="real">Сегодняшние ₽</button><button data-mode="nominal">Будущие ₽</button></div><label class="sr-only" for="scenario">Сценарий</label><select id="scenario"><option value="base">Базовый</option><option value="optimistic">Благоприятный</option><option value="stress">Стрессовый</option></select></div><div class="big-number" id="final-capital"></div><div class="chart-subtitle" id="capital-subtitle"></div><div id="capital-chart" class="chart" role="img" aria-label="График капитала по годам"></div><label class="chart-control">Год на графике <input id="chart-year" type="range" min="0" value="0" step="1"><output id="chart-readout" aria-live="polite"></output></label><div class="chart-foot"><span><i class="dot orange"></i>Капитал · <i class="dot" style="background:#8c7be9"></i>10–90% учебных вариантов базовой модели</span><span id="chart-unit"></span></div></section>
+<section class="panel cashflow"><h2>Ежемесячный бюджет</h2><div class="allocation" id="allocation" aria-label="Распределение ежемесячного бюджета"></div><p class="small-note" id="budget-note"></p></section>
 <section class="panel goal-card"><div class="panel-head"><span class="goal-label">Моя цель</span><button class="round-icon" data-edit="goals" aria-label="Изменить цель">↗</button></div><span class="goal-symbol" aria-hidden="true">◎</span><h2 id="goal-title"></h2><p id="goal-amount"></p><div class="goal-progress"><div id="goal-progress"></div></div><div class="goal-result" id="goal-result"></div><div class="goal-plan"><span>Чтобы накопить к сроку</span><strong id="goal-monthly"></strong><p id="goal-compare"></p><p>Все накопления — на цель. Инфляция и доходность учтены; сценарии — нет. Сравнение приблизительное: бюджет со временем может измениться.</p></div></section>
 </div>
 <section class="health-section" aria-labelledby="health-title"><h2 id="health-title">Финансовое здоровье</h2><div class="health-grid"><div><span>Остаток в месяц</span><strong id="health-free"></strong></div><div><span>Доля сбережений</span><strong id="health-rate"></strong></div><div><span>Обязательные расходы</span><strong id="health-essential"></strong></div><div><span>Запас средств</span><strong id="health-reserve"></strong></div></div><p id="health-note"></p></section><section class="credit-section" aria-labelledby="credit-title"><div class="credit-header"><div><h2 id="credit-title">Кредит</h2><p>Учти действующий долг в своём бюджете.</p></div><button class="credit-edit" type="button" data-edit="credit">Настроить ↗</button></div><p id="loan-empty">Добавь остаток долга, ставку и срок, чтобы увидеть платёж.</p><div id="loan-metrics" class="credit-metrics" hidden><div><span>Платёж в месяц</span><strong id="loan-payment"></strong></div><div><span>Оставшиеся проценты</span><strong id="loan-overpayment"></strong></div><div><span>Доля дохода</span><strong id="loan-ratio"></strong></div></div><p id="loan-note" class="credit-note" hidden>Равные платежи; комиссии и страховка не учтены. Долг не прибавляется к капиталу и не вычитается из него.</p></section><section id="decisions" class="decisions-section"><div class="section-heading"><h2>А что, если…</h2></div><div class="decision-list"><button data-decision="none" class="decision active"><strong>Ничего не менять</strong></button><button data-decision="save" class="decision"><strong>Тратить на 10% меньше</strong></button><button data-decision="education" class="decision"><strong>Вложиться в обучение</strong><small>120 тыс. ₽ · доход +15%</small></button><button data-decision="car" class="decision"><strong>Купить автомобиль</strong><small>900 тыс. ₽ + 8 тыс. ₽/мес.</small></button></div><div class="insight" id="decision-insight" aria-live="polite"></div></section>
@@ -356,7 +358,13 @@ body{overflow-x:hidden}
     const runs = Array.from({length:count},(_,i)=>simulate(input,'random',71+i*997));
     const values = runs.map(r=>r.final.real).sort((a,b)=>a-b);
     const q = n => values[Math.floor((values.length-1)*n)];
-    return {low:q(.1),median:q(.5),high:q(.9),success:runs.filter(r=>r.final.real>=normalize(input).goal).length/count,count};
+    const bands = runs[0].rows.map((_,year)=>{
+      const real=runs.map(r=>r.rows[year].real).sort((a,b)=>a-b);
+      const nominal=runs.map(r=>r.rows[year].balance).sort((a,b)=>a-b);
+      const at=(values,n)=>values[Math.floor((values.length-1)*n)];
+      return {realLow:at(real,.1),realHigh:at(real,.9),nominalLow:at(nominal,.1),nominalHigh:at(nominal,.9)};
+    });
+    return {low:q(.1),median:q(.5),high:q(.9),success:runs.filter(r=>r.final.real>=normalize(input).goal).length/count,count,bands};
   }
   root.Mathical = {defaults,bounds,normalize,loanTerms,goalPlan,financialHealth,simulate,distribution};
 })(globalThis);
@@ -368,26 +376,27 @@ body{overflow-x:hidden}
   const pct=n=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:1}).format(n)+'%';
   root.MathicalFormat={money,yearsLabel,pct};
 })(globalThis);
-</script><script>/* Построение SVG-графика капитала. */
+</script><script>/* График капитала и диапазон учебных сценариев. */
 (function(root){
   'use strict';
   const {money}=root.MathicalFormat;
-  function chart(rows, {years, mode, startYear}) {
-    const count=Math.min(6,years+1);
-    const indices=Array.from({length:count},(_,i)=>Math.round(i*years/(count-1)));
-    const barX=i=>86+i*261/(count-1);
-    const points=indices.map(i=>rows[i]);
-    const values=points.map(r=>r[mode==='real'?'real':'balance']);
-    const max=Math.max(1,...values)*1.12, min=Math.min(0,...values)*1.15;
-    const y=v=>225-(v-min)/(max-min)*205;
-    const zero=y(0), width=390;
-    const ticks=[min, (max+min)/2,max];
-    const trackClips=points.map((_,i)=>`<clipPath id="capital-track-${i}"><rect x="${barX(i)}" y="${y(max)}" width="38" height="205" rx="19"/></clipPath>`).join('');
-    let svg=`<svg viewBox="0 0 ${width} 255" role="img" aria-label="Капитал от ${startYear} до ${startYear+years}, ${mode==='real'?'в сегодняшних':'в будущих'} рублях"><title>Капитал по годам</title><defs><clipPath id="capital-plot-clip"><rect x="82" y="20" width="307" height="205"/></clipPath>${trackClips}</defs>`;
-    ticks.forEach(v=>{svg+=`<line x1="82" y1="${y(v)}" x2="389" y2="${y(v)}" stroke="#ddd3a5" stroke-dasharray="3 4"/><text x="75" y="${y(v)+3}" text-anchor="end" font-size="12" fill="#807653">${money(v).replace(/₽/g,'')}</text>`;});
-    svg+=`<line x1="82" y1="${zero}" x2="389" y2="${zero}" stroke="#9c926c"/>`;
-    points.forEach((r,i)=>{const v=values[i],x=barX(i), yy=y(v), h=v===0?0:Math.max(2,Math.abs(zero-yy)); svg+=`<g clip-path="url(#capital-plot-clip)"><rect x="${x}" y="${y(max)}" width="38" height="${205}" rx="19" fill="#e7ddb0"/><g clip-path="url(#capital-track-${i})"><rect x="${x}" y="${v>=0?zero-h:zero}" width="38" height="${h}" rx="${Math.min(19,h/2)}" fill="${v<0?'#d46485':'#ffb647'}"><title>${startYear+r.year}: ${money(v,false)}</title></rect></g></g><text x="${x+19}" y="249" text-anchor="middle" fill="#756d50" font-size="12">${startYear+r.year}</text>`;});
-    svg+='</svg>'; return svg;
+  function chart(rows,{years,mode,startYear,bands,goal}){
+    const real=mode==='real', val=r=>real?r.real:r.balance;
+    const low=b=>real?b.realLow:b.nominalLow, high=b=>real?b.realHigh:b.nominalHigh;
+    const values=rows.map(val), ext=[...values,...bands.flatMap(b=>[low(b),high(b)])];
+    let max=Math.max(1,...ext),min=Math.min(0,...ext);const pad=(max-min)*.09||1;max+=pad;min-=pad;
+    const x=i=>70+i*305/years, y=v=>205-(v-min)/(max-min)*180;
+    const path=points=>points.map(([a,b],i)=>(i?'L':'M')+a.toFixed(2)+' '+b.toFixed(2)).join(' ');
+    const line=path(values.map((v,i)=>[x(i),y(v)]));
+    const band=path(bands.map((b,i)=>[x(i),y(high(b))]).concat(bands.map((b,i)=>[x(i),y(low(b))]).reverse()))+' Z';
+    let svg=`<svg viewBox="0 0 390 235" role="img" aria-label="График капитала и диапазон учебных сценариев с ${startYear} по ${startYear+years} год"><defs><linearGradient id="chart-fill" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#ffb647" stop-opacity=".38"/><stop offset="1" stop-color="#ffb647" stop-opacity="0"/></linearGradient></defs>`;
+    [min,(min+max)/2,max].forEach(v=>{svg+=`<line x1="70" y1="${y(v)}" x2="375" y2="${y(v)}" stroke="#d4c99a" stroke-dasharray="3 4"/><text x="64" y="${y(v)+4}" text-anchor="end" font-size="11" fill="#675e40">${money(v).replace(/₽/g,'')}</text>`;});
+    svg+=`<path d="${band}" fill="#8c7be9" opacity=".18"/><path d="${line} L ${x(years)} ${y(0)} L ${x(0)} ${y(0)} Z" fill="url(#chart-fill)"/>`;
+    if(real && goal>=min && goal<=max) svg+=`<line x1="70" y1="${y(goal)}" x2="375" y2="${y(goal)}" stroke="#a64f8b" stroke-dasharray="5 4"/><text x="373" y="${y(goal)-5}" text-anchor="end" font-size="11" fill="#853966">Цель</text>`;
+    svg+=`<path class="capital-line" d="${line}" fill="none" stroke="#dc7916" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`;
+    rows.forEach((r,i)=>{svg+=`<circle data-year="${i}" cx="${x(i)}" cy="${y(val(r))}" r="4" fill="#a94f0d"><title>${startYear+i}: ${money(val(r),false)}</title></circle>`;});
+    const count=Math.min(5,years+1);for(let i=0;i<count;i++){const n=Math.round(i*years/(count-1));svg+=`<text x="${x(n)}" y="228" text-anchor="middle" font-size="11" fill="#675e40">${startYear+n}</text>`;}
+    return svg+'</svg>';
   }
   root.MathicalChart=chart;
 })(globalThis);
@@ -426,6 +435,9 @@ body{overflow-x:hidden}
     if(!saved.length){const el=document.createElement('div');el.className='empty-saved';el.textContent='Здесь появятся твои варианты будущего.';box.append(el);return;}
     saved.forEach((item,i)=>{const p=item.params,r=M.simulate(p,item.scenario);const row=document.createElement('div');row.className='saved-row';const left=document.createElement('div');const title=document.createElement('strong');title.textContent=`${i+1}. ${decisions[p.decision]}`;const info=document.createElement('small');info.textContent=`${outcomes[item.scenario]} · ${yearsLabel(p.years)} · ${money(p.salary)}/мес.`;left.append(title,info);const val=document.createElement('b');val.textContent=money(r.final.real);const load=document.createElement('button');load.textContent='↗';load.title='Загрузить этот сценарий';load.setAttribute('aria-label',`Загрузить вариант ${i+1}`);load.onclick=()=>{params={...p};scenario=item.scenario;$('#scenario').value=scenario;render();toast('Параметры варианта загружены');};const del=document.createElement('button');del.textContent='×';del.setAttribute('aria-label',`Удалить вариант ${i+1}`);del.onclick=()=>{saved.splice(i,1);renderSaved();persist();};row.append(left,val,load,del);box.append(row);});
   }
+  function updateChartYear(){const year=Number($('#chart-year').value),row=result.rows[year],value=mode==='real'?row.real:row.balance; text('chart-readout',`${startYear+year} год: ${money(value,false)}`);const marker=$('#capital-chart [data-year="'+year+'"]');document.querySelectorAll('#capital-chart [data-year]').forEach(el=>el.classList.remove('current'));if(marker)marker.classList.add('current');}
+  $('#chart-year').addEventListener('input',updateChartYear);
+  $('#capital-chart').addEventListener('click',e=>{const dot=e.target.closest('[data-year]');if(dot){$('#chart-year').value=dot.dataset.year;updateChartYear();}});
   function render(){
     params=M.normalize(params);result=M.simulate(params,scenario);
     const baseline=M.simulate({...params,decision:'none'},scenario),uncertain=M.distribution(params);
@@ -441,11 +453,12 @@ body{overflow-x:hidden}
     text('health-note',healthNote+(params.oneTime>0?' Разовая трата вычтена из накоплений.':''));
     text('future-year',startYear+params.years+' ↗');
     text('income-metric',money(params.salary));text('expense-metric',money(spent));
-    showCapital(mode==='real'?result.final.real:result.final.balance);text('capital-subtitle',`${outcomes[scenario]} сценарий · конец ${startYear+params.years} года`);text('chart-unit',mode==='real'?'Покупательная способность':'Номинальные суммы');$('#capital-chart').innerHTML=makeChart(result.rows,{years:params.years,mode,startYear});
+    showCapital(mode==='real'?result.final.real:result.final.balance);text('capital-subtitle',`${outcomes[scenario]} сценарий · конец ${startYear+params.years} года`);text('chart-unit',mode==='real'?'Покупательная способность':'Номинальные суммы');$('#capital-chart').innerHTML=makeChart(result.rows,{years:params.years,mode,startYear,bands:uncertain.bands,goal:params.goal}); const chartYear=$('#chart-year');chartYear.max=params.years;chartYear.value=params.years;updateChartYear();
     const share=n=>pct(n/Math.max(params.salary,spent,1)*100);
-    $('#allocation').classList.toggle('has-loan',loan.principal>0);
-    $('#allocation').innerHTML=`<div class="tile tile-saving"><b>${money(Math.max(0,free))}</b><span>остаётся на накопления · ${share(Math.max(0,free))}</span></div><div class="tile tile-housing"><b>${share(params.housing*factor)}</b><span>жильё</span></div><div class="tile-other${loan.principal>0?' with-loan':''}"><div class="tile tile-living"><b>${share((params.living+annualTotal/12)*factor)}</b><span>еда, быт и годовые траты</span></div><div class="tile tile-leisure"><b>${share(params.leisure*factor)}</b><span>досуг</span></div>${loan.principal>0?`<div class="tile tile-loan"><b>${share(loan.payment)}</b><span>кредит</span></div>`:''}</div>`;
-    text('budget-note',free<0?`Дефицит: ${money(-free,false)}/мес. Расходы превышают доход; проценты показаны от расходов.`:`В расходах учтена 1/12 годовых платежей${params.oneTime ? ' · разовая трата '+money(params.oneTime,false)+' учтена в первый месяц прогноза' : ''}. Размеры блоков условные.`);
+    const categories=[['Накопления',Math.max(0,free),'saving'],['Жильё',params.housing*factor,'housing'],['Еда и быт',(params.living+annualTotal/12)*factor,'living'],['Досуг',params.leisure*factor,'leisure'],...(loan.principal>0?[['Кредит',loan.payment,'loan']]:[])];
+    const total=categories.reduce((sum,x)=>sum+x[1],0);
+    $('#allocation').innerHTML=`<div class="budget-bar" aria-hidden="true">${categories.map(([name,value,color])=>`<span class="budget-${color}" style="width:${total?value/total*100:0}%"></span>`).join('')}</div><div class="budget-legend">${categories.map(([name,value,color])=>`<div><span><i class="budget-key budget-${color}"></i>${name}</span><strong>${pct(total?value/total*100:0)}</strong></div>`).join('')}</div>`;
+    text('budget-note',free<0?`Дефицит: ${money(-free,false)}/мес. Доли показаны от расходов.`:`В расходах учтена 1/12 годовых платежей${params.oneTime ? ' · разовая трата '+money(params.oneTime,false)+' учтена в первый месяц прогноза' : ''}.`);
     $('#loan-empty').hidden=loan.principal>0;
     $('#loan-metrics').hidden=loan.principal<=0;
     $('#loan-note').hidden=loan.principal<=0;

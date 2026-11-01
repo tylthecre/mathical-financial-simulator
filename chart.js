@@ -1,23 +1,24 @@
-/* Построение SVG-графика капитала. */
+/* График капитала и диапазон учебных сценариев. */
 (function(root){
   'use strict';
   const {money}=root.MathicalFormat;
-  function chart(rows, {years, mode, startYear}) {
-    const count=Math.min(6,years+1);
-    const indices=Array.from({length:count},(_,i)=>Math.round(i*years/(count-1)));
-    const barX=i=>86+i*261/(count-1);
-    const points=indices.map(i=>rows[i]);
-    const values=points.map(r=>r[mode==='real'?'real':'balance']);
-    const max=Math.max(1,...values)*1.12, min=Math.min(0,...values)*1.15;
-    const y=v=>225-(v-min)/(max-min)*205;
-    const zero=y(0), width=390;
-    const ticks=[min, (max+min)/2,max];
-    const trackClips=points.map((_,i)=>`<clipPath id="capital-track-${i}"><rect x="${barX(i)}" y="${y(max)}" width="38" height="205" rx="19"/></clipPath>`).join('');
-    let svg=`<svg viewBox="0 0 ${width} 255" role="img" aria-label="Капитал от ${startYear} до ${startYear+years}, ${mode==='real'?'в сегодняшних':'в будущих'} рублях"><title>Капитал по годам</title><defs><clipPath id="capital-plot-clip"><rect x="82" y="20" width="307" height="205"/></clipPath>${trackClips}</defs>`;
-    ticks.forEach(v=>{svg+=`<line x1="82" y1="${y(v)}" x2="389" y2="${y(v)}" stroke="#ddd3a5" stroke-dasharray="3 4"/><text x="75" y="${y(v)+3}" text-anchor="end" font-size="12" fill="#807653">${money(v).replace(/₽/g,'')}</text>`;});
-    svg+=`<line x1="82" y1="${zero}" x2="389" y2="${zero}" stroke="#9c926c"/>`;
-    points.forEach((r,i)=>{const v=values[i],x=barX(i), yy=y(v), h=v===0?0:Math.max(2,Math.abs(zero-yy)); svg+=`<g clip-path="url(#capital-plot-clip)"><rect x="${x}" y="${y(max)}" width="38" height="${205}" rx="19" fill="#e7ddb0"/><g clip-path="url(#capital-track-${i})"><rect x="${x}" y="${v>=0?zero-h:zero}" width="38" height="${h}" rx="${Math.min(19,h/2)}" fill="${v<0?'#d46485':'#ffb647'}"><title>${startYear+r.year}: ${money(v,false)}</title></rect></g></g><text x="${x+19}" y="249" text-anchor="middle" fill="#756d50" font-size="12">${startYear+r.year}</text>`;});
-    svg+='</svg>'; return svg;
+  function chart(rows,{years,mode,startYear,bands,goal}){
+    const real=mode==='real', val=r=>real?r.real:r.balance;
+    const low=b=>real?b.realLow:b.nominalLow, high=b=>real?b.realHigh:b.nominalHigh;
+    const values=rows.map(val), ext=[...values,...bands.flatMap(b=>[low(b),high(b)])];
+    let max=Math.max(1,...ext),min=Math.min(0,...ext);const pad=(max-min)*.09||1;max+=pad;min-=pad;
+    const x=i=>70+i*305/years, y=v=>205-(v-min)/(max-min)*180;
+    const path=points=>points.map(([a,b],i)=>(i?'L':'M')+a.toFixed(2)+' '+b.toFixed(2)).join(' ');
+    const line=path(values.map((v,i)=>[x(i),y(v)]));
+    const band=path(bands.map((b,i)=>[x(i),y(high(b))]).concat(bands.map((b,i)=>[x(i),y(low(b))]).reverse()))+' Z';
+    let svg=`<svg viewBox="0 0 390 235" role="img" aria-label="График капитала и диапазон учебных сценариев с ${startYear} по ${startYear+years} год"><defs><linearGradient id="chart-fill" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#ffb647" stop-opacity=".38"/><stop offset="1" stop-color="#ffb647" stop-opacity="0"/></linearGradient></defs>`;
+    [min,(min+max)/2,max].forEach(v=>{svg+=`<line x1="70" y1="${y(v)}" x2="375" y2="${y(v)}" stroke="#d4c99a" stroke-dasharray="3 4"/><text x="64" y="${y(v)+4}" text-anchor="end" font-size="11" fill="#675e40">${money(v).replace(/₽/g,'')}</text>`;});
+    svg+=`<path d="${band}" fill="#8c7be9" opacity=".18"/><path d="${line} L ${x(years)} ${y(0)} L ${x(0)} ${y(0)} Z" fill="url(#chart-fill)"/>`;
+    if(real && goal>=min && goal<=max) svg+=`<line x1="70" y1="${y(goal)}" x2="375" y2="${y(goal)}" stroke="#a64f8b" stroke-dasharray="5 4"/><text x="373" y="${y(goal)-5}" text-anchor="end" font-size="11" fill="#853966">Цель</text>`;
+    svg+=`<path class="capital-line" d="${line}" fill="none" stroke="#dc7916" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`;
+    rows.forEach((r,i)=>{svg+=`<circle data-year="${i}" cx="${x(i)}" cy="${y(val(r))}" r="4" fill="#a94f0d"><title>${startYear+i}: ${money(val(r),false)}</title></circle>`;});
+    const count=Math.min(5,years+1);for(let i=0;i<count;i++){const n=Math.round(i*years/(count-1));svg+=`<text x="${x(n)}" y="228" text-anchor="middle" font-size="11" fill="#675e40">${startYear+n}</text>`;}
+    return svg+'</svg>';
   }
   root.MathicalChart=chart;
 })(globalThis);

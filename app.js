@@ -33,6 +33,9 @@
     if(!saved.length){const el=document.createElement('div');el.className='empty-saved';el.textContent='Здесь появятся твои варианты будущего.';box.append(el);return;}
     saved.forEach((item,i)=>{const p=item.params,r=M.simulate(p,item.scenario);const row=document.createElement('div');row.className='saved-row';const left=document.createElement('div');const title=document.createElement('strong');title.textContent=`${i+1}. ${decisions[p.decision]}`;const info=document.createElement('small');info.textContent=`${outcomes[item.scenario]} · ${yearsLabel(p.years)} · ${money(p.salary)}/мес.`;left.append(title,info);const val=document.createElement('b');val.textContent=money(r.final.real);const load=document.createElement('button');load.textContent='↗';load.title='Загрузить этот сценарий';load.setAttribute('aria-label',`Загрузить вариант ${i+1}`);load.onclick=()=>{params={...p};scenario=item.scenario;$('#scenario').value=scenario;render();toast('Параметры варианта загружены');};const del=document.createElement('button');del.textContent='×';del.setAttribute('aria-label',`Удалить вариант ${i+1}`);del.onclick=()=>{saved.splice(i,1);renderSaved();persist();};row.append(left,val,load,del);box.append(row);});
   }
+  function updateChartYear(){const year=Number($('#chart-year').value),row=result.rows[year],value=mode==='real'?row.real:row.balance; text('chart-readout',`${startYear+year} год: ${money(value,false)}`);const marker=$('#capital-chart [data-year="'+year+'"]');document.querySelectorAll('#capital-chart [data-year]').forEach(el=>el.classList.remove('current'));if(marker)marker.classList.add('current');}
+  $('#chart-year').addEventListener('input',updateChartYear);
+  $('#capital-chart').addEventListener('click',e=>{const dot=e.target.closest('[data-year]');if(dot){$('#chart-year').value=dot.dataset.year;updateChartYear();}});
   function render(){
     params=M.normalize(params);result=M.simulate(params,scenario);
     const baseline=M.simulate({...params,decision:'none'},scenario),uncertain=M.distribution(params);
@@ -48,11 +51,12 @@
     text('health-note',healthNote+(params.oneTime>0?' Разовая трата вычтена из накоплений.':''));
     text('future-year',startYear+params.years+' ↗');
     text('income-metric',money(params.salary));text('expense-metric',money(spent));
-    showCapital(mode==='real'?result.final.real:result.final.balance);text('capital-subtitle',`${outcomes[scenario]} сценарий · конец ${startYear+params.years} года`);text('chart-unit',mode==='real'?'Покупательная способность':'Номинальные суммы');$('#capital-chart').innerHTML=makeChart(result.rows,{years:params.years,mode,startYear});
+    showCapital(mode==='real'?result.final.real:result.final.balance);text('capital-subtitle',`${outcomes[scenario]} сценарий · конец ${startYear+params.years} года`);text('chart-unit',mode==='real'?'Покупательная способность':'Номинальные суммы');$('#capital-chart').innerHTML=makeChart(result.rows,{years:params.years,mode,startYear,bands:uncertain.bands,goal:params.goal}); const chartYear=$('#chart-year');chartYear.max=params.years;chartYear.value=params.years;updateChartYear();
     const share=n=>pct(n/Math.max(params.salary,spent,1)*100);
-    $('#allocation').classList.toggle('has-loan',loan.principal>0);
-    $('#allocation').innerHTML=`<div class="tile tile-saving"><b>${money(Math.max(0,free))}</b><span>остаётся на накопления · ${share(Math.max(0,free))}</span></div><div class="tile tile-housing"><b>${share(params.housing*factor)}</b><span>жильё</span></div><div class="tile-other${loan.principal>0?' with-loan':''}"><div class="tile tile-living"><b>${share((params.living+annualTotal/12)*factor)}</b><span>еда, быт и годовые траты</span></div><div class="tile tile-leisure"><b>${share(params.leisure*factor)}</b><span>досуг</span></div>${loan.principal>0?`<div class="tile tile-loan"><b>${share(loan.payment)}</b><span>кредит</span></div>`:''}</div>`;
-    text('budget-note',free<0?`Дефицит: ${money(-free,false)}/мес. Расходы превышают доход; проценты показаны от расходов.`:`В расходах учтена 1/12 годовых платежей${params.oneTime ? ' · разовая трата '+money(params.oneTime,false)+' учтена в первый месяц прогноза' : ''}. Размеры блоков условные.`);
+    const categories=[['Накопления',Math.max(0,free),'saving'],['Жильё',params.housing*factor,'housing'],['Еда и быт',(params.living+annualTotal/12)*factor,'living'],['Досуг',params.leisure*factor,'leisure'],...(loan.principal>0?[['Кредит',loan.payment,'loan']]:[])];
+    const total=categories.reduce((sum,x)=>sum+x[1],0);
+    $('#allocation').innerHTML=`<div class="budget-bar" aria-hidden="true">${categories.map(([name,value,color])=>`<span class="budget-${color}" style="width:${total?value/total*100:0}%"></span>`).join('')}</div><div class="budget-legend">${categories.map(([name,value,color])=>`<div><span><i class="budget-key budget-${color}"></i>${name}</span><strong>${pct(total?value/total*100:0)}</strong></div>`).join('')}</div>`;
+    text('budget-note',free<0?`Дефицит: ${money(-free,false)}/мес. Доли показаны от расходов.`:`В расходах учтена 1/12 годовых платежей${params.oneTime ? ' · разовая трата '+money(params.oneTime,false)+' учтена в первый месяц прогноза' : ''}.`);
     $('#loan-empty').hidden=loan.principal>0;
     $('#loan-metrics').hidden=loan.principal<=0;
     $('#loan-note').hidden=loan.principal<=0;

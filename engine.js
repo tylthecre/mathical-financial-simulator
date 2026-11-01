@@ -86,7 +86,13 @@
     const runs = Array.from({length:count},(_,i)=>simulate(input,'random',71+i*997));
     const values = runs.map(r=>r.final.real).sort((a,b)=>a-b);
     const q = n => values[Math.floor((values.length-1)*n)];
-    return {low:q(.1),median:q(.5),high:q(.9),success:runs.filter(r=>r.final.real>=normalize(input).goal).length/count,count};
+    const bands = runs[0].rows.map((_,year)=>{
+      const real=runs.map(r=>r.rows[year].real).sort((a,b)=>a-b);
+      const nominal=runs.map(r=>r.rows[year].balance).sort((a,b)=>a-b);
+      const at=(values,n)=>values[Math.floor((values.length-1)*n)];
+      return {realLow:at(real,.1),realHigh:at(real,.9),nominalLow:at(nominal,.1),nominalHigh:at(nominal,.9)};
+    });
+    return {low:q(.1),median:q(.5),high:q(.9),success:runs.filter(r=>r.final.real>=normalize(input).goal).length/count,count,bands};
   }
   root.Mathical = {defaults,bounds,normalize,loanTerms,goalPlan,financialHealth,simulate,distribution};
 })(globalThis);
