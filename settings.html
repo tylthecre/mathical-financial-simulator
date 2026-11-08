@@ -22,13 +22,13 @@
       <button class="switch" id="s-band" type="button" role="switch" aria-checked="true" aria-label="Коридор на графике"></button></div></section>
 
   <section class="card surface reveal" aria-labelledby="s-data"><h2 id="s-data">Данные</h2>
-    <div class="setting"><div><h3>Скачать данные</h3><p>План, сохранённые варианты и настройки в одном файле JSON.</p></div><button class="btn btn-ghost btn-small" id="s-export" type="button">Скачать</button></div>
-    <div class="setting"><div><h3>Загрузить данные</h3><p>Восстановить всё из ранее скачанного файла. Текущие данные будут заменены.</p></div>
+    <div class="setting"><div><h3>Скачать данные</h3><p>Скачать план, записи по месяцам, варианты и настройки в одном файле.</p></div><button class="btn btn-ghost btn-small" id="s-export" type="button">Скачать</button></div>
+    <div class="setting"><div><h3>Загрузить данные</h3><p>Восстановить данные из файла. Текущие данные, включая записи по месяцам, будут заменены.</p></div>
       <button class="btn btn-ghost btn-small" id="s-import" type="button">Выбрать файл</button><input type="file" id="s-file" accept="application/json,.json" hidden></div>
-    <div class="setting"><div><h3>Хранилище браузера</h3><p id="s-storage"></p></div></div></section>
+    <div class="setting"><div><h3>Хранилище браузера</h3><p id="s-storage"></p></div></div><details class="plan-help"><summary>Подробнее <span aria-hidden="true">+</span></summary><div class="plan-help-content"><p>Данные находятся в этом браузере на этом устройстве. При очистке данных сайта или браузера они могут удалиться; в приватном режиме они могут не сохраниться после закрытия окна.</p><p>Чтобы перенести или восстановить данные, скачай файл и затем загрузи его в Mathical. Файл содержит план, записи по месяцам, сохранённые варианты, данные корзины и настройки. Загрузка заменяет текущие данные.</p></div></details></section>
 
   <section class="card surface danger-zone reveal" aria-labelledby="s-reset"><h2 id="s-reset">Сброс</h2>
-    <div class="setting"><div><h3>Удалить все данные</h3><p>План, варианты и настройки вернутся к начальным. Это нельзя отменить.</p></div><button class="btn btn-danger btn-small" id="s-wipe" type="button">Удалить всё</button></div></section>
+    <div class="setting"><div><h3>Удалить все данные</h3><p>Удалятся план, записи по месяцам, варианты и настройки. Это нельзя отменить.</p></div><button class="btn btn-danger btn-small" id="s-wipe" type="button">Удалить всё</button></div><details class="plan-help"><summary>Подробнее <span aria-hidden="true">+</span></summary><div class="plan-help-content"><p>Удаление очищает данные Mathical в этом браузере, включая личную корзину инфляции. Если данные могут понадобиться, сначала скачай их в разделе выше.</p><p>Уже скачанный файл останется на устройстве и его можно будет загрузить обратно.</p></div></details></section>
 </div>
 
 </main>
