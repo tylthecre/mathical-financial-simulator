@@ -550,7 +550,7 @@ main{padding:6px 16px 60px}
     for (const [month, row] of Object.entries(value)) {
       if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month) || !row || typeof row !== 'object') continue;
       out[month] = {};
-      for (const key of ['income','housing','living','leisure','other']) {
+      for (const key of ['income','housing','living','leisure','other','unexpected']) {
         const n = Number(row[key]); out[month][key] = Number.isFinite(n) && n >= 0 && n <= 1000000000 ? n : 0;
       }
     }

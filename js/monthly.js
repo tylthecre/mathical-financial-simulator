@@ -1,7 +1,7 @@
 (function () {
   'use strict';
   const S = MStore, U = MUI, form = U.$('#monthly-form'), month = U.$('#monthly-month');
-  const names = ['income', 'housing', 'living', 'leisure', 'other'];
+  const names = ['income', 'housing', 'living', 'leisure', 'other', 'unexpected'];
   const money = MathicalFormat.money;
   let current, dirty = false;
   function selectView(monthly) {
@@ -14,7 +14,7 @@
   U.$('#show-monthly').onclick = () => selectView(true);
   function totals() {
     const values = Object.fromEntries(names.map(name => [name, Number(form.elements[name].value) || 0]));
-    const expenses = values.housing + values.living + values.leisure + values.other;
+    const expenses = values.housing + values.living + values.leisure + values.other + values.unexpected;
     const balance = values.income - expenses;
     U.text('monthly-label', balance < 0 ? 'Дефицит за месяц' : 'Остаток за месяц');
     U.text('monthly-balance', money(Math.abs(balance), false));
