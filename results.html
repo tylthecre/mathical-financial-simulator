@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#10110f"><meta name="description" content="Капитал, бюджет, цель и финансовое здоровье."><title>Результаты — mathical</title><link rel="stylesheet" href="css/site.css?v=89352b5a0789"></head><body>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#10110f"><meta name="description" content="Капитал, бюджет, цель и финансовое здоровье."><title>Результаты — mathical</title><link rel="stylesheet" href="css/site.css?v=73ee5ea938c4"></head><body>
 <script src="engine.js?v=e9b6081a89b2"></script><script src="format.js?v=553037bf80be"></script><script src="chart.js?v=2d1dda41075b"></script><script src="js/store.js?v=0b091adbe616"></script><script src="js/ui.js?v=78b7b41bf3a9"></script>
 <main>
 
@@ -9,7 +9,7 @@
   <p class="lead reveal" style="--d:.14s" id="r-lead"></p>
 </div>
 <div class="controls reveal">
-  <div class="seg" id="money-mode" role="group" aria-label="Тип рублей"><button data-mode="real">Сегодняшние ₽</button><button data-mode="nominal">Будущие ₽</button></div>
+  <div class="money-mode-wrap"><div class="seg" id="money-mode" role="group" aria-label="Тип рублей"><button data-mode="real">Сегодняшние ₽</button><button data-mode="nominal">Будущие ₽</button></div><details class="plan-help money-help"><summary>Подробнее <span aria-hidden="true">+</span></summary><div class="plan-help-content"><p><strong>Будущие ₽</strong> — сумма в рублях будущего года без поправки на инфляцию.</p><p><strong>Сегодняшние ₽</strong> — сколько примерно эта сумма стоит по нынешним ценам с учётом инфляции.</p><p>Например, если цены вырастут вдвое, на 200 000 ₽ в будущем можно будет купить примерно столько же, сколько на 100 000 ₽ сегодня.</p></div></details></div>
   <label class="sr-only" for="scenario">Сценарий</label>
   <select class="pick" id="scenario"><option value="base">Базовый сценарий</option><option value="optimistic">Благоприятный сценарий</option><option value="stress">Стрессовый сценарий</option></select>
   <div class="seg" id="years" role="group" aria-label="На сколько лет показать прогноз"><button data-years="10">10 лет</button><button data-years="15">15 лет</button><button data-years="20">20 лет</button></div>
