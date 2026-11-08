@@ -373,3 +373,6 @@ main{padding:6px 16px 60px}
 
 /* Выбор вида плана и учёт по месяцам */
 .plan-view-switch{display:inline-flex;margin:0 0 24px}.monthly-status{margin-top:16px;min-height:1.5em}@media(max-width:480px){.plan-view-switch{display:flex}.plan-view-switch button{flex:1}}
+
+/* Сравнение остатка месяца с целью */
+.monthly-goal{padding:24px}.monthly-goal-kicker{font-size:13px;color:var(--muted)}.monthly-goal h2{font-size:21px;line-height:1.25;overflow-wrap:anywhere;margin:7px 0 18px}.monthly-goal-row{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-size:14px;color:var(--muted)}.monthly-goal-row strong{color:var(--ink);font-size:18px;white-space:nowrap}.monthly-goal-result{font-size:15px;font-weight:600;line-height:1.5;margin:16px 0 8px}.monthly-goal .field-note{line-height:1.5;margin-bottom:14px}.monthly-goal .btn{margin-top:0}
