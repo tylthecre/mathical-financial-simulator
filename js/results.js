@@ -1,6 +1,6 @@
 (function () {
   'use strict';
-  const M = Mathical, S = MStore, U = MUI, {money, yearsLabel, pct} = MathicalFormat;
+  const M = Mathical, S = MStore, U = MUI, {money, yearsLabel, durationLabel, pct} = MathicalFormat;
   const {outcomes, startYear} = S, view = S.state.view;
   let params = S.state.params, result;
 
@@ -50,13 +50,14 @@
     const goal = M.goalPlan(params), monthly = Math.max(0, Math.ceil(goal.monthly - 1e-7));
     U.countUp(U.$('#goal-monthly'), monthly, n => money(n, false) + '/мес.', 1200);
     const cmp = monthly === 0 ? 'К сроку достаточно начальных накоплений.' : free < 0 ? 'Сейчас расходы превышают доход.' : monthly > free ? 'Не хватает ' + money(Math.ceil(monthly - free), false) + '/мес. к остатку на старте плана.' : 'Остатка на старте плана хватает на этот взнос.';
-    U.text('goal-compare', 'Срок: ' + yearsLabel(params.goalYears) + '. ' + cmp);
+    U.text('goal-compare', 'Срок: ' + durationLabel(goal.months) + '. ' + cmp);
     const progress = Math.max(0, Math.min(100, result.final.real / params.goal * 100));
     const bar = U.$('#goal-progress');
     bar.style.width = '0%';
     setTimeout(() => { bar.style.width = progress + '%'; }, 120);
     let gr = result.reached !== null ? (result.reached === 0 ? 'Общего капитала уже достаточно для цели' : 'Общий капитал впервые достигнет стоимости цели в ' + (startYear + result.reached)) : 'Весь капитал: ' + Math.round(progress) + '% стоимости цели к ' + (startYear + params.years);
     if (result.reached !== null && result.final.real < params.goal) gr = 'Общий капитал достигал стоимости цели ранее, но к концу прогноза его недостаточно';
+    if (goal.months < 12) gr = 'График показывает общий капитал по годам; срок цели — ' + durationLabel(goal.months) + '.';
     U.text('goal-result', gr);
 
     /* Диапазон */

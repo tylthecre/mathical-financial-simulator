@@ -113,3 +113,29 @@ test('Цель: выбранная часть накоплений и совме
   assert.equal(normalize({...p,goalInitial:999999}).goalInitial,180000);
   assert.equal(normalize({...p,goalInitial:''}).goalInitial,null);
 });
+
+test('Короткая цель: 27 000 рублей за 2 месяца',()=>{
+  const p={...plain,initial:0,oneTime:0,goalInitial:0,goal:27000,goalMonths:2,inflation:0,rate:0};
+  const plan=globalThis.Mathical.goalPlan(p);
+  assert.equal(plan.months,2); assert.equal(plan.target,27000);
+  assert.ok(Math.abs(plan.monthly-13500)<1e-6);
+});
+test('Цель: месяцы учитывают инфляцию за часть года и сохраняют старые сроки',()=>{
+  const m=globalThis.Mathical, old={...plain,goalYears:2,goal:27000,initial:0,oneTime:0,inflation:12,rate:0};
+  assert.equal(m.normalize(old).goalMonths,24);
+  const p=m.goalPlan({...old,goalMonths:2});
+  assert.equal(p.months,2); assert.ok(Math.abs(p.target-27000*1.12**(2/12))<1e-8);
+  assert.equal(m.normalize({...old,goalMonths:0}).goalMonths,1);
+  assert.equal(m.normalize({...old,goalMonths:601}).goalMonths,600);
+  assert.equal(m.normalize(m.normalize({...old,goalMonths:18})).goalMonths,18);
+});
+
+test('Срок цели отображается понятными годами и месяцами', async()=>{
+  await import('./format.js');
+  const label=globalThis.MathicalFormat.durationLabel;
+  assert.equal(label(1),'1 месяц');
+  assert.equal(label(2),'2 месяца');
+  assert.equal(label(12),'1 год');
+  assert.equal(label(18),'1 год 6 месяцев');
+  assert.equal(label(24),'2 года');
+});

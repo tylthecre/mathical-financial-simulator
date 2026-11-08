@@ -418,6 +418,9 @@ body.accessible-mode .btn-danger{background:#a9212b;color:#fff}
 body.accessible-mode :is(.setting h3,.variant h3){font-size:21px;line-height:1.3}
 body.accessible-mode .card h2{font-size:24px;line-height:1.25}
 body.accessible-mode :is(.sub-line,.goal-amt,.goal-result,.goal-plan span,.goal-plan p,.card-top>span,.annual-items>p){font-size:18px;line-height:1.5}
+
+/* Срок цели: годы и месяцы. */
+.goal-duration{border:0;padding:0;margin:0;min-width:0}.goal-duration legend{font-size:14px;color:var(--muted);font-weight:500;margin:0 0 8px}.goal-duration-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.goal-duration .field-note,.goal-duration .field-error{margin-top:9px}body.accessible-mode .goal-duration legend{font-size:18px}@media(max-width:380px){.goal-duration-fields{grid-template-columns:minmax(0,1fr)}}
 </style></head><body>
 <script>/* Mathical — прозрачная учебная модель. Без внешних запросов. */
 (function (root) {
@@ -436,7 +439,11 @@ body.accessible-mode :is(.sub-line,.goal-amt,.goal-result,.goal-plan span,.goal-
     const otherSpending = p.living + p.leisure + (p.annual + p.annualItems.reduce((sum,x)=>sum+x.amount,0)) / 12;
     p.essentialOther = Math.min(p.essentialOther, otherSpending);
     p.years = Math.round(p.years);
-    p.goalYears = Math.round(p.goalYears);
+    // Старые планы хранят срок в годах, новые — точное число месяцев.
+    const rawGoalMonths = input && input.goalMonths;
+    const hasGoalMonths = rawGoalMonths !== undefined && rawGoalMonths !== null && rawGoalMonths !== '' && Number.isFinite(Number(rawGoalMonths));
+    p.goalMonths = hasGoalMonths ? Math.min(600, Math.max(1, Math.round(Number(rawGoalMonths)))) : Math.round(p.goalYears) * 12;
+    p.goalYears = p.goalMonths / 12;
     p.loanMonths = Math.round(p.loanMonths);
     p.goalName = String(p.goalName || defaults.goalName).slice(0,80);
     if (!['none','save','education','car'].includes(p.decision)) p.decision = 'none';
@@ -451,8 +458,8 @@ body.accessible-mode :is(.sub-line,.goal-amt,.goal-result,.goal-plan span,.goal-
   }
   // Фиксированный номинальный взнос в конце месяца для цели на выбранный срок.
   function goalPlan(input) {
-    const p = normalize(input), months = p.goalYears * 12;
-    const target = p.goal * Math.pow(1 + p.inflation / 100, p.goalYears);
+    const p = normalize(input), months = p.goalMonths;
+    const target = p.goal * Math.pow(1 + p.inflation / 100, months / 12);
     const monthlyRate = Math.pow(1 + p.rate / 100, 1 / 12) - 1;
     const starting = p.goalInitial === null ? p.initial - p.oneTime : p.goalInitial;
     function projected(contribution) {
@@ -526,8 +533,10 @@ body.accessible-mode :is(.sub-line,.goal-amt,.goal-result,.goal-plan span,.goal-
   'use strict';
   function money(n,compact=true){return new Intl.NumberFormat('ru-RU',{style:'currency',currency:'RUB',maximumFractionDigits:compact?1:0,...(compact?{notation:'compact'}:{})}).format(n);}
   const yearsLabel=n=>n+' '+({one:'год',few:'года',many:'лет',other:'лет'}[new Intl.PluralRules('ru-RU').select(n)]);
+  const monthsLabel = n => n + ' ' + ({one:'месяц',few:'месяца',many:'месяцев',other:'месяца'}[new Intl.PluralRules('ru-RU').select(n)]);
+  const durationLabel = months => { const years = Math.floor(months / 12), rest = months % 12; return [years ? yearsLabel(years) : '', rest ? monthsLabel(rest) : ''].filter(Boolean).join(' '); };
   const pct=n=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:1}).format(n)+'%';
-  root.MathicalFormat={money,yearsLabel,pct};
+  root.MathicalFormat={money,yearsLabel,monthsLabel,durationLabel,pct};
 })(globalThis);
 </script><script>/* График капитала и диапазон учебных сценариев. */
 (function(root){

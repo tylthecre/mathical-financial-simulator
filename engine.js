@@ -15,7 +15,11 @@
     const otherSpending = p.living + p.leisure + (p.annual + p.annualItems.reduce((sum,x)=>sum+x.amount,0)) / 12;
     p.essentialOther = Math.min(p.essentialOther, otherSpending);
     p.years = Math.round(p.years);
-    p.goalYears = Math.round(p.goalYears);
+    // Старые планы хранят срок в годах, новые — точное число месяцев.
+    const rawGoalMonths = input && input.goalMonths;
+    const hasGoalMonths = rawGoalMonths !== undefined && rawGoalMonths !== null && rawGoalMonths !== '' && Number.isFinite(Number(rawGoalMonths));
+    p.goalMonths = hasGoalMonths ? Math.min(600, Math.max(1, Math.round(Number(rawGoalMonths)))) : Math.round(p.goalYears) * 12;
+    p.goalYears = p.goalMonths / 12;
     p.loanMonths = Math.round(p.loanMonths);
     p.goalName = String(p.goalName || defaults.goalName).slice(0,80);
     if (!['none','save','education','car'].includes(p.decision)) p.decision = 'none';
@@ -30,8 +34,8 @@
   }
   // Фиксированный номинальный взнос в конце месяца для цели на выбранный срок.
   function goalPlan(input) {
-    const p = normalize(input), months = p.goalYears * 12;
-    const target = p.goal * Math.pow(1 + p.inflation / 100, p.goalYears);
+    const p = normalize(input), months = p.goalMonths;
+    const target = p.goal * Math.pow(1 + p.inflation / 100, months / 12);
     const monthlyRate = Math.pow(1 + p.rate / 100, 1 / 12) - 1;
     const starting = p.goalInitial === null ? p.initial - p.oneTime : p.goalInitial;
     function projected(contribution) {

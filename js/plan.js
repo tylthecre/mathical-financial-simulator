@@ -32,6 +32,13 @@
     U.$('#essential-error').textContent = err;
     U.$('#essential-error').hidden = !err;
 
+    const goalDuration = num('goalYears') * 12 + num('goalMonthsPart');
+    const durationError = goalDuration < 1 ? 'Укажи срок цели хотя бы 1 месяц.' : goalDuration > 600 ? 'Срок цели не может превышать 50 лет.' : '';
+    f.goalMonthsPart.setCustomValidity(durationError);
+    f.goalMonthsPart.setAttribute('aria-invalid', String(Boolean(durationError)));
+    U.$('#goal-duration-error').textContent = durationError;
+    U.$('#goal-duration-error').hidden = !durationError;
+
     const availableForGoal = Math.max(0, num('initial') - num('oneTime'));
     const goalError = f.goalInitial.value !== '' && Number(f.goalInitial.value) > availableForGoal ? 'Не больше доступных накоплений после разовой траты: ' + money(availableForGoal, false) + '.' : '';
     f.goalInitial.setCustomValidity(goalError);
@@ -59,6 +66,8 @@
       if (el && 'value' in el) el.value = v;
     }
     f.goalInitial.value = params.goalInitial == null ? '' : params.goalInitial;
+    f.goalYears.value = Math.floor(params.goalMonths / 12);
+    f.goalMonthsPart.value = params.goalMonths % 12;
     list.replaceChildren();
     params.annualItems.forEach(addItem);
     U.$('#credit-card').open = params.loanPrincipal > 0;
@@ -80,7 +89,9 @@
     update();
     if (!form.reportValidity()) return;
     if (Number(f.inflation.value) !== Number(S.state.params.inflation)) S.state.inflationInfo.source = 'manual';
-    S.state.params = M.normalize({...S.state.params, ...Object.fromEntries(new FormData(form)), annualItems: readItems()});
+    const {goalMonthsPart, ...values} = Object.fromEntries(new FormData(form));
+    const goalMonths = Number(values.goalYears) * 12 + Number(goalMonthsPart);
+    S.state.params = M.normalize({...S.state.params, ...values, goalMonths, annualItems: readItems()});
     S.persist();
     U.toast('План сохранён — смотрим результаты');
     setTimeout(() => U.go('results.html'), 650);
