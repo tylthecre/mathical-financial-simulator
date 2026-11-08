@@ -54,6 +54,8 @@
     if (!s.theme && (legacy === 'light' || legacy === 'dark')) s.theme = legacy;
     state.settings = cleanSettings(s);
     state.params = M.normalize(data.params && typeof data.params === 'object' ? data.params : {});
+    state.legacyDecisionRemoved = ['education', 'car'].includes(state.params.decision);
+    if (state.legacyDecisionRemoved) state.params = M.normalize({...state.params, decision: 'none'});
     state.saved = cleanSaved(data.saved);
     state.monthly = cleanMonthly(data.monthly);
     state.inflationInfo = cleanInflation(data.inflationInfo);
@@ -86,6 +88,8 @@
     const data = JSON.parse(text);
     if (!data || typeof data !== 'object' || data.app !== 'mathical') throw new Error('Это не файл Mathical');
     state.params = M.normalize(data.params && typeof data.params === 'object' ? data.params : {});
+    state.legacyDecisionRemoved = ['education', 'car'].includes(state.params.decision);
+    if (state.legacyDecisionRemoved) state.params = M.normalize({...state.params, decision: 'none'});
     state.saved = cleanSaved(data.saved);
     state.monthly = cleanMonthly(data.monthly);
     state.inflationInfo = cleanInflation(data.inflationInfo);

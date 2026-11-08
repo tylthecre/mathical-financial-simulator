@@ -209,7 +209,7 @@ input[type=range]{width:100%;accent-color:var(--purple)}
 .empty-cta p{margin:0;color:var(--muted);line-height:1.55}
 
 /* Сравнение */
-.decision-list{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.decision-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .decision{text-align:left;background:var(--surface);color:var(--ink);border-radius:24px;padding:22px;box-shadow:inset 0 0 0 1.5px var(--line);display:flex;flex-direction:column;gap:8px;min-height:120px;transition:transform .35s var(--ease),box-shadow .25s,background .25s,color .25s}
 .decision:hover{transform:translateY(-4px)}
 .decision strong{font-size:16px;font-weight:600;line-height:1.35}
@@ -584,6 +584,8 @@ main{padding:6px 16px 60px}
     if (!s.theme && (legacy === 'light' || legacy === 'dark')) s.theme = legacy;
     state.settings = cleanSettings(s);
     state.params = M.normalize(data.params && typeof data.params === 'object' ? data.params : {});
+    state.legacyDecisionRemoved = ['education', 'car'].includes(state.params.decision);
+    if (state.legacyDecisionRemoved) state.params = M.normalize({...state.params, decision: 'none'});
     state.saved = cleanSaved(data.saved);
     state.monthly = cleanMonthly(data.monthly);
     state.inflationInfo = cleanInflation(data.inflationInfo);
@@ -616,6 +618,8 @@ main{padding:6px 16px 60px}
     const data = JSON.parse(text);
     if (!data || typeof data !== 'object' || data.app !== 'mathical') throw new Error('Это не файл Mathical');
     state.params = M.normalize(data.params && typeof data.params === 'object' ? data.params : {});
+    state.legacyDecisionRemoved = ['education', 'car'].includes(state.params.decision);
+    if (state.legacyDecisionRemoved) state.params = M.normalize({...state.params, decision: 'none'});
     state.saved = cleanSaved(data.saved);
     state.monthly = cleanMonthly(data.monthly);
     state.inflationInfo = cleanInflation(data.inflationInfo);
@@ -770,6 +774,8 @@ main{padding:6px 16px 60px}
   const $$ = (s, r = doc) => [...r.querySelectorAll(s)];
   const text = (id, v) => { const el = doc.getElementById(id); if (el) el.textContent = v; };
 
+  if (S.state.legacyDecisionRemoved) toast('Ранее выбранный сценарий больше недоступен. Включён обычный план.');
+
   root.MUI = {applyTheme, animOn, reveal, countUp, drawChart, toast, download, go, $, $$, text};
 })(globalThis);
 </script>
@@ -798,7 +804,7 @@ main{padding:6px 16px 60px}
     <p>Взнос для цели предполагает равную сумму в конце каждого месяца, сумму начальных накоплений, выбранную для цели (или все после разовой траты, если поле пустое) и заданные инфляцию и доходность. Сценарии и будущие изменения бюджета в этом отдельном расчёте не учитываются.</p>
     <p>Кредит рассчитывается равными платежами по остатку долга; годовая ставка делится на 12, платёж учитывается в бюджете до окончания срока. Остаток долга не прибавляется к капиталу и не вычитается из него. Комиссии, страховки, изменение ставок и досрочные погашения не включены.</p></section>
   <section class="card orange reveal" id="decisions"><span class="num">5</span><h2>Жизненные решения</h2>
-    <p>Экономия уменьшает регулярные расходы на 10%, кроме платежа по кредиту. Обучение оплачивается в начале второго года, повышение зарплаты на 15% действует с третьего. Автомобиль покупается в начале третьего года, затем требует 8 тыс. ₽ в месяц в исходных ценах; стоимость автомобиля как актива не учитывается. Цель — порог накоплений, покупка автоматически не совершается.</p></section>
+    <p>Экономия уменьшает регулярные расходы на 10%, кроме платежа по кредиту. Цель — порог накоплений, покупка автоматически не совершается.</p></section>
   <section class="card lilac reveal" id="limits"><span class="num">6</span><h2>Границы модели</h2>
     <p>Не учитываются пенсия, отдельные налоги, стоимость имущества, ипотечные сборы и взаимосвязь рыночных показателей. Настройки и сохранённые варианты остаются в этом браузере, если он разрешает локальное хранение.</p></section>
   <section class="card surface reveal" id="about"><span class="num" style="background:var(--surface-2)">7</span><h2>О проекте и аналогах</h2>

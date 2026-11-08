@@ -208,7 +208,7 @@ input[type=range]{width:100%;accent-color:var(--purple)}
 .empty-cta p{margin:0;color:var(--muted);line-height:1.55}
 
 /* Сравнение */
-.decision-list{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.decision-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .decision{text-align:left;background:var(--surface);color:var(--ink);border-radius:24px;padding:22px;box-shadow:inset 0 0 0 1.5px var(--line);display:flex;flex-direction:column;gap:8px;min-height:120px;transition:transform .35s var(--ease),box-shadow .25s,background .25s,color .25s}
 .decision:hover{transform:translateY(-4px)}
 .decision strong{font-size:16px;font-weight:600;line-height:1.35}

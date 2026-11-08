@@ -139,5 +139,7 @@
   const $$ = (s, r = doc) => [...r.querySelectorAll(s)];
   const text = (id, v) => { const el = doc.getElementById(id); if (el) el.textContent = v; };
 
+  if (S.state.legacyDecisionRemoved) toast('Ранее выбранный сценарий больше недоступен. Включён обычный план.');
+
   root.MUI = {applyTheme, animOn, reveal, countUp, drawChart, toast, download, go, $, $$, text};
 })(globalThis);

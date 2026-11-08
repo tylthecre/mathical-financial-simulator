@@ -6,11 +6,12 @@
 
   function variantCard(item, i) {
     const label = item.current ? 'Сейчас' : 'Вариант ' + i;
+    const archived = !item.current && ['education', 'car'].includes(item.params.decision);
     const buttons = item.current
       ? '<button class="btn btn-dark btn-small" data-act="save" type="button">Сохранить вариант +</button>'
-      : '<button class="btn btn-dark btn-small" data-act="load" data-i="' + (i - 1) + '" type="button">Загрузить</button><button class="btn btn-ghost btn-small" style="color:inherit;box-shadow:inset 0 0 0 1.5px #0003" data-act="del" data-i="' + (i - 1) + '" type="button" aria-label="Удалить вариант ' + i + '">Удалить</button>';
-    return '<div class="card variant hover-lift reveal' + (item.current ? ' current lime' : '') + '" style="--d:' + i * .08 + 's"><span class="badge">' + label + '</span><h3>' + decisions[item.params.decision] + '</h3>' +
-      '<small>' + outcomes[item.scenario] + ' · ' + yearsLabel(item.params.years) + ' · ' + money(item.params.salary) + '/мес.</small>' +
+      : (archived ? '' : '<button class="btn btn-dark btn-small" data-act="load" data-i="' + (i - 1) + '" type="button">Загрузить</button>') + '<button class="btn btn-ghost btn-small" style="color:inherit;box-shadow:inset 0 0 0 1.5px #0003" data-act="del" data-i="' + (i - 1) + '" type="button" aria-label="Удалить вариант ' + i + '">Удалить</button>';
+    return '<div class="card variant hover-lift reveal' + (item.current ? ' current lime' : '') + '" style="--d:' + i * .08 + 's"><span class="badge">' + label + '</span><h3>' + (archived ? 'Архивный вариант' : decisions[item.params.decision]) + '</h3>' +
+      (archived ? '<small>Старый сценарий сохранён для просмотра; загрузка недоступна.</small>' : '') + '<small>' + outcomes[item.scenario] + ' · ' + yearsLabel(item.params.years) + ' · ' + money(item.params.salary) + '/мес.</small>' +
       '<div class="val">' + money(item.value) + '</div><div class="bar"><i data-w="' + item.pct + '"></i></div><div class="btn-row">' + buttons + '</div></div>';
   }
 
@@ -33,9 +34,7 @@
     const delta = result.final.real - base.final.real;
     const desc = {
       none: 'Базовый план без изменений. Выбери решение выше, чтобы увидеть его эффект.',
-      save: 'Регулярные расходы ниже на 10%; платёж по кредиту не меняется.',
-      education: 'Оплата в начале 2-го года; зарплата выше на 15% с 3-го года. Эффект повышения задан как учебное допущение.',
-      car: 'Покупка в начале 3-го года, затем содержание. Цена автомобиля как актива не входит в капитал.'
+      save: 'Регулярные расходы ниже на 10%; платёж по кредиту не меняется.'
     };
     U.$('#decision-insight').innerHTML = desc[params.decision] + (params.decision === 'none' ? '' : ' Разница через ' + yearsLabel(params.years) + ': <b>' + (delta >= 0 ? '+' : '') + money(delta, false) + '</b> в сегодняшних рублях.');
     U.$$('[data-decision]').forEach(b => b.classList.toggle('active', b.dataset.decision === params.decision));

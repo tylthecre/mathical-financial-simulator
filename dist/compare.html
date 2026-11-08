@@ -209,7 +209,7 @@ input[type=range]{width:100%;accent-color:var(--purple)}
 .empty-cta p{margin:0;color:var(--muted);line-height:1.55}
 
 /* Сравнение */
-.decision-list{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.decision-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .decision{text-align:left;background:var(--surface);color:var(--ink);border-radius:24px;padding:22px;box-shadow:inset 0 0 0 1.5px var(--line);display:flex;flex-direction:column;gap:8px;min-height:120px;transition:transform .35s var(--ease),box-shadow .25s,background .25s,color .25s}
 .decision:hover{transform:translateY(-4px)}
 .decision strong{font-size:16px;font-weight:600;line-height:1.35}
@@ -584,6 +584,8 @@ main{padding:6px 16px 60px}
     if (!s.theme && (legacy === 'light' || legacy === 'dark')) s.theme = legacy;
     state.settings = cleanSettings(s);
     state.params = M.normalize(data.params && typeof data.params === 'object' ? data.params : {});
+    state.legacyDecisionRemoved = ['education', 'car'].includes(state.params.decision);
+    if (state.legacyDecisionRemoved) state.params = M.normalize({...state.params, decision: 'none'});
     state.saved = cleanSaved(data.saved);
     state.monthly = cleanMonthly(data.monthly);
     state.inflationInfo = cleanInflation(data.inflationInfo);
@@ -616,6 +618,8 @@ main{padding:6px 16px 60px}
     const data = JSON.parse(text);
     if (!data || typeof data !== 'object' || data.app !== 'mathical') throw new Error('Это не файл Mathical');
     state.params = M.normalize(data.params && typeof data.params === 'object' ? data.params : {});
+    state.legacyDecisionRemoved = ['education', 'car'].includes(state.params.decision);
+    if (state.legacyDecisionRemoved) state.params = M.normalize({...state.params, decision: 'none'});
     state.saved = cleanSaved(data.saved);
     state.monthly = cleanMonthly(data.monthly);
     state.inflationInfo = cleanInflation(data.inflationInfo);
@@ -770,6 +774,8 @@ main{padding:6px 16px 60px}
   const $$ = (s, r = doc) => [...r.querySelectorAll(s)];
   const text = (id, v) => { const el = doc.getElementById(id); if (el) el.textContent = v; };
 
+  if (S.state.legacyDecisionRemoved) toast('Ранее выбранный сценарий больше недоступен. Включён обычный план.');
+
   root.MUI = {applyTheme, animOn, reveal, countUp, drawChart, toast, download, go, $, $$, text};
 })(globalThis);
 </script>
@@ -778,7 +784,7 @@ main{padding:6px 16px 60px}
 <div class="page-head">
   <span class="kicker reveal">Шаг 3 · Сравнение</span>
   <h1 class="title reveal" style="--d:.07s">А что, <span>если…</span></h1>
-  <p class="lead reveal" style="--d:.14s">Выбери жизненное решение и посмотри, как оно изменит капитал. Понравившийся вариант можно сохранить и сравнить с другими.</p>
+  <p class="lead reveal" style="--d:.14s">Сравни текущий план с вариантом, в котором расходы ниже. Можно сохранить до трёх вариантов.</p>
 </div>
 
 <section aria-labelledby="dec-title">
@@ -786,8 +792,6 @@ main{padding:6px 16px 60px}
   <div class="decision-list">
     <button class="decision reveal" data-decision="none"><span class="em">—</span><strong>Ничего не менять</strong><small>Текущий план как есть</small></button>
     <button class="decision reveal" style="--d:.06s" data-decision="save"><span class="em">−10%</span><strong>Тратить на 10% меньше</strong><small>Регулярные расходы ниже</small></button>
-    <button class="decision reveal" style="--d:.12s" data-decision="education"><span class="em">+15%</span><strong>Вложиться в обучение</strong><small>120 тыс. ₽ · доход +15%</small></button>
-    <button class="decision reveal" style="--d:.18s" data-decision="car"><span class="em">900к</span><strong>Купить автомобиль</strong><small>900 тыс. ₽ + 8 тыс. ₽/мес.</small></button>
   </div>
   <div class="insight" id="decision-insight" aria-live="polite"></div>
 </section>
@@ -812,11 +816,12 @@ main{padding:6px 16px 60px}
 
   function variantCard(item, i) {
     const label = item.current ? 'Сейчас' : 'Вариант ' + i;
+    const archived = !item.current && ['education', 'car'].includes(item.params.decision);
     const buttons = item.current
       ? '<button class="btn btn-dark btn-small" data-act="save" type="button">Сохранить вариант +</button>'
-      : '<button class="btn btn-dark btn-small" data-act="load" data-i="' + (i - 1) + '" type="button">Загрузить</button><button class="btn btn-ghost btn-small" style="color:inherit;box-shadow:inset 0 0 0 1.5px #0003" data-act="del" data-i="' + (i - 1) + '" type="button" aria-label="Удалить вариант ' + i + '">Удалить</button>';
-    return '<div class="card variant hover-lift reveal' + (item.current ? ' current lime' : '') + '" style="--d:' + i * .08 + 's"><span class="badge">' + label + '</span><h3>' + decisions[item.params.decision] + '</h3>' +
-      '<small>' + outcomes[item.scenario] + ' · ' + yearsLabel(item.params.years) + ' · ' + money(item.params.salary) + '/мес.</small>' +
+      : (archived ? '' : '<button class="btn btn-dark btn-small" data-act="load" data-i="' + (i - 1) + '" type="button">Загрузить</button>') + '<button class="btn btn-ghost btn-small" style="color:inherit;box-shadow:inset 0 0 0 1.5px #0003" data-act="del" data-i="' + (i - 1) + '" type="button" aria-label="Удалить вариант ' + i + '">Удалить</button>';
+    return '<div class="card variant hover-lift reveal' + (item.current ? ' current lime' : '') + '" style="--d:' + i * .08 + 's"><span class="badge">' + label + '</span><h3>' + (archived ? 'Архивный вариант' : decisions[item.params.decision]) + '</h3>' +
+      (archived ? '<small>Старый сценарий сохранён для просмотра; загрузка недоступна.</small>' : '') + '<small>' + outcomes[item.scenario] + ' · ' + yearsLabel(item.params.years) + ' · ' + money(item.params.salary) + '/мес.</small>' +
       '<div class="val">' + money(item.value) + '</div><div class="bar"><i data-w="' + item.pct + '"></i></div><div class="btn-row">' + buttons + '</div></div>';
   }
 
@@ -839,9 +844,7 @@ main{padding:6px 16px 60px}
     const delta = result.final.real - base.final.real;
     const desc = {
       none: 'Базовый план без изменений. Выбери решение выше, чтобы увидеть его эффект.',
-      save: 'Регулярные расходы ниже на 10%; платёж по кредиту не меняется.',
-      education: 'Оплата в начале 2-го года; зарплата выше на 15% с 3-го года. Эффект повышения задан как учебное допущение.',
-      car: 'Покупка в начале 3-го года, затем содержание. Цена автомобиля как актива не входит в капитал.'
+      save: 'Регулярные расходы ниже на 10%; платёж по кредиту не меняется.'
     };
     U.$('#decision-insight').innerHTML = desc[params.decision] + (params.decision === 'none' ? '' : ' Разница через ' + yearsLabel(params.years) + ': <b>' + (delta >= 0 ? '+' : '') + money(delta, false) + '</b> в сегодняшних рублях.');
     U.$$('[data-decision]').forEach(b => b.classList.toggle('active', b.dataset.decision === params.decision));

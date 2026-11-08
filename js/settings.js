@@ -33,7 +33,7 @@
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => {
-      try { S.importData(String(reader.result)); U.applyTheme(); sync(); U.toast('Данные загружены'); }
+      try { S.importData(String(reader.result)); U.applyTheme(); sync(); U.toast(S.state.legacyDecisionRemoved ? 'Данные загружены. Старый сценарий заменён обычным планом.' : 'Данные загружены'); }
       catch { U.toast('Не удалось прочитать файл. Нужен файл, скачанный из Mathical.'); }
     };
     reader.readAsText(file);

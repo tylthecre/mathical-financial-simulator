@@ -209,7 +209,7 @@ input[type=range]{width:100%;accent-color:var(--purple)}
 .empty-cta p{margin:0;color:var(--muted);line-height:1.55}
 
 /* Сравнение */
-.decision-list{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.decision-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .decision{text-align:left;background:var(--surface);color:var(--ink);border-radius:24px;padding:22px;box-shadow:inset 0 0 0 1.5px var(--line);display:flex;flex-direction:column;gap:8px;min-height:120px;transition:transform .35s var(--ease),box-shadow .25s,background .25s,color .25s}
 .decision:hover{transform:translateY(-4px)}
 .decision strong{font-size:16px;font-weight:600;line-height:1.35}
@@ -584,6 +584,8 @@ main{padding:6px 16px 60px}
     if (!s.theme && (legacy === 'light' || legacy === 'dark')) s.theme = legacy;
     state.settings = cleanSettings(s);
     state.params = M.normalize(data.params && typeof data.params === 'object' ? data.params : {});
+    state.legacyDecisionRemoved = ['education', 'car'].includes(state.params.decision);
+    if (state.legacyDecisionRemoved) state.params = M.normalize({...state.params, decision: 'none'});
     state.saved = cleanSaved(data.saved);
     state.monthly = cleanMonthly(data.monthly);
     state.inflationInfo = cleanInflation(data.inflationInfo);
@@ -616,6 +618,8 @@ main{padding:6px 16px 60px}
     const data = JSON.parse(text);
     if (!data || typeof data !== 'object' || data.app !== 'mathical') throw new Error('Это не файл Mathical');
     state.params = M.normalize(data.params && typeof data.params === 'object' ? data.params : {});
+    state.legacyDecisionRemoved = ['education', 'car'].includes(state.params.decision);
+    if (state.legacyDecisionRemoved) state.params = M.normalize({...state.params, decision: 'none'});
     state.saved = cleanSaved(data.saved);
     state.monthly = cleanMonthly(data.monthly);
     state.inflationInfo = cleanInflation(data.inflationInfo);
@@ -770,6 +774,8 @@ main{padding:6px 16px 60px}
   const $$ = (s, r = doc) => [...r.querySelectorAll(s)];
   const text = (id, v) => { const el = doc.getElementById(id); if (el) el.textContent = v; };
 
+  if (S.state.legacyDecisionRemoved) toast('Ранее выбранный сценарий больше недоступен. Включён обычный план.');
+
   root.MUI = {applyTheme, animOn, reveal, countUp, drawChart, toast, download, go, $, $$, text};
 })(globalThis);
 </script>
@@ -779,7 +785,7 @@ main{padding:6px 16px 60px}
   <div>
     <span class="kicker reveal">Финансовый симулятор</span>
     <h1 class="reveal" style="--d:.08s"><span>Твоё финансовое</span><span class="grad">будущее.</span></h1>
-    <p class="lead reveal" style="--d:.16s">Укажи доходы, расходы и цель — mathical покажет, как вырастет капитал и что изменят твои решения: экономия, учёба или крупная покупка.</p>
+    <p class="lead reveal" style="--d:.16s">Укажи доходы, расходы и цель — mathical покажет, как может измениться капитал и как на него повлияет экономия.</p>
     <div class="cta reveal" style="--d:.24s">
       <a class="btn btn-primary" href="plan.html">Собрать свой план <span class="arr">→</span></a>
       <a class="btn btn-ghost" href="results.html">Смотреть результаты</a>
@@ -803,7 +809,7 @@ main{padding:6px 16px 60px}
   <div class="grid g4">
     <a class="card feature purple hover-lift reveal" href="plan.html"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></span><h3>План</h3><p>Доходы, расходы, накопления, цель и кредит — с этого начинается расчёт.</p><span class="go"><span>Открыть</span><span>→</span></span></a>
     <a class="card feature lime hover-lift reveal" style="--d:.08s" href="results.html"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18M5 16l4-5 4 3 6-8"/><path d="M15 6h4v4"/></svg></span><h3>Результаты</h3><p>Капитал во времени, бюджет, прогресс цели и финансовое здоровье.</p><span class="go"><span>Открыть</span><span>→</span></span></a>
-    <a class="card feature pink hover-lift reveal" style="--d:.16s" href="compare.html"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="10" width="5" height="10" rx="1.5"/><rect x="10" y="4" width="5" height="16" rx="1.5"/><rect x="17" y="13" width="4" height="7" rx="1.5"/></svg></span><h3>Сравнение</h3><p>А что, если тратить меньше, учиться или купить машину? Сравни варианты рядом.</p><span class="go"><span>Открыть</span><span>→</span></span></a>
+    <a class="card feature pink hover-lift reveal" style="--d:.16s" href="compare.html"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="10" width="5" height="10" rx="1.5"/><rect x="10" y="4" width="5" height="16" rx="1.5"/><rect x="17" y="13" width="4" height="7" rx="1.5"/></svg></span><h3>Сравнение</h3><p>Посмотри, как экономия изменит накопления, и сравни сохранённые варианты.</p><span class="go"><span>Открыть</span><span>→</span></span></a>
     <a class="card feature orange hover-lift reveal" style="--d:.24s" href="method.html"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5M9 8h6M9 12h4"/></svg></span><h3>Как считается</h3><p>Формулы и допущения модели — простым языком.</p><span class="go"><span>Открыть</span><span>→</span></span></a>
   </div>
 </section>
