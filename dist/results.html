@@ -794,7 +794,7 @@ main{padding:6px 16px 60px}
     <div class="big" id="final-capital">—</div><div class="sub-line" id="capital-subtitle"></div>
     <div id="capital-chart" class="chart" role="img" aria-label="График капитала по годам"></div>
     <label class="chart-control">Год на графике <input id="chart-year" type="range" min="0" value="0" step="1"><output id="chart-readout" aria-live="polite"></output></label>
-    <div class="chart-foot"><span><i class="dot" style="background:#dc7916"></i>Капитал · <i class="dot" style="background:#a64f8b"></i>Цель <span id="chart-band-legend">· <i class="dot" style="background:#8c7be9"></i>10–90% базовой модели</span></span></div>
+    <div class="chart-foot"><span><i class="dot" style="background:#dc7916"></i>Капитал · <i class="dot" style="background:#a64f8b"></i>Цель <span id="chart-band-legend">· <i class="dot" style="background:#8c7be9"></i>Диапазон модели</span></span></div>
     <p class="note" id="chart-goal-note"></p></section>
 
   <section class="card pink goal-card reveal" style="--d:.1s" aria-label="Цель">
@@ -809,9 +809,9 @@ main{padding:6px 16px 60px}
 
 <div class="grid cols-main" style="margin-top:16px">
   <section class="card reveal" aria-labelledby="bud-title"><h2 id="bud-title">Ежемесячный бюджет</h2><div id="allocation" aria-label="Распределение ежемесячного бюджета"></div><p class="note" id="budget-note"></p></section>
-  <section class="card sage reveal" style="--d:.1s" aria-labelledby="rng-title"><h2 id="rng-title">Диапазон результатов</h2><p class="note" style="margin-top:8px">160 учебных траекторий · в сегодняшних рублях</p>
-    <div class="range-values"><div><span>10-й перцентиль</span><b id="p10"></b></div><div><span>Медиана</span><b id="p50"></b></div><div><span>90-й перцентиль</span><b id="p90"></b></div></div>
-    <div class="range-line"><span></span></div><p class="note" id="probability"></p></section>
+  <section class="card sage reveal" style="--d:.1s" aria-labelledby="rng-title"><h2 id="rng-title">Диапазон результатов</h2><p class="note" style="margin-top:8px">В сегодняшних рублях</p>
+    <div class="range-values"><div><span>Меньше</span><b id="p10"></b></div><div><span>Средний вариант</span><b id="p50"></b></div><div><span>Больше</span><b id="p90"></b></div></div>
+    <div class="range-line"><span></span></div><p class="note">Примерные результаты модели. Возможны и другие суммы.</p></section>
 </div>
 
 <section class="section" aria-labelledby="health-title">
@@ -903,7 +903,6 @@ main{padding:6px 16px 60px}
 
     /* Диапазон */
     U.text('p10', money(dist.low)); U.text('p50', money(dist.median)); U.text('p90', money(dist.high));
-    U.text('probability', 'Весь капитал достиг стоимости цели в ' + Math.round(dist.success * 100) + '% учебных прогонов к концу прогноза. Не гарантия результата.');
 
     /* Здоровье */
     const health = M.financialHealth(params);

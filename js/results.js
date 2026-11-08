@@ -61,7 +61,6 @@
 
     /* Диапазон */
     U.text('p10', money(dist.low)); U.text('p50', money(dist.median)); U.text('p90', money(dist.high));
-    U.text('probability', 'Весь капитал достиг стоимости цели в ' + Math.round(dist.success * 100) + '% учебных прогонов к концу прогноза. Не гарантия результата.');
 
     /* Здоровье */
     const health = M.financialHealth(params);
