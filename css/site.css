@@ -387,3 +387,34 @@ main{padding:6px 16px 60px}
 .plan-help summary{display:flex;width:max-content;margin-left:auto;gap:5px;padding:3px 0;background:transparent;box-shadow:none;border-radius:0;color:var(--muted);font-size:12px;font-weight:400}.plan-help summary:hover{color:var(--ink)}.plan-help summary span{font-size:14px;font-weight:400}.plan-view-switch+.plan-help{max-width:390px;margin-top:-12px}.money-mode-wrap{width:min(100%,290px);align-self:flex-start}.money-mode-wrap .seg{width:max-content;max-width:100%}.money-help{margin:3px 0 0}.money-help .plan-help-content{padding-top:8px}.money-help p{font-size:13px}
 
 .controls{align-items:flex-start}
+
+/* Дополнительная читаемость без изменения обычного вида. */
+.accessibility-toggle{font-size:16px;font-weight:700;letter-spacing:-1px}.accessibility-toggle:hover{transform:none}.accessibility-toggle[aria-pressed=true]{background:var(--lime);color:#1b2108}.theme-light .accessibility-toggle[aria-pressed=true]{background:var(--purple);color:#fff}
+body.accessible-mode{font-size:18px;line-height:1.55;--muted:#d2d9ca;--line:#7a8970;--card-muted:#403c2b;--focus:#f6ff57}
+body.theme-light.accessible-mode{--muted:#343d31;--line:#697764;--card-muted:#353123;--focus:#3012b2}
+body.accessible-mode :is(.lead,.field>.lbl,.input-wrap .unit,.field-note,.field-error,.form-card .sub,.card-details>summary small,.setting p,.note,.plan-help,.plan-help summary,.plan-help-content p,.nav-links a,.foot,.step p,.feature p,.monthly-goal-kicker,.monthly-goal-row,.monthly-goal-result,.decision small,.decision strong,.chart-control,.chart-foot,.range-values span,.sum-row,.goal-plan p,.stat span,.variant small,.slot,.toc a,.prose p,.inflation-current p){font-size:18px;line-height:1.55}
+body.accessible-mode :is(.btn,.seg button,select.pick,.input-wrap input,.annual-item input){font-size:18px;line-height:1.35}
+body.accessible-mode :is(.btn,.seg button,select.pick,.plan-help summary){min-height:44px}
+body.accessible-mode .plan-help summary{padding:8px 3px}
+body.accessible-mode .input-wrap input{min-height:52px}
+body.accessible-mode .seg{flex-wrap:wrap;border-radius:20px}
+body.accessible-mode .seg button{white-space:normal}
+body.accessible-mode .monthly-goal-row{flex-wrap:wrap}
+body.accessible-mode .sum-free{white-space:normal;overflow-wrap:anywhere}
+body.accessible-mode .card.purple :is(.note,.sum-row){color:#fff}
+body.accessible-mode .field-error,body.accessible-mode .input-wrap input[aria-invalid=true]{color:#ffb9bd}
+body.theme-light.accessible-mode .field-error,body.theme-light.accessible-mode .input-wrap input[aria-invalid=true]{color:#a40011}
+body.accessible-mode :focus-visible{outline:4px solid #f6ff57;outline-offset:4px}
+body.theme-light.accessible-mode :focus-visible{outline-color:#3012b2}
+body.accessible-mode .input-wrap:focus-within{box-shadow:inset 0 0 0 3px var(--focus)}
+@media(max-width:1100px){body.accessible-mode .nav-links{position:absolute;top:78px;left:14px;right:14px;flex-direction:column;margin:0;padding:8px;background:var(--surface);border-radius:24px;box-shadow:0 24px 50px -20px #000d,inset 0 0 0 1px var(--line);opacity:0;transform:translateY(-10px) scale(.98);pointer-events:none}body.accessible-mode .site-header.open .nav-links{opacity:1;transform:none;pointer-events:auto}body.accessible-mode .nav-links a{padding:14px 18px}body.accessible-mode .nav-ind{display:none}body.accessible-mode .nav-actions{margin-left:auto}body.accessible-mode .menu-btn{display:grid}}
+@media(max-width:480px){body.accessible-mode .nav{padding:0 12px;gap:6px}body.accessible-mode .nav-actions{gap:5px}body.accessible-mode .wordmark{font-size:26px}body.accessible-mode .form-grid{grid-template-columns:minmax(0,1fr)}body.accessible-mode .form-grid .wide{grid-column:auto}body.accessible-mode .money-mode-wrap{width:100%}}
+
+body.accessible-mode .switch{height:44px}
+body.accessible-mode .switch::after{top:10px}
+body.accessible-mode .btn-danger{background:#a9212b;color:#fff}
+@media(max-width:1100px){body.accessible-mode .nav-links{visibility:hidden}body.accessible-mode .site-header.open .nav-links{visibility:visible}}
+
+body.accessible-mode :is(.setting h3,.variant h3){font-size:21px;line-height:1.3}
+body.accessible-mode .card h2{font-size:24px;line-height:1.25}
+body.accessible-mode :is(.sub-line,.goal-amt,.goal-result,.goal-plan span,.goal-plan p,.card-top>span,.annual-items>p){font-size:18px;line-height:1.5}

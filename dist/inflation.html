@@ -387,6 +387,37 @@ main{padding:6px 16px 60px}
 .plan-help summary{display:flex;width:max-content;margin-left:auto;gap:5px;padding:3px 0;background:transparent;box-shadow:none;border-radius:0;color:var(--muted);font-size:12px;font-weight:400}.plan-help summary:hover{color:var(--ink)}.plan-help summary span{font-size:14px;font-weight:400}.plan-view-switch+.plan-help{max-width:390px;margin-top:-12px}.money-mode-wrap{width:min(100%,290px);align-self:flex-start}.money-mode-wrap .seg{width:max-content;max-width:100%}.money-help{margin:3px 0 0}.money-help .plan-help-content{padding-top:8px}.money-help p{font-size:13px}
 
 .controls{align-items:flex-start}
+
+/* Дополнительная читаемость без изменения обычного вида. */
+.accessibility-toggle{font-size:16px;font-weight:700;letter-spacing:-1px}.accessibility-toggle:hover{transform:none}.accessibility-toggle[aria-pressed=true]{background:var(--lime);color:#1b2108}.theme-light .accessibility-toggle[aria-pressed=true]{background:var(--purple);color:#fff}
+body.accessible-mode{font-size:18px;line-height:1.55;--muted:#d2d9ca;--line:#7a8970;--card-muted:#403c2b;--focus:#f6ff57}
+body.theme-light.accessible-mode{--muted:#343d31;--line:#697764;--card-muted:#353123;--focus:#3012b2}
+body.accessible-mode :is(.lead,.field>.lbl,.input-wrap .unit,.field-note,.field-error,.form-card .sub,.card-details>summary small,.setting p,.note,.plan-help,.plan-help summary,.plan-help-content p,.nav-links a,.foot,.step p,.feature p,.monthly-goal-kicker,.monthly-goal-row,.monthly-goal-result,.decision small,.decision strong,.chart-control,.chart-foot,.range-values span,.sum-row,.goal-plan p,.stat span,.variant small,.slot,.toc a,.prose p,.inflation-current p){font-size:18px;line-height:1.55}
+body.accessible-mode :is(.btn,.seg button,select.pick,.input-wrap input,.annual-item input){font-size:18px;line-height:1.35}
+body.accessible-mode :is(.btn,.seg button,select.pick,.plan-help summary){min-height:44px}
+body.accessible-mode .plan-help summary{padding:8px 3px}
+body.accessible-mode .input-wrap input{min-height:52px}
+body.accessible-mode .seg{flex-wrap:wrap;border-radius:20px}
+body.accessible-mode .seg button{white-space:normal}
+body.accessible-mode .monthly-goal-row{flex-wrap:wrap}
+body.accessible-mode .sum-free{white-space:normal;overflow-wrap:anywhere}
+body.accessible-mode .card.purple :is(.note,.sum-row){color:#fff}
+body.accessible-mode .field-error,body.accessible-mode .input-wrap input[aria-invalid=true]{color:#ffb9bd}
+body.theme-light.accessible-mode .field-error,body.theme-light.accessible-mode .input-wrap input[aria-invalid=true]{color:#a40011}
+body.accessible-mode :focus-visible{outline:4px solid #f6ff57;outline-offset:4px}
+body.theme-light.accessible-mode :focus-visible{outline-color:#3012b2}
+body.accessible-mode .input-wrap:focus-within{box-shadow:inset 0 0 0 3px var(--focus)}
+@media(max-width:1100px){body.accessible-mode .nav-links{position:absolute;top:78px;left:14px;right:14px;flex-direction:column;margin:0;padding:8px;background:var(--surface);border-radius:24px;box-shadow:0 24px 50px -20px #000d,inset 0 0 0 1px var(--line);opacity:0;transform:translateY(-10px) scale(.98);pointer-events:none}body.accessible-mode .site-header.open .nav-links{opacity:1;transform:none;pointer-events:auto}body.accessible-mode .nav-links a{padding:14px 18px}body.accessible-mode .nav-ind{display:none}body.accessible-mode .nav-actions{margin-left:auto}body.accessible-mode .menu-btn{display:grid}}
+@media(max-width:480px){body.accessible-mode .nav{padding:0 12px;gap:6px}body.accessible-mode .nav-actions{gap:5px}body.accessible-mode .wordmark{font-size:26px}body.accessible-mode .form-grid{grid-template-columns:minmax(0,1fr)}body.accessible-mode .form-grid .wide{grid-column:auto}body.accessible-mode .money-mode-wrap{width:100%}}
+
+body.accessible-mode .switch{height:44px}
+body.accessible-mode .switch::after{top:10px}
+body.accessible-mode .btn-danger{background:#a9212b;color:#fff}
+@media(max-width:1100px){body.accessible-mode .nav-links{visibility:hidden}body.accessible-mode .site-header.open .nav-links{visibility:visible}}
+
+body.accessible-mode :is(.setting h3,.variant h3){font-size:21px;line-height:1.3}
+body.accessible-mode .card h2{font-size:24px;line-height:1.25}
+body.accessible-mode :is(.sub-line,.goal-amt,.goal-result,.goal-plan span,.goal-plan p,.card-top>span,.annual-items>p){font-size:18px;line-height:1.5}
 </style></head><body>
 <script>/* Mathical — прозрачная учебная модель. Без внешних запросов. */
 (function (root) {
@@ -532,7 +563,7 @@ main{padding:6px 16px 60px}
   'use strict';
   const M = root.Mathical, KEY = 'mathical-v1', SKEY = 'mathical-settings', TKEY = 'mathical-theme';
   const SCEN = ['base', 'optimistic', 'stress'];
-  const DEFAULT_SETTINGS = {theme: 'system', mode: 'real', animations: true, band: true};
+  const DEFAULT_SETTINGS = {theme: 'system', mode: 'real', animations: true, band: true, accessible: false};
   const decisions = {none: 'Без изменений', save: 'Экономия 10%', education: 'Обучение', car: 'Автомобиль'};
   const outcomes = {base: 'Базовый', optimistic: 'Благоприятный', stress: 'Стрессовый'};
   const startYear = new Date().getFullYear();
@@ -548,7 +579,8 @@ main{padding:6px 16px 60px}
       theme: ['system', 'light', 'dark'].includes(o.theme) ? o.theme : 'system',
       mode: ['real', 'nominal'].includes(o.mode) ? o.mode : 'real',
       animations: o.animations !== false,
-      band: o.band !== false
+      band: o.band !== false,
+      accessible: o.accessible === true
     };
   }
   function cleanSaved(list) {
@@ -644,6 +676,9 @@ main{padding:6px 16px 60px}
   function applyTheme() {
     const t = S.state.settings.theme, light = t === 'system' ? mq.matches : t === 'light';
     doc.body.classList.toggle('theme-light', light);
+    doc.body.classList.toggle('accessible-mode', S.state.settings.accessible);
+    const access = doc.getElementById('accessibility-toggle');
+    if (access) access.setAttribute('aria-pressed', String(S.state.settings.accessible));
     doc.body.classList.toggle('no-anim', !animOn());
     const m = doc.querySelector('meta[name=theme-color]');
     if (m) m.content = light ? '#f5f3e9' : '#10110f';
@@ -661,10 +696,16 @@ main{padding:6px 16px 60px}
     '<header class="site-header" id="site-header"><div class="nav"><a href="index.html" class="wordmark" aria-label="Mathical — главная">mathical' + logo + '</a>' +
     '<nav class="nav-links" id="nav-links" aria-label="Разделы сайта"><span class="nav-ind" id="nav-ind"></span>' +
     links.map(([h, t]) => '<a href="' + h + '"' + (h === here ? ' class="active" aria-current="page"' : '') + '>' + t + '</a>').join('') + '</nav>' +
-    '<div class="nav-actions"><a class="icon-btn' + (here === 'settings.html' ? ' active' : '') + '" href="settings.html" aria-label="Настройки" title="Настройки">' + gear + '</a>' +
+    '<div class="nav-actions"><button class="icon-btn accessibility-toggle" id="accessibility-toggle" type="button" aria-label="Режим для слабовидящих" aria-pressed="false" title="Режим для слабовидящих">Аа</button><a class="icon-btn' + (here === 'settings.html' ? ' active' : '') + '" href="settings.html" aria-label="Настройки" title="Настройки">' + gear + '</a>' +
     '<button class="icon-btn menu-btn" id="menu-btn" type="button" aria-label="Меню" aria-expanded="false" aria-controls="nav-links">' + menu + '</button></div></div></header>' +
     '<div class="toast" id="toast" role="status"></div>');
   applyTheme();
+  doc.getElementById('accessibility-toggle').onclick = () => {
+    S.state.settings.accessible = !S.state.settings.accessible;
+    const ok = S.persist(); applyTheme();
+    doc.dispatchEvent(new Event('mathical-accessibility-changed'));
+    toast(ok ? (S.state.settings.accessible ? 'Режим для слабовидящих включён' : 'Обычный вид включён') : 'Не удалось сохранить настройку в браузере');
+  };
 
   const header = doc.getElementById('site-header'), ind = doc.getElementById('nav-ind'), navLinks = doc.getElementById('nav-links');
   const active = navLinks.querySelector('a.active');

@@ -6,6 +6,7 @@
     const st = cfg();
     U.$$('#s-theme button').forEach(b => b.classList.toggle('selected', b.dataset.v === st.theme));
     U.$$('#s-mode button').forEach(b => b.classList.toggle('selected', b.dataset.v === st.mode));
+    U.$('#s-accessible').setAttribute('aria-checked', String(st.accessible));
     U.$('#s-anim').setAttribute('aria-checked', String(st.animations));
     U.$('#s-band').setAttribute('aria-checked', String(st.band));
     U.text('s-storage', S.ok() ? 'Данные хранятся только в этом браузере и никуда не отправляются.' : 'Браузер запретил хранение — настройки и план не сохранятся после закрытия страницы.');
@@ -20,6 +21,8 @@
   }
   U.$$('#s-theme button').forEach(b => b.onclick = () => change('theme', b.dataset.v));
   U.$$('#s-mode button').forEach(b => b.onclick = () => change('mode', b.dataset.v));
+  U.$('#s-accessible').onclick = () => change('accessible', !cfg().accessible, cfg().accessible ? 'Обычный вид включён' : 'Режим для слабовидящих включён');
+  document.addEventListener('mathical-accessibility-changed', sync);
   U.$('#s-anim').onclick = () => change('animations', !cfg().animations, cfg().animations ? 'Анимации выключены' : 'Анимации включены');
   U.$('#s-band').onclick = () => change('band', !cfg().band);
 

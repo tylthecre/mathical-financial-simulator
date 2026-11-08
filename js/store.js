@@ -3,7 +3,7 @@
   'use strict';
   const M = root.Mathical, KEY = 'mathical-v1', SKEY = 'mathical-settings', TKEY = 'mathical-theme';
   const SCEN = ['base', 'optimistic', 'stress'];
-  const DEFAULT_SETTINGS = {theme: 'system', mode: 'real', animations: true, band: true};
+  const DEFAULT_SETTINGS = {theme: 'system', mode: 'real', animations: true, band: true, accessible: false};
   const decisions = {none: 'Без изменений', save: 'Экономия 10%', education: 'Обучение', car: 'Автомобиль'};
   const outcomes = {base: 'Базовый', optimistic: 'Благоприятный', stress: 'Стрессовый'};
   const startYear = new Date().getFullYear();
@@ -19,7 +19,8 @@
       theme: ['system', 'light', 'dark'].includes(o.theme) ? o.theme : 'system',
       mode: ['real', 'nominal'].includes(o.mode) ? o.mode : 'real',
       animations: o.animations !== false,
-      band: o.band !== false
+      band: o.band !== false,
+      accessible: o.accessible === true
     };
   }
   function cleanSaved(list) {

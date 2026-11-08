@@ -10,6 +10,9 @@
   function applyTheme() {
     const t = S.state.settings.theme, light = t === 'system' ? mq.matches : t === 'light';
     doc.body.classList.toggle('theme-light', light);
+    doc.body.classList.toggle('accessible-mode', S.state.settings.accessible);
+    const access = doc.getElementById('accessibility-toggle');
+    if (access) access.setAttribute('aria-pressed', String(S.state.settings.accessible));
     doc.body.classList.toggle('no-anim', !animOn());
     const m = doc.querySelector('meta[name=theme-color]');
     if (m) m.content = light ? '#f5f3e9' : '#10110f';
@@ -27,10 +30,16 @@
     '<header class="site-header" id="site-header"><div class="nav"><a href="index.html" class="wordmark" aria-label="Mathical — главная">mathical' + logo + '</a>' +
     '<nav class="nav-links" id="nav-links" aria-label="Разделы сайта"><span class="nav-ind" id="nav-ind"></span>' +
     links.map(([h, t]) => '<a href="' + h + '"' + (h === here ? ' class="active" aria-current="page"' : '') + '>' + t + '</a>').join('') + '</nav>' +
-    '<div class="nav-actions"><a class="icon-btn' + (here === 'settings.html' ? ' active' : '') + '" href="settings.html" aria-label="Настройки" title="Настройки">' + gear + '</a>' +
+    '<div class="nav-actions"><button class="icon-btn accessibility-toggle" id="accessibility-toggle" type="button" aria-label="Режим для слабовидящих" aria-pressed="false" title="Режим для слабовидящих">Аа</button><a class="icon-btn' + (here === 'settings.html' ? ' active' : '') + '" href="settings.html" aria-label="Настройки" title="Настройки">' + gear + '</a>' +
     '<button class="icon-btn menu-btn" id="menu-btn" type="button" aria-label="Меню" aria-expanded="false" aria-controls="nav-links">' + menu + '</button></div></div></header>' +
     '<div class="toast" id="toast" role="status"></div>');
   applyTheme();
+  doc.getElementById('accessibility-toggle').onclick = () => {
+    S.state.settings.accessible = !S.state.settings.accessible;
+    const ok = S.persist(); applyTheme();
+    doc.dispatchEvent(new Event('mathical-accessibility-changed'));
+    toast(ok ? (S.state.settings.accessible ? 'Режим для слабовидящих включён' : 'Обычный вид включён') : 'Не удалось сохранить настройку в браузере');
+  };
 
   const header = doc.getElementById('site-header'), ind = doc.getElementById('nav-ind'), navLinks = doc.getElementById('nav-links');
   const active = navLinks.querySelector('a.active');
