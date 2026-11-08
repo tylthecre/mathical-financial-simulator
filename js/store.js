@@ -33,6 +33,18 @@
     const rows = Array.isArray(v.rows) ? v.rows.slice(0, 50).map(r => ({name: String(r?.name || '').slice(0, 80), old: String(r?.old ?? '').slice(0, 16), current: String(r?.current ?? '').slice(0, 16)})) : [];
     return {rows, from: /^\d{4}-\d{2}$/.test(v.from || '') ? v.from : '', to: /^\d{4}-\d{2}$/.test(v.to || '') ? v.to : '', source: ['manual','official','personal'].includes(v.source) ? v.source : 'manual'};
   }
+  function cleanMonthly(value) {
+    const out = {};
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return out;
+    for (const [month, row] of Object.entries(value)) {
+      if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month) || !row || typeof row !== 'object') continue;
+      out[month] = {};
+      for (const key of ['income','housing','living','leisure','other']) {
+        const n = Number(row[key]); out[month][key] = Number.isFinite(n) && n >= 0 && n <= 1000000000 ? n : 0;
+      }
+    }
+    return out;
+  }
   function load() {
     const data = read(KEY) || {}, s = read(SKEY) || {};
     let legacy = null;
@@ -41,6 +53,7 @@
     state.settings = cleanSettings(s);
     state.params = M.normalize(data.params && typeof data.params === 'object' ? data.params : {});
     state.saved = cleanSaved(data.saved);
+    state.monthly = cleanMonthly(data.monthly);
     state.inflationInfo = cleanInflation(data.inflationInfo);
     const v = data.view && typeof data.view === 'object' ? data.view : {};
     state.view = {
@@ -50,7 +63,7 @@
   }
   function persist() {
     storageOK = true;
-    write(KEY, {params: state.params, saved: state.saved, view: state.view, inflationInfo: state.inflationInfo});
+    write(KEY, {params: state.params, saved: state.saved, view: state.view, inflationInfo: state.inflationInfo, monthly: state.monthly});
     write(SKEY, state.settings);
     return storageOK;
   }
@@ -65,13 +78,14 @@
     return {p, annualTotal, factor, loan, expense, spent, free: p.salary - spent};
   }
   function exportData() {
-    return JSON.stringify({app: 'mathical', version: 1, params: state.params, saved: state.saved, settings: state.settings, inflationInfo: state.inflationInfo}, null, 2);
+    return JSON.stringify({app: 'mathical', version: 1, params: state.params, saved: state.saved, settings: state.settings, inflationInfo: state.inflationInfo, monthly: state.monthly}, null, 2);
   }
   function importData(text) {
     const data = JSON.parse(text);
     if (!data || typeof data !== 'object' || data.app !== 'mathical') throw new Error('Это не файл Mathical');
     state.params = M.normalize(data.params && typeof data.params === 'object' ? data.params : {});
     state.saved = cleanSaved(data.saved);
+    state.monthly = cleanMonthly(data.monthly);
     state.inflationInfo = cleanInflation(data.inflationInfo);
     if (data.settings) state.settings = cleanSettings(data.settings);
     state.view = {mode: state.settings.mode, scenario: 'base'};

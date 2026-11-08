@@ -371,6 +371,9 @@ main{padding:6px 16px 60px}
 .mini.a{bottom:6px}.mini.b{bottom:34px}
 .sum-free{font-size:clamp(30px,3.4vw,40px);white-space:nowrap}
 .inflation-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px}.inflation-number{font-size:48px;line-height:1;margin:22px 0}.inflation-number small{font-size:16px;color:var(--muted)}.inflation-action{margin-top:18px}.inflation-basket,.inflation-current{margin-top:18px}.inflation-dates{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}.basket-row{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px;align-items:end;margin:12px 0}.basket-row button{margin-bottom:3px}.basket-result{line-height:1.5;margin:18px 0}.inflation-current{padding:28px}.inflation-current p{line-height:1.6}.inflation-current h2{margin-bottom:12px}#use-personal:disabled{opacity:.45;cursor:not-allowed}@media(max-width:900px){.nav-links a{padding:10px 10px}}@media(max-width:650px){.inflation-layout,.inflation-dates{grid-template-columns:1fr}.basket-row{grid-template-columns:1fr 1fr}.basket-row label:first-child{grid-column:1/-1}.basket-row button{justify-self:start}}
+
+/* Выбор вида плана и учёт по месяцам */
+.plan-view-switch{display:inline-flex;margin:0 0 24px}.monthly-status{margin-top:16px;min-height:1.5em}@media(max-width:480px){.plan-view-switch{display:flex}.plan-view-switch button{flex:1}}
 </style></head><body>
 <script>/* Mathical — прозрачная учебная модель. Без внешних запросов. */
 (function (root) {
@@ -542,6 +545,18 @@ main{padding:6px 16px 60px}
     const rows = Array.isArray(v.rows) ? v.rows.slice(0, 50).map(r => ({name: String(r?.name || '').slice(0, 80), old: String(r?.old ?? '').slice(0, 16), current: String(r?.current ?? '').slice(0, 16)})) : [];
     return {rows, from: /^\d{4}-\d{2}$/.test(v.from || '') ? v.from : '', to: /^\d{4}-\d{2}$/.test(v.to || '') ? v.to : '', source: ['manual','official','personal'].includes(v.source) ? v.source : 'manual'};
   }
+  function cleanMonthly(value) {
+    const out = {};
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return out;
+    for (const [month, row] of Object.entries(value)) {
+      if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month) || !row || typeof row !== 'object') continue;
+      out[month] = {};
+      for (const key of ['income','housing','living','leisure','other']) {
+        const n = Number(row[key]); out[month][key] = Number.isFinite(n) && n >= 0 && n <= 1000000000 ? n : 0;
+      }
+    }
+    return out;
+  }
   function load() {
     const data = read(KEY) || {}, s = read(SKEY) || {};
     let legacy = null;
@@ -550,6 +565,7 @@ main{padding:6px 16px 60px}
     state.settings = cleanSettings(s);
     state.params = M.normalize(data.params && typeof data.params === 'object' ? data.params : {});
     state.saved = cleanSaved(data.saved);
+    state.monthly = cleanMonthly(data.monthly);
     state.inflationInfo = cleanInflation(data.inflationInfo);
     const v = data.view && typeof data.view === 'object' ? data.view : {};
     state.view = {
@@ -559,7 +575,7 @@ main{padding:6px 16px 60px}
   }
   function persist() {
     storageOK = true;
-    write(KEY, {params: state.params, saved: state.saved, view: state.view, inflationInfo: state.inflationInfo});
+    write(KEY, {params: state.params, saved: state.saved, view: state.view, inflationInfo: state.inflationInfo, monthly: state.monthly});
     write(SKEY, state.settings);
     return storageOK;
   }
@@ -574,13 +590,14 @@ main{padding:6px 16px 60px}
     return {p, annualTotal, factor, loan, expense, spent, free: p.salary - spent};
   }
   function exportData() {
-    return JSON.stringify({app: 'mathical', version: 1, params: state.params, saved: state.saved, settings: state.settings, inflationInfo: state.inflationInfo}, null, 2);
+    return JSON.stringify({app: 'mathical', version: 1, params: state.params, saved: state.saved, settings: state.settings, inflationInfo: state.inflationInfo, monthly: state.monthly}, null, 2);
   }
   function importData(text) {
     const data = JSON.parse(text);
     if (!data || typeof data !== 'object' || data.app !== 'mathical') throw new Error('Это не файл Mathical');
     state.params = M.normalize(data.params && typeof data.params === 'object' ? data.params : {});
     state.saved = cleanSaved(data.saved);
+    state.monthly = cleanMonthly(data.monthly);
     state.inflationInfo = cleanInflation(data.inflationInfo);
     if (data.settings) state.settings = cleanSettings(data.settings);
     state.view = {mode: state.settings.mode, scenario: 'base'};
@@ -743,7 +760,9 @@ main{padding:6px 16px 60px}
   <h1 class="title reveal" style="--d:.07s">Всё начинается <span>с бюджета.</span></h1>
   <p class="lead reveal" style="--d:.14s">Заполни поля — справа сразу видно, сколько остаётся в месяц. Когда будет готово, нажми «Применить».</p>
 </div>
-<div class="form-layout">
+<div class="plan-view-switch seg" role="group" aria-label="Режим плана"><button type="button" id="show-plan" class="selected" aria-pressed="true">Обычный план</button><button type="button" id="show-monthly" aria-pressed="false">По месяцам</button></div>
+<section id="monthly-view" hidden aria-labelledby="monthly-title"><div class="form-layout"><form id="monthly-form" class="form-stack"><section class="card surface form-card"><h2 id="monthly-title">Учёт по месяцам</h2><p class="sub">Записывай фактические доходы и расходы за выбранный месяц. Они сохраняются в браузере отдельно от обычного плана.</p><div class="form-grid"><label class="field wide"><span class="lbl">Месяц</span><span class="input-wrap"><input id="monthly-month" type="month" required></span></label><label class="field wide"><span class="lbl">Доход после налогов</span><span class="input-wrap"><input name="income" type="number" min="0" max="1000000000" step="0.01" inputmode="decimal" placeholder="0"><span class="unit">₽</span></span></label><label class="field"><span class="lbl">Жильё и коммунальные</span><span class="input-wrap"><input name="housing" type="number" min="0" max="1000000000" step="0.01" inputmode="decimal" placeholder="0"><span class="unit">₽</span></span></label><label class="field"><span class="lbl">Еда, транспорт и быт</span><span class="input-wrap"><input name="living" type="number" min="0" max="1000000000" step="0.01" inputmode="decimal" placeholder="0"><span class="unit">₽</span></span></label><label class="field"><span class="lbl">Досуг и покупки</span><span class="input-wrap"><input name="leisure" type="number" min="0" max="1000000000" step="0.01" inputmode="decimal" placeholder="0"><span class="unit">₽</span></span></label><label class="field"><span class="lbl">Другие расходы</span><span class="input-wrap"><input name="other" type="number" min="0" max="1000000000" step="0.01" inputmode="decimal" placeholder="0"><span class="unit">₽</span></span></label></div><p class="field-note monthly-status" id="monthly-status" role="status"></p></section></form><aside class="summary" aria-label="Итог за месяц"><div class="card purple"><span style="color:#ddd8ff;font-size:15px" id="monthly-label">Остаток за месяц</span><div class="sum-free" id="monthly-balance">0 ₽</div><div class="sum-details"><div class="sum-row"><span>Доход</span><b id="monthly-income">0 ₽</b></div><div class="sum-row"><span>Расходы</span><b id="monthly-expenses">0 ₽</b></div></div><button class="btn btn-cream btn-block" type="submit" form="monthly-form" style="margin-top:18px">Сохранить месяц <span class="arr">→</span></button></div></aside></div></section>
+<div class="form-layout" id="ordinary-plan">
 <form id="plan-form" class="form-stack" novalidate>
   <section class="card surface form-card reveal"><h2>Доходы и накопления</h2><p class="sub">Доход указывай после налогов.</p>
     <div class="form-grid"><label class="field wide"><span class="lbl">Доход в месяц</span><span class="input-wrap"><input name="salary" type="number" inputmode="decimal" min="0" max="10000000" step="1" required ><span class="unit">₽</span></span></label><label class="field wide"><span class="lbl">Уже накоплено</span><span class="input-wrap"><input name="initial" type="number" inputmode="decimal" min="0" max="1000000000" step="1" required ><span class="unit">₽</span></span></label></div></section>
@@ -876,6 +895,53 @@ main{padding:6px 16px 60px}
     U.$('#credit-card').open = true;
     setTimeout(() => { U.$('#credit-card').scrollIntoView({block: 'center', behavior: 'smooth'}); f.loanPrincipal.focus({preventScroll: true}); }, 500);
   }
+})();
+</script><script>(function () {
+  'use strict';
+  const S = MStore, U = MUI, form = U.$('#monthly-form'), month = U.$('#monthly-month');
+  const names = ['income', 'housing', 'living', 'leisure', 'other'];
+  const money = MathicalFormat.money;
+  let current, dirty = false;
+  function selectView(monthly) {
+    U.$('#ordinary-plan').hidden = monthly; U.$('#monthly-view').hidden = !monthly;
+    for (const [id, active] of [['show-plan', !monthly], ['show-monthly', monthly]]) {
+      const button = U.$('#' + id); button.classList.toggle('selected', active); button.setAttribute('aria-pressed', String(active));
+    }
+  }
+  U.$('#show-plan').onclick = () => selectView(false);
+  U.$('#show-monthly').onclick = () => selectView(true);
+  function totals() {
+    const values = Object.fromEntries(names.map(name => [name, Number(form.elements[name].value) || 0]));
+    const expenses = values.housing + values.living + values.leisure + values.other;
+    const balance = values.income - expenses;
+    U.text('monthly-label', balance < 0 ? 'Дефицит за месяц' : 'Остаток за месяц');
+    U.text('monthly-balance', money(Math.abs(balance), false));
+    U.text('monthly-income', money(values.income, false)); U.text('monthly-expenses', money(expenses, false));
+  }
+  function load() {
+    current = month.value; dirty = false;
+    const row = S.state.monthly[current];
+    for (const name of names) form.elements[name].value = row ? row[name] : '';
+    totals(); U.text('monthly-status', row ? 'Сохранённые данные загружены.' : 'За этот месяц записей пока нет.');
+  }
+  const now = new Date(); month.value = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+  month.addEventListener('change', () => {
+    if (dirty && !confirm('Изменения за текущий месяц не сохранены. Перейти к другому месяцу?')) { month.value = current; return; }
+    load();
+  });
+  form.addEventListener('input', e => { if (e.target === month) return; dirty = true; totals(); U.text('monthly-status', 'Изменения ещё не сохранены.'); });
+  form.addEventListener('submit', e => {
+    e.preventDefault(); if (!form.reportValidity()) return;
+    const previous = S.state.monthly[current];
+    S.state.monthly[current] = Object.fromEntries(names.map(name => [name, Number(form.elements[name].value) || 0]));
+    if (!S.persist()) {
+      if (previous) S.state.monthly[current] = previous; else delete S.state.monthly[current];
+      U.text('monthly-status', 'Не удалось сохранить данные в браузере.'); return;
+    }
+    dirty = false; U.text('monthly-status', 'Месяц сохранён в этом браузере.');
+  });
+  addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+  load();
 })();
 </script>
 </body></html>

@@ -370,6 +370,9 @@ main{padding:6px 16px 60px}
 .mini.a{bottom:6px}.mini.b{bottom:34px}
 .sum-free{font-size:clamp(30px,3.4vw,40px);white-space:nowrap}
 .inflation-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px}.inflation-number{font-size:48px;line-height:1;margin:22px 0}.inflation-number small{font-size:16px;color:var(--muted)}.inflation-action{margin-top:18px}.inflation-basket,.inflation-current{margin-top:18px}.inflation-dates{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}.basket-row{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px;align-items:end;margin:12px 0}.basket-row button{margin-bottom:3px}.basket-result{line-height:1.5;margin:18px 0}.inflation-current{padding:28px}.inflation-current p{line-height:1.6}.inflation-current h2{margin-bottom:12px}#use-personal:disabled{opacity:.45;cursor:not-allowed}@media(max-width:900px){.nav-links a{padding:10px 10px}}@media(max-width:650px){.inflation-layout,.inflation-dates{grid-template-columns:1fr}.basket-row{grid-template-columns:1fr 1fr}.basket-row label:first-child{grid-column:1/-1}.basket-row button{justify-self:start}}
+
+/* Выбор вида плана и учёт по месяцам */
+.plan-view-switch{display:inline-flex;margin:0 0 24px}.monthly-status{margin-top:16px;min-height:1.5em}@media(max-width:480px){.plan-view-switch{display:flex}.plan-view-switch button{flex:1}}
 </style></head><body>
 <script>/* Mathical — прозрачная учебная модель. Без внешних запросов. */
 (function (root) {
@@ -541,6 +544,18 @@ main{padding:6px 16px 60px}
     const rows = Array.isArray(v.rows) ? v.rows.slice(0, 50).map(r => ({name: String(r?.name || '').slice(0, 80), old: String(r?.old ?? '').slice(0, 16), current: String(r?.current ?? '').slice(0, 16)})) : [];
     return {rows, from: /^\d{4}-\d{2}$/.test(v.from || '') ? v.from : '', to: /^\d{4}-\d{2}$/.test(v.to || '') ? v.to : '', source: ['manual','official','personal'].includes(v.source) ? v.source : 'manual'};
   }
+  function cleanMonthly(value) {
+    const out = {};
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return out;
+    for (const [month, row] of Object.entries(value)) {
+      if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month) || !row || typeof row !== 'object') continue;
+      out[month] = {};
+      for (const key of ['income','housing','living','leisure','other']) {
+        const n = Number(row[key]); out[month][key] = Number.isFinite(n) && n >= 0 && n <= 1000000000 ? n : 0;
+      }
+    }
+    return out;
+  }
   function load() {
     const data = read(KEY) || {}, s = read(SKEY) || {};
     let legacy = null;
@@ -549,6 +564,7 @@ main{padding:6px 16px 60px}
     state.settings = cleanSettings(s);
     state.params = M.normalize(data.params && typeof data.params === 'object' ? data.params : {});
     state.saved = cleanSaved(data.saved);
+    state.monthly = cleanMonthly(data.monthly);
     state.inflationInfo = cleanInflation(data.inflationInfo);
     const v = data.view && typeof data.view === 'object' ? data.view : {};
     state.view = {
@@ -558,7 +574,7 @@ main{padding:6px 16px 60px}
   }
   function persist() {
     storageOK = true;
-    write(KEY, {params: state.params, saved: state.saved, view: state.view, inflationInfo: state.inflationInfo});
+    write(KEY, {params: state.params, saved: state.saved, view: state.view, inflationInfo: state.inflationInfo, monthly: state.monthly});
     write(SKEY, state.settings);
     return storageOK;
   }
@@ -573,13 +589,14 @@ main{padding:6px 16px 60px}
     return {p, annualTotal, factor, loan, expense, spent, free: p.salary - spent};
   }
   function exportData() {
-    return JSON.stringify({app: 'mathical', version: 1, params: state.params, saved: state.saved, settings: state.settings, inflationInfo: state.inflationInfo}, null, 2);
+    return JSON.stringify({app: 'mathical', version: 1, params: state.params, saved: state.saved, settings: state.settings, inflationInfo: state.inflationInfo, monthly: state.monthly}, null, 2);
   }
   function importData(text) {
     const data = JSON.parse(text);
     if (!data || typeof data !== 'object' || data.app !== 'mathical') throw new Error('Это не файл Mathical');
     state.params = M.normalize(data.params && typeof data.params === 'object' ? data.params : {});
     state.saved = cleanSaved(data.saved);
+    state.monthly = cleanMonthly(data.monthly);
     state.inflationInfo = cleanInflation(data.inflationInfo);
     if (data.settings) state.settings = cleanSettings(data.settings);
     state.view = {mode: state.settings.mode, scenario: 'base'};
