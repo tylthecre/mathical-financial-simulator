@@ -129,7 +129,7 @@ input[type=range]{width:100%;accent-color:var(--purple)}
 
 /* Форма плана */
 .form-layout{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:20px;align-items:start}
-.form-stack{display:grid;gap:16px}
+.form-stack{display:grid;grid-template-columns:minmax(0,1fr);min-width:0;gap:16px}
 .form-card h2{margin-bottom:6px}
 .form-card .sub{color:var(--muted);font-size:14px;margin:0 0 20px;line-height:1.5}
 .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
@@ -142,7 +142,11 @@ input[type=range]{width:100%;accent-color:var(--purple)}
 .plus{width:36px;height:36px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-size:20px;flex:none;transition:transform .4s var(--ease),background .25s}
 .card-details[open] .plus{transform:rotate(45deg);background:var(--lime);color:#1b2108}
 .card-details .inner{padding:0 28px 28px;animation:page-in .45s var(--ease) both}
-.horizon-row{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.horizon-row{display:grid;grid-template-columns:max-content minmax(0,1fr);align-items:end;gap:16px}
+.horizon-row .seg{min-height:51px}
+.assumptions>.field-note{margin-bottom:18px}
+.assumptions .form-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));align-items:end}
+@media(max-width:640px){.horizon-row{grid-template-columns:minmax(0,1fr)}.horizon-row .seg button{flex:1}}
 .annual-items{margin-top:22px;padding-top:20px;border-top:1px solid var(--line)}
 .annual-items>p{margin:0 0 12px;font-size:14px;color:var(--muted)}
 .annual-item{display:flex;gap:10px;margin-bottom:10px;animation:page-in .35s var(--ease) both}
@@ -348,7 +352,7 @@ main{padding:6px 16px 60px}
 .hero-stack{padding-bottom:0}
 .hero-stack .mini{position:static;margin-top:12px;animation:none}
 .cta-band{padding:28px}
-.card-details>summary{padding:22px}.card-details .inner{padding:0 22px 22px}
+.card.card-details{padding:0}.card-details>summary{padding:22px}.card-details .inner{padding:0 22px 22px}
 .setting{flex-direction:column;align-items:flex-start;gap:14px}
 .foot{padding:26px 16px}
 .chart-control output{text-align:left}
@@ -758,16 +762,16 @@ main{padding:6px 16px 60px}
   <section class="card surface form-card reveal"><h2>На что копим</h2><p class="sub">Цель считается в сегодняшних ценах — инфляцию добавим сами.</p>
     <div class="form-grid"><label class="field wide"><span class="lbl">Название цели</span><span class="input-wrap"><input name="goalName" maxlength="80" required></span></label><label class="field "><span class="lbl">Стоимость сегодня</span><span class="input-wrap"><input name="goal" type="number" inputmode="decimal" min="1" max="1000000000" step="1" required ><span class="unit">₽</span></span></label><label class="field "><span class="lbl">Срок цели</span><span class="input-wrap"><input name="goalYears" type="number" inputmode="decimal" min="1" max="50" step="1" required ><span class="unit">лет</span></span></label></div></section>
 
-  <section class="card surface form-card reveal"><h2>Срок планирования</h2><p class="sub">На сколько лет вперёд строим график.</p>
-    <div class="horizon-row"><div class="seg" id="years-quick" role="group" aria-label="Быстрый выбор срока"><button type="button" data-years="10">10 лет</button><button type="button" data-years="15">15 лет</button><button type="button" data-years="20">20 лет</button></div>
-    <label class="field" style="flex:1;min-width:180px"><span class="lbl">Свой срок</span><span class="input-wrap"><input name="years" type="number" inputmode="numeric" min="1" max="50" step="1" required><span class="unit">лет · от 1 до 50</span></span></label></div></section>
+  <section class="card surface form-card reveal"><h2>Срок планирования</h2><p class="sub">Выбери срок или введи свой — от 1 до 50 лет.</p>
+    <div class="horizon-row"><div class="field"><span class="lbl">Быстрый выбор</span><div class="seg" id="years-quick" role="group" aria-label="Быстрый выбор срока"><button type="button" data-years="10">10 лет</button><button type="button" data-years="15">15 лет</button><button type="button" data-years="20">20 лет</button></div></div>
+    <label class="field"><span class="lbl">Свой срок</span><span class="input-wrap"><input name="years" type="number" inputmode="numeric" min="1" max="50" step="1" required><span class="unit">лет</span></span></label></div></section>
 
   <details class="card surface card-details reveal" id="credit-card"><summary><div><h2>Кредит</h2><small>Учти действующий долг в бюджете</small></div><span class="plus" aria-hidden="true">+</span></summary>
     <div class="inner"><div class="form-grid"><label class="field "><span class="lbl">Остаток долга</span><span class="input-wrap"><input name="loanPrincipal" type="number" inputmode="decimal" min="0" max="1000000000" step="1" required ><span class="unit">₽</span></span></label><label class="field "><span class="lbl">Ставка в год</span><span class="input-wrap"><input name="loanRate" type="number" inputmode="decimal" min="0" max="100" step="0.01" required ><span class="unit">%</span></span></label><label class="field "><span class="lbl">Осталось месяцев</span><span class="input-wrap"><input name="loanMonths" type="number" inputmode="decimal" min="1" max="600" step="1" required ><span class="unit">мес.</span></span></label></div>
     <p class="field-note" style="margin-top:14px">Платёж добавится к бюджету. Не включай его повторно в другие расходы.</p></div></details>
 
   <details class="card surface card-details reveal"><summary><div><h2>Инфляция и доходность</h2><small>Допущения модели</small></div><span class="plus" aria-hidden="true">+</span></summary>
-    <div class="inner"><p class="field-note">Выбери официальный показатель или рассчитай личную корзину в разделе <a href="inflation.html">«Инфляция»</a>. Здесь можно задать своё значение.</p><div class="form-grid"><label class="field "><span class="lbl">Инфляция в год</span><span class="input-wrap"><input name="inflation" type="number" inputmode="decimal" min="0" max="30" step="0.01" required ><span class="unit">%</span></span></label><label class="field "><span class="lbl">Рост дохода в год</span><span class="input-wrap"><input name="growth" type="number" inputmode="decimal" min="-20" max="30" step="0.1" required ><span class="unit">%</span></span></label><label class="field "><span class="lbl">Доходность накоплений</span><span class="input-wrap"><input name="rate" type="number" inputmode="decimal" min="-20" max="30" step="0.1" required ><span class="unit">%</span></span></label></div></div></details>
+    <div class="inner assumptions"><p class="field-note">Выбери официальный показатель или рассчитай личную корзину в разделе <a href="inflation.html">«Инфляция»</a>. Здесь можно задать своё значение.</p><div class="form-grid"><label class="field "><span class="lbl">Инфляция в год</span><span class="input-wrap"><input name="inflation" type="number" inputmode="decimal" min="0" max="30" step="0.01" required ><span class="unit">%</span></span></label><label class="field "><span class="lbl">Рост дохода в год</span><span class="input-wrap"><input name="growth" type="number" inputmode="decimal" min="-20" max="30" step="0.1" required ><span class="unit">%</span></span></label><label class="field "><span class="lbl">Доходность накоплений</span><span class="input-wrap"><input name="rate" type="number" inputmode="decimal" min="-20" max="30" step="0.1" required ><span class="unit">%</span></span></label></div></div></details>
 </form>
 
 <aside class="summary" aria-label="Итог по бюджету">

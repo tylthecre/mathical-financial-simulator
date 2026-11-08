@@ -129,7 +129,7 @@ input[type=range]{width:100%;accent-color:var(--purple)}
 
 /* Форма плана */
 .form-layout{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:20px;align-items:start}
-.form-stack{display:grid;gap:16px}
+.form-stack{display:grid;grid-template-columns:minmax(0,1fr);min-width:0;gap:16px}
 .form-card h2{margin-bottom:6px}
 .form-card .sub{color:var(--muted);font-size:14px;margin:0 0 20px;line-height:1.5}
 .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
@@ -142,7 +142,11 @@ input[type=range]{width:100%;accent-color:var(--purple)}
 .plus{width:36px;height:36px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-size:20px;flex:none;transition:transform .4s var(--ease),background .25s}
 .card-details[open] .plus{transform:rotate(45deg);background:var(--lime);color:#1b2108}
 .card-details .inner{padding:0 28px 28px;animation:page-in .45s var(--ease) both}
-.horizon-row{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.horizon-row{display:grid;grid-template-columns:max-content minmax(0,1fr);align-items:end;gap:16px}
+.horizon-row .seg{min-height:51px}
+.assumptions>.field-note{margin-bottom:18px}
+.assumptions .form-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));align-items:end}
+@media(max-width:640px){.horizon-row{grid-template-columns:minmax(0,1fr)}.horizon-row .seg button{flex:1}}
 .annual-items{margin-top:22px;padding-top:20px;border-top:1px solid var(--line)}
 .annual-items>p{margin:0 0 12px;font-size:14px;color:var(--muted)}
 .annual-item{display:flex;gap:10px;margin-bottom:10px;animation:page-in .35s var(--ease) both}
@@ -348,7 +352,7 @@ main{padding:6px 16px 60px}
 .hero-stack{padding-bottom:0}
 .hero-stack .mini{position:static;margin-top:12px;animation:none}
 .cta-band{padding:28px}
-.card-details>summary{padding:22px}.card-details .inner{padding:0 22px 22px}
+.card.card-details{padding:0}.card-details>summary{padding:22px}.card-details .inner{padding:0 22px 22px}
 .setting{flex-direction:column;align-items:flex-start;gap:14px}
 .foot{padding:26px 16px}
 .chart-control output{text-align:left}
