@@ -71,6 +71,7 @@
     e.preventDefault();
     update();
     if (!form.reportValidity()) return;
+    if (Number(f.inflation.value) !== Number(S.state.params.inflation)) S.state.inflationInfo.source = 'manual';
     S.state.params = M.normalize({...S.state.params, ...Object.fromEntries(new FormData(form)), annualItems: readItems()});
     S.persist();
     U.toast('План сохранён — смотрим результаты');

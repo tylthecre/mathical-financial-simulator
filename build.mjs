@@ -3,7 +3,7 @@
 import {readFileSync, writeFileSync, mkdirSync} from 'node:fs';
 const read = p => readFileSync(new URL(p, import.meta.url), 'utf8');
 const font = readFileSync(new URL('Onest.ttf', import.meta.url)).toString('base64');
-const pages = ['index', 'plan', 'results', 'compare', 'method', 'settings'];
+const pages = ['index', 'plan', 'results', 'compare', 'inflation', 'method', 'settings'];
 const css = read('css/site.css').replace('url("../Onest.ttf")', () => `url(data:font/ttf;base64,${font})`);
 mkdirSync(new URL('dist/', import.meta.url), {recursive: true});
 for (const name of pages) {

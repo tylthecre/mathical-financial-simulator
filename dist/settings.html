@@ -366,6 +366,7 @@ main{padding:6px 16px 60px}
 .hero-stack{padding-bottom:96px}
 .mini.a{bottom:6px}.mini.b{bottom:34px}
 .sum-free{font-size:clamp(30px,3.4vw,40px);white-space:nowrap}
+.inflation-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px}.inflation-number{font-size:48px;line-height:1;margin:22px 0}.inflation-number small{font-size:16px;color:var(--muted)}.inflation-action{margin-top:18px}.inflation-basket,.inflation-current{margin-top:18px}.inflation-dates{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}.basket-row{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px;align-items:end;margin:12px 0}.basket-row button{margin-bottom:3px}.basket-result{line-height:1.5;margin:18px 0}.inflation-current{padding:28px}.inflation-current p{line-height:1.6}.inflation-current h2{margin-bottom:12px}#use-personal:disabled{opacity:.45;cursor:not-allowed}@media(max-width:900px){.nav-links a{padding:10px 10px}}@media(max-width:650px){.inflation-layout,.inflation-dates{grid-template-columns:1fr}.basket-row{grid-template-columns:1fr 1fr}.basket-row label:first-child{grid-column:1/-1}.basket-row button{justify-self:start}}
 </style></head><body>
 <script>/* Mathical — прозрачная учебная модель. Без внешних запросов. */
 (function (root) {
@@ -532,6 +533,11 @@ main{padding:6px 16px 60px}
           .map(x => ({params: M.normalize(x.params), scenario: SCEN.includes(x.scenario) ? x.scenario : 'base'}))
       : [];
   }
+  function cleanInflation(value) {
+    const v = value && typeof value === 'object' ? value : {};
+    const rows = Array.isArray(v.rows) ? v.rows.slice(0, 50).map(r => ({name: String(r?.name || '').slice(0, 80), old: String(r?.old ?? '').slice(0, 16), current: String(r?.current ?? '').slice(0, 16)})) : [];
+    return {rows, from: /^\d{4}-\d{2}$/.test(v.from || '') ? v.from : '', to: /^\d{4}-\d{2}$/.test(v.to || '') ? v.to : '', source: ['manual','official','personal'].includes(v.source) ? v.source : 'manual'};
+  }
   function load() {
     const data = read(KEY) || {}, s = read(SKEY) || {};
     let legacy = null;
@@ -540,6 +546,7 @@ main{padding:6px 16px 60px}
     state.settings = cleanSettings(s);
     state.params = M.normalize(data.params && typeof data.params === 'object' ? data.params : {});
     state.saved = cleanSaved(data.saved);
+    state.inflationInfo = cleanInflation(data.inflationInfo);
     const v = data.view && typeof data.view === 'object' ? data.view : {};
     state.view = {
       mode: ['real', 'nominal'].includes(v.mode) ? v.mode : state.settings.mode,
@@ -548,7 +555,7 @@ main{padding:6px 16px 60px}
   }
   function persist() {
     storageOK = true;
-    write(KEY, {params: state.params, saved: state.saved, view: state.view});
+    write(KEY, {params: state.params, saved: state.saved, view: state.view, inflationInfo: state.inflationInfo});
     write(SKEY, state.settings);
     return storageOK;
   }
@@ -563,13 +570,14 @@ main{padding:6px 16px 60px}
     return {p, annualTotal, factor, loan, expense, spent, free: p.salary - spent};
   }
   function exportData() {
-    return JSON.stringify({app: 'mathical', version: 1, params: state.params, saved: state.saved, settings: state.settings}, null, 2);
+    return JSON.stringify({app: 'mathical', version: 1, params: state.params, saved: state.saved, settings: state.settings, inflationInfo: state.inflationInfo}, null, 2);
   }
   function importData(text) {
     const data = JSON.parse(text);
     if (!data || typeof data !== 'object' || data.app !== 'mathical') throw new Error('Это не файл Mathical');
     state.params = M.normalize(data.params && typeof data.params === 'object' ? data.params : {});
     state.saved = cleanSaved(data.saved);
+    state.inflationInfo = cleanInflation(data.inflationInfo);
     if (data.settings) state.settings = cleanSettings(data.settings);
     state.view = {mode: state.settings.mode, scenario: 'base'};
     return persist();
@@ -598,7 +606,7 @@ main{padding:6px 16px 60px}
   }
   mq.addEventListener('change', applyTheme);
 
-  const links = [['index.html', 'Главная'], ['plan.html', 'План'], ['results.html', 'Результаты'], ['compare.html', 'Сравнение'], ['method.html', 'Как считается']];
+  const links = [['index.html', 'Главная'], ['plan.html', 'План'], ['results.html', 'Результаты'], ['compare.html', 'Сравнение'], ['inflation.html', 'Инфляция'], ['method.html', 'Как считается']];
   const here = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
   const gear = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>';
   const menu = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>';
