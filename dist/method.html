@@ -377,6 +377,9 @@ main{padding:6px 16px 60px}
 
 /* Сравнение остатка месяца с целью */
 .monthly-goal{padding:24px}.monthly-goal-kicker{font-size:13px;color:var(--muted)}.monthly-goal h2{font-size:21px;line-height:1.25;overflow-wrap:anywhere;margin:7px 0 18px}.monthly-goal-row{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-size:14px;color:var(--muted)}.monthly-goal-row strong{color:var(--ink);font-size:18px;white-space:nowrap}.monthly-goal-result{font-size:15px;font-weight:600;line-height:1.5;margin:16px 0 8px}.monthly-goal .field-note{line-height:1.5;margin-bottom:14px}.monthly-goal .btn{margin-top:0}
+
+/* Выравниваем низ карточек помесячного плана на широких экранах. */
+@media(min-width:1061px){#monthly-view .form-layout{align-items:stretch}#monthly-view .summary{align-self:start}#monthly-form{align-self:stretch}}
 </style></head><body>
 <script>/* Mathical — прозрачная учебная модель. Без внешних запросов. */
 (function (root) {
