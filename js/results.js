@@ -55,13 +55,13 @@
     const bar = U.$('#goal-progress');
     bar.style.width = '0%';
     setTimeout(() => { bar.style.width = progress + '%'; }, 120);
-    let gr = result.reached !== null ? (result.reached === 0 ? 'Цель доступна уже сейчас' : 'Впервые доступна в ' + (startYear + result.reached)) : Math.round(progress) + '% цели к ' + (startYear + params.years);
-    if (result.reached !== null && result.final.real < params.goal) gr = 'Достигнута ранее, но к концу срока денег не хватает';
+    let gr = result.reached !== null ? (result.reached === 0 ? 'Общего капитала уже достаточно для цели' : 'Общий капитал впервые достигнет стоимости цели в ' + (startYear + result.reached)) : 'Весь капитал: ' + Math.round(progress) + '% стоимости цели к ' + (startYear + params.years);
+    if (result.reached !== null && result.final.real < params.goal) gr = 'Общий капитал достигал стоимости цели ранее, но к концу прогноза его недостаточно';
     U.text('goal-result', gr);
 
     /* Диапазон */
     U.text('p10', money(dist.low)); U.text('p50', money(dist.median)); U.text('p90', money(dist.high));
-    U.text('probability', 'Цель достигнута в ' + Math.round(dist.success * 100) + '% учебных прогонов к концу срока. Не гарантия результата.');
+    U.text('probability', 'Весь капитал достиг стоимости цели в ' + Math.round(dist.success * 100) + '% учебных прогонов к концу прогноза. Не гарантия результата.');
 
     /* Здоровье */
     const health = M.financialHealth(params);

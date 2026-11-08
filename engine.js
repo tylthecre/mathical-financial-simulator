@@ -7,6 +7,10 @@
     const p = { ...defaults, ...input };
     delete p.profession; // Drop obsolete presets from previously saved plans.
     for (const [key,[min,max]] of Object.entries(bounds)) { const n = Number(p[key]); p[key] = Number.isFinite(n) ? Math.min(max,Math.max(min,n)) : defaults[key]; }
+    // Пустое значение сохраняет прежний расчёт: все накопления после разовой траты.
+    const allocation = p.goalInitial;
+    const available = Math.max(0, p.initial - p.oneTime);
+    p.goalInitial = allocation === null || allocation === undefined || allocation === '' || !Number.isFinite(Number(allocation)) ? null : Math.min(available, Math.max(0, Number(allocation)));
     p.annualItems = Array.isArray(p.annualItems) ? p.annualItems.slice(0,50).filter(x => x && typeof x === 'object').map(x => ({name:String(x.name || '').slice(0,80), amount:Math.min(120000000,Math.max(0,Number(x.amount) || 0))})) : [];
     const otherSpending = p.living + p.leisure + (p.annual + p.annualItems.reduce((sum,x)=>sum+x.amount,0)) / 12;
     p.essentialOther = Math.min(p.essentialOther, otherSpending);
@@ -29,7 +33,7 @@
     const p = normalize(input), months = p.goalYears * 12;
     const target = p.goal * Math.pow(1 + p.inflation / 100, p.goalYears);
     const monthlyRate = Math.pow(1 + p.rate / 100, 1 / 12) - 1;
-    const starting = p.initial - p.oneTime;
+    const starting = p.goalInitial === null ? p.initial - p.oneTime : p.goalInitial;
     function projected(contribution) {
       let balance = starting;
       for (let i=0; i<months; i++) balance += Math.max(0,balance) * monthlyRate + contribution;

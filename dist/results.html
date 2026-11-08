@@ -393,6 +393,10 @@ main{padding:6px 16px 60px}
     const p = { ...defaults, ...input };
     delete p.profession; // Drop obsolete presets from previously saved plans.
     for (const [key,[min,max]] of Object.entries(bounds)) { const n = Number(p[key]); p[key] = Number.isFinite(n) ? Math.min(max,Math.max(min,n)) : defaults[key]; }
+    // Пустое значение сохраняет прежний расчёт: все накопления после разовой траты.
+    const allocation = p.goalInitial;
+    const available = Math.max(0, p.initial - p.oneTime);
+    p.goalInitial = allocation === null || allocation === undefined || allocation === '' || !Number.isFinite(Number(allocation)) ? null : Math.min(available, Math.max(0, Number(allocation)));
     p.annualItems = Array.isArray(p.annualItems) ? p.annualItems.slice(0,50).filter(x => x && typeof x === 'object').map(x => ({name:String(x.name || '').slice(0,80), amount:Math.min(120000000,Math.max(0,Number(x.amount) || 0))})) : [];
     const otherSpending = p.living + p.leisure + (p.annual + p.annualItems.reduce((sum,x)=>sum+x.amount,0)) / 12;
     p.essentialOther = Math.min(p.essentialOther, otherSpending);
@@ -415,7 +419,7 @@ main{padding:6px 16px 60px}
     const p = normalize(input), months = p.goalYears * 12;
     const target = p.goal * Math.pow(1 + p.inflation / 100, p.goalYears);
     const monthlyRate = Math.pow(1 + p.rate / 100, 1 / 12) - 1;
-    const starting = p.initial - p.oneTime;
+    const starting = p.goalInitial === null ? p.initial - p.oneTime : p.goalInitial;
     function projected(contribution) {
       let balance = starting;
       for (let i=0; i<months; i++) balance += Math.max(0,balance) * monthlyRate + contribution;
@@ -563,6 +567,8 @@ main{padding:6px 16px 60px}
       for (const key of ['income','housing','living','leisure','other','unexpected']) {
         const n = Number(row[key]); out[month][key] = Number.isFinite(n) && n >= 0 && n <= 1000000000 ? n : 0;
       }
+      const saved = row.savedGoal;
+      out[month].savedGoal = saved === undefined || saved === null || saved === '' || !Number.isFinite(Number(saved)) ? null : Math.min(1000000000, Math.max(0, Number(saved)));
     }
     return out;
   }
@@ -793,7 +799,7 @@ main{padding:6px 16px 60px}
     <div class="progress"><div id="goal-progress"></div></div>
     <div class="goal-result" id="goal-result"></div>
     <div class="goal-plan"><span>Чтобы накопить к сроку</span><strong id="goal-monthly"></strong><p id="goal-compare"></p>
-    <p>Все накопления — на цель. Инфляция и доходность учтены, сценарии — нет. Сравнение приблизительное: бюджет со временем может измениться.</p></div></section>
+    <p>Взнос учитывает сумму накоплений, выбранную для цели, инфляцию и доходность; сценарии не учтены. Процент выше и график показывают весь капитал относительно цели. Бюджет со временем может измениться.</p></div></section>
 </div>
 
 <div class="grid cols-main" style="margin-top:16px">
@@ -886,13 +892,13 @@ main{padding:6px 16px 60px}
     const bar = U.$('#goal-progress');
     bar.style.width = '0%';
     setTimeout(() => { bar.style.width = progress + '%'; }, 120);
-    let gr = result.reached !== null ? (result.reached === 0 ? 'Цель доступна уже сейчас' : 'Впервые доступна в ' + (startYear + result.reached)) : Math.round(progress) + '% цели к ' + (startYear + params.years);
-    if (result.reached !== null && result.final.real < params.goal) gr = 'Достигнута ранее, но к концу срока денег не хватает';
+    let gr = result.reached !== null ? (result.reached === 0 ? 'Общего капитала уже достаточно для цели' : 'Общий капитал впервые достигнет стоимости цели в ' + (startYear + result.reached)) : 'Весь капитал: ' + Math.round(progress) + '% стоимости цели к ' + (startYear + params.years);
+    if (result.reached !== null && result.final.real < params.goal) gr = 'Общий капитал достигал стоимости цели ранее, но к концу прогноза его недостаточно';
     U.text('goal-result', gr);
 
     /* Диапазон */
     U.text('p10', money(dist.low)); U.text('p50', money(dist.median)); U.text('p90', money(dist.high));
-    U.text('probability', 'Цель достигнута в ' + Math.round(dist.success * 100) + '% учебных прогонов к концу срока. Не гарантия результата.');
+    U.text('probability', 'Весь капитал достиг стоимости цели в ' + Math.round(dist.success * 100) + '% учебных прогонов к концу прогноза. Не гарантия результата.');
 
     /* Здоровье */
     const health = M.financialHealth(params);

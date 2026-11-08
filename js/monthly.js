@@ -21,6 +21,9 @@
     U.text('monthly-label', balance < 0 ? 'Дефицит за месяц' : 'Остаток за месяц');
     U.text('monthly-balance', money(Math.abs(balance), false));
     U.text('monthly-income', money(values.income, false)); U.text('monthly-expenses', money(expenses, false));
+    const savedField = form.elements.savedGoal, hasSaved = savedField.value !== '' && savedField.validity.valid;
+    U.$('#monthly-after-row').hidden = !hasSaved;
+    if (hasSaved) U.text('monthly-after', money(balance - Number(savedField.value), false));
     const params = S.state.params, payment = Math.max(0, Math.ceil(Mathical.goalPlan(params).monthly - 1e-7));
     U.text('monthly-goal-title', params.goalName);
     U.text('monthly-goal-payment', money(payment, false) + '/мес.');
@@ -38,6 +41,7 @@
     current = month.value; dirty = false;
     const row = S.state.monthly[current];
     for (const name of names) form.elements[name].value = row ? row[name] : '';
+    form.elements.savedGoal.value = row && row.savedGoal != null ? row.savedGoal : '';
     totals(); U.text('monthly-status', row ? 'Сохранённые данные загружены.' : 'За этот месяц записей пока нет.');
   }
   const now = new Date(); month.value = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
@@ -49,7 +53,7 @@
   form.addEventListener('submit', e => {
     e.preventDefault(); if (!form.reportValidity()) return;
     const previous = S.state.monthly[current];
-    S.state.monthly[current] = Object.fromEntries(names.map(name => [name, Number(form.elements[name].value) || 0]));
+    S.state.monthly[current] = {...Object.fromEntries(names.map(name => [name, Number(form.elements[name].value) || 0])), savedGoal: form.elements.savedGoal.value === '' ? null : Number(form.elements.savedGoal.value)};
     if (!S.persist()) {
       if (previous) S.state.monthly[current] = previous; else delete S.state.monthly[current];
       U.text('monthly-status', 'Не удалось сохранить данные в браузере.'); return;

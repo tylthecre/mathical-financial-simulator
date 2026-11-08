@@ -32,6 +32,13 @@
     U.$('#essential-error').textContent = err;
     U.$('#essential-error').hidden = !err;
 
+    const availableForGoal = Math.max(0, num('initial') - num('oneTime'));
+    const goalError = f.goalInitial.value !== '' && Number(f.goalInitial.value) > availableForGoal ? 'Не больше доступных накоплений после разовой траты: ' + money(availableForGoal, false) + '.' : '';
+    f.goalInitial.setCustomValidity(goalError);
+    f.goalInitial.setAttribute('aria-invalid', String(Boolean(goalError)));
+    U.$('#goal-initial-error').textContent = goalError;
+    U.$('#goal-initial-error').hidden = !goalError;
+
     const loan = M.loanTerms({loanPrincipal: f.loanPrincipal.value, loanRate: f.loanRate.value, loanMonths: f.loanMonths.value});
     const income = num('salary'), expenses = num('housing') + other + loan.payment, free = income - expenses;
     U.countUp(U.$('#sum-free'), free, n => money(n, false), 450);
@@ -51,6 +58,7 @@
       const el = f.namedItem(k);
       if (el && 'value' in el) el.value = v;
     }
+    f.goalInitial.value = params.goalInitial == null ? '' : params.goalInitial;
     list.replaceChildren();
     params.annualItems.forEach(addItem);
     U.$('#credit-card').open = params.loanPrincipal > 0;

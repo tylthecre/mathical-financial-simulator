@@ -42,6 +42,8 @@
       for (const key of ['income','housing','living','leisure','other','unexpected']) {
         const n = Number(row[key]); out[month][key] = Number.isFinite(n) && n >= 0 && n <= 1000000000 ? n : 0;
       }
+      const saved = row.savedGoal;
+      out[month].savedGoal = saved === undefined || saved === null || saved === '' || !Number.isFinite(Number(saved)) ? null : Math.min(1000000000, Math.max(0, Number(saved)));
     }
     return out;
   }

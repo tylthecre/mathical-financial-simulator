@@ -103,3 +103,13 @@ test('Диапазон случайных сценариев рассчитан 
   assert.equal(d.bands.at(-1).realHigh, d.high);
 });
 
+
+test('Цель: выбранная часть накоплений и совместимость со старыми планами',()=>{
+  const p={...plain,initial:200000,oneTime:20000,goal:300000,goalYears:1,inflation:0,rate:0};
+  const goal=globalThis.Mathical.goalPlan;
+  assert.ok(Math.abs(goal(p).monthly-10000)<1e-6);
+  assert.ok(Math.abs(goal({...p,goalInitial:100000}).monthly-200000/12)<1e-6);
+  assert.ok(Math.abs(goal({...p,goalInitial:0}).monthly-25000)<1e-6);
+  assert.equal(normalize({...p,goalInitial:999999}).goalInitial,180000);
+  assert.equal(normalize({...p,goalInitial:''}).goalInitial,null);
+});

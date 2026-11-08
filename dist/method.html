@@ -393,6 +393,10 @@ main{padding:6px 16px 60px}
     const p = { ...defaults, ...input };
     delete p.profession; // Drop obsolete presets from previously saved plans.
     for (const [key,[min,max]] of Object.entries(bounds)) { const n = Number(p[key]); p[key] = Number.isFinite(n) ? Math.min(max,Math.max(min,n)) : defaults[key]; }
+    // Пустое значение сохраняет прежний расчёт: все накопления после разовой траты.
+    const allocation = p.goalInitial;
+    const available = Math.max(0, p.initial - p.oneTime);
+    p.goalInitial = allocation === null || allocation === undefined || allocation === '' || !Number.isFinite(Number(allocation)) ? null : Math.min(available, Math.max(0, Number(allocation)));
     p.annualItems = Array.isArray(p.annualItems) ? p.annualItems.slice(0,50).filter(x => x && typeof x === 'object').map(x => ({name:String(x.name || '').slice(0,80), amount:Math.min(120000000,Math.max(0,Number(x.amount) || 0))})) : [];
     const otherSpending = p.living + p.leisure + (p.annual + p.annualItems.reduce((sum,x)=>sum+x.amount,0)) / 12;
     p.essentialOther = Math.min(p.essentialOther, otherSpending);
@@ -415,7 +419,7 @@ main{padding:6px 16px 60px}
     const p = normalize(input), months = p.goalYears * 12;
     const target = p.goal * Math.pow(1 + p.inflation / 100, p.goalYears);
     const monthlyRate = Math.pow(1 + p.rate / 100, 1 / 12) - 1;
-    const starting = p.initial - p.oneTime;
+    const starting = p.goalInitial === null ? p.initial - p.oneTime : p.goalInitial;
     function projected(contribution) {
       let balance = starting;
       for (let i=0; i<months; i++) balance += Math.max(0,balance) * monthlyRate + contribution;
@@ -563,6 +567,8 @@ main{padding:6px 16px 60px}
       for (const key of ['income','housing','living','leisure','other','unexpected']) {
         const n = Number(row[key]); out[month][key] = Number.isFinite(n) && n >= 0 && n <= 1000000000 ? n : 0;
       }
+      const saved = row.savedGoal;
+      out[month].savedGoal = saved === undefined || saved === null || saved === '' || !Number.isFinite(Number(saved)) ? null : Math.min(1000000000, Math.max(0, Number(saved)));
     }
     return out;
   }
@@ -784,7 +790,7 @@ main{padding:6px 16px 60px}
     <p>В каждом из 160 прогонов ежегодные отклонения равномерны: инфляция ±2 п. п. (не ниже нуля), рост зарплаты ±1 п. п., доходность ±6 п. п. Вероятность двухмесячного перерыва в доходах — 8% в каждом году. Это условные учебные допущения, не оценка рынка. Случайная последовательность фиксирована для честного сравнения решений.</p>
     <p>10-й и 90-й перцентили ограничивают центральные 80% полученных результатов. Доля достижения цели относится к концу выбранного срока и только к этой модели; она не является гарантией или реальной вероятностью.</p></section>
   <section class="card pink reveal" id="goal"><span class="num">4</span><h2>Цель и кредит</h2>
-    <p>Взнос для цели предполагает равную сумму в конце каждого месяца, всю начальную сумму за вычетом разовой траты и заданные инфляцию и доходность. Сценарии и будущие изменения бюджета в этом отдельном расчёте не учитываются.</p>
+    <p>Взнос для цели предполагает равную сумму в конце каждого месяца, сумму начальных накоплений, выбранную для цели (или все после разовой траты, если поле пустое) и заданные инфляцию и доходность. Сценарии и будущие изменения бюджета в этом отдельном расчёте не учитываются.</p>
     <p>Кредит рассчитывается равными платежами по остатку долга; годовая ставка делится на 12, платёж учитывается в бюджете до окончания срока. Остаток долга не прибавляется к капиталу и не вычитается из него. Комиссии, страховки, изменение ставок и досрочные погашения не включены.</p></section>
   <section class="card orange reveal" id="decisions"><span class="num">5</span><h2>Жизненные решения</h2>
     <p>Экономия уменьшает регулярные расходы на 10%, кроме платежа по кредиту. Обучение оплачивается в начале второго года, повышение зарплаты на 15% действует с третьего. Автомобиль покупается в начале третьего года, затем требует 8 тыс. ₽ в месяц в исходных ценах; стоимость автомобиля как актива не учитывается. Цель — порог накоплений, покупка автоматически не совершается.</p></section>
