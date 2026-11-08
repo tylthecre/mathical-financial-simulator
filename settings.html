@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#10110f"><meta name="description" content="Тема, анимации и данные."><title>Настройки — mathical</title><link rel="stylesheet" href="css/site.css"></head><body>
+<script src="engine.js"></script><script src="format.js"></script><script src="chart.js"></script><script src="js/store.js"></script><script src="js/ui.js"></script>
+<main>
+
+<div class="page-head">
+  <span class="kicker reveal">Настройки</span>
+  <h1 class="title reveal" style="--d:.07s">Настройки <span>сайта</span></h1>
+  <p class="lead reveal" style="--d:.14s">Внешний вид, отображение и твои данные. Параметры плана — на странице «План».</p>
+</div>
+<div class="settings-wrap stack">
+  <section class="card surface reveal" aria-labelledby="s-look"><h2 id="s-look">Внешний вид</h2>
+    <div class="setting"><div><h3>Тема</h3><p>Светлая, тёмная или как в настройках устройства.</p></div>
+      <div class="seg" id="s-theme" role="group" aria-label="Тема"><button data-v="system">Как в системе</button><button data-v="light">Светлая</button><button data-v="dark">Тёмная</button></div></div>
+    <div class="setting"><div><h3>Анимации</h3><p>Плавные переходы между страницами, появление блоков и «набегающие» числа. Выключи, если они мешают.</p></div>
+      <button class="switch" id="s-anim" type="button" role="switch" aria-checked="true" aria-label="Анимации"></button></div></section>
+
+  <section class="card surface reveal" aria-labelledby="s-res"><h2 id="s-res">Отображение результатов</h2>
+    <div class="setting"><div><h3>Суммы по умолчанию</h3><p>В каких рублях показывать капитал: с поправкой на инфляцию или номинальные.</p></div>
+      <div class="seg" id="s-mode" role="group" aria-label="Суммы по умолчанию"><button data-v="real">Сегодняшние ₽</button><button data-v="nominal">Будущие ₽</button></div></div>
+    <div class="setting"><div><h3>Коридор на графике</h3><p>Показывать на базовом графике область от 10-го до 90-го перцентиля.</p></div>
+      <button class="switch" id="s-band" type="button" role="switch" aria-checked="true" aria-label="Коридор на графике"></button></div></section>
+
+  <section class="card surface reveal" aria-labelledby="s-data"><h2 id="s-data">Данные</h2>
+    <div class="setting"><div><h3>Скачать данные</h3><p>План, сохранённые варианты и настройки в одном файле JSON.</p></div><button class="btn btn-ghost btn-small" id="s-export" type="button">Скачать</button></div>
+    <div class="setting"><div><h3>Загрузить данные</h3><p>Восстановить всё из ранее скачанного файла. Текущие данные будут заменены.</p></div>
+      <button class="btn btn-ghost btn-small" id="s-import" type="button">Выбрать файл</button><input type="file" id="s-file" accept="application/json,.json" hidden></div>
+    <div class="setting"><div><h3>Хранилище браузера</h3><p id="s-storage"></p></div></div></section>
+
+  <section class="card surface danger-zone reveal" aria-labelledby="s-reset"><h2 id="s-reset">Сброс</h2>
+    <div class="setting"><div><h3>Удалить все данные</h3><p>План, варианты и настройки вернутся к начальным. Это нельзя отменить.</p></div><button class="btn btn-danger btn-small" id="s-wipe" type="button">Удалить всё</button></div></section>
+</div>
+
+</main>
+<script src="js/settings.js"></script>
+</body></html>

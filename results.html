@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#10110f"><meta name="description" content="Капитал, бюджет, цель и финансовое здоровье."><title>Результаты — mathical</title><link rel="stylesheet" href="css/site.css"></head><body>
+<script src="engine.js"></script><script src="format.js"></script><script src="chart.js"></script><script src="js/store.js"></script><script src="js/ui.js"></script>
+<main>
+
+<div class="page-head">
+  <span class="kicker reveal">Шаг 2 · Результаты</span>
+  <h1 class="title reveal" style="--d:.07s">Твой капитал <span>через <span id="r-years"></span></span></h1>
+  <p class="lead reveal" style="--d:.14s" id="r-lead"></p>
+</div>
+<div class="controls reveal">
+  <div class="seg" id="money-mode" role="group" aria-label="Тип рублей"><button data-mode="real">Сегодняшние ₽</button><button data-mode="nominal">Будущие ₽</button></div>
+  <label class="sr-only" for="scenario">Сценарий</label>
+  <select class="pick" id="scenario"><option value="base">Базовый сценарий</option><option value="optimistic">Благоприятный сценарий</option><option value="stress">Стрессовый сценарий</option></select>
+  <div class="seg" id="years" role="group" aria-label="Срок планирования"><button data-years="10">10 лет</button><button data-years="15">15 лет</button><button data-years="20">20 лет</button></div>
+  <span class="spacer"></span>
+  <a class="btn btn-ghost btn-small" href="plan.html">Изменить план <span class="arr">→</span></a>
+</div>
+
+<div class="grid cols-main">
+  <section class="card reveal" aria-labelledby="cap-title"><div class="card-top"><h2 id="cap-title">Капитал во времени</h2><span class="sub-line" id="chart-unit" style="margin:0;min-height:0"></span></div>
+    <div class="big" id="final-capital">—</div><div class="sub-line" id="capital-subtitle"></div>
+    <div id="capital-chart" class="chart" role="img" aria-label="График капитала по годам"></div>
+    <label class="chart-control">Год на графике <input id="chart-year" type="range" min="0" value="0" step="1"><output id="chart-readout" aria-live="polite"></output></label>
+    <div class="chart-foot"><span><i class="dot" style="background:#dc7916"></i>Капитал · <i class="dot" style="background:#a64f8b"></i>Цель <span id="chart-band-legend">· <i class="dot" style="background:#8c7be9"></i>10–90% базовой модели</span></span></div>
+    <p class="note" id="chart-goal-note"></p></section>
+
+  <section class="card pink goal-card reveal" style="--d:.1s" aria-label="Цель">
+    <div class="card-top"><span style="font-size:15px">Моя цель</span><a class="btn btn-dark btn-small" href="plan.html">Изменить</a></div>
+    <div class="goal-icon" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3"><circle cx="32" cy="32" r="27"/><circle cx="32" cy="32" r="15"/><circle cx="32" cy="32" r="3" fill="currentColor"/></svg></div>
+    <h2 id="goal-title"></h2><p class="goal-amt" id="goal-amount"></p>
+    <div class="progress"><div id="goal-progress"></div></div>
+    <div class="goal-result" id="goal-result"></div>
+    <div class="goal-plan"><span>Чтобы накопить к сроку</span><strong id="goal-monthly"></strong><p id="goal-compare"></p>
+    <p>Все накопления — на цель. Инфляция и доходность учтены, сценарии — нет. Сравнение приблизительное: бюджет со временем может измениться.</p></div></section>
+</div>
+
+<div class="grid cols-main" style="margin-top:16px">
+  <section class="card reveal" aria-labelledby="bud-title"><h2 id="bud-title">Ежемесячный бюджет</h2><div id="allocation" aria-label="Распределение ежемесячного бюджета"></div><p class="note" id="budget-note"></p></section>
+  <section class="card sage reveal" style="--d:.1s" aria-labelledby="rng-title"><h2 id="rng-title">Диапазон результатов</h2><p class="note" style="margin-top:8px">160 учебных траекторий · в сегодняшних рублях</p>
+    <div class="range-values"><div><span>10-й перцентиль</span><b id="p10"></b></div><div><span>Медиана</span><b id="p50"></b></div><div><span>90-й перцентиль</span><b id="p90"></b></div></div>
+    <div class="range-line"><span></span></div><p class="note" id="probability"></p></section>
+</div>
+
+<section class="section" aria-labelledby="health-title">
+  <div class="section-head reveal"><div><h2 id="health-title">Финансовое здоровье</h2><p id="health-note"></p></div></div>
+  <div class="grid g4">
+    <div class="stat reveal"><span>Остаток в месяц</span><strong id="health-free"></strong></div>
+    <div class="stat reveal" style="--d:.07s"><span>Доля сбережений</span><strong id="health-rate"></strong></div>
+    <div class="stat reveal" style="--d:.14s"><span>Обязательные расходы</span><strong id="health-essential"></strong></div>
+    <div class="stat reveal" style="--d:.21s"><span>Запас средств</span><strong id="health-reserve"></strong></div>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="credit-title">
+  <div class="section-head reveal"><div><h2 id="credit-title">Кредит</h2><p>Действующий долг в твоём бюджете.</p></div></div>
+  <div class="card surface reveal">
+    <div class="empty-cta" id="loan-empty"><p>Кредит не указан. Добавь остаток долга, ставку и срок — и здесь появится платёж.</p><a class="btn btn-ghost btn-small" href="plan.html#credit">Добавить кредит <span class="arr">→</span></a></div>
+    <div id="loan-metrics" class="grid g3" hidden>
+      <div class="stat" style="background:var(--surface-2)"><span>Платёж в месяц</span><strong id="loan-payment"></strong></div>
+      <div class="stat" style="background:var(--surface-2)"><span>Оставшиеся проценты</span><strong id="loan-overpayment"></strong></div>
+      <div class="stat" style="background:var(--surface-2)"><span>Доля дохода</span><strong id="loan-ratio"></strong></div>
+    </div>
+    <p class="field-note" id="loan-note" style="margin-top:16px" hidden>Равные платежи; комиссии и страховка не учтены. Долг не прибавляется к капиталу и не вычитается из него.</p>
+  </div>
+</section>
+
+<div class="section"><div class="card lilac cta-band reveal"><h2>А что, если поступить иначе?</h2><a class="btn btn-dark" href="compare.html">Сравнить решения <span class="arr">→</span></a></div></div>
+
+</main>
+<script src="js/results.js"></script>
+</body></html>

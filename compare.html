@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#10110f"><meta name="description" content="Жизненные решения и сохранённые варианты."><title>Сравнение — mathical</title><link rel="stylesheet" href="css/site.css"></head><body>
+<script src="engine.js"></script><script src="format.js"></script><script src="chart.js"></script><script src="js/store.js"></script><script src="js/ui.js"></script>
+<main>
+
+<div class="page-head">
+  <span class="kicker reveal">Шаг 3 · Сравнение</span>
+  <h1 class="title reveal" style="--d:.07s">А что, <span>если…</span></h1>
+  <p class="lead reveal" style="--d:.14s">Выбери жизненное решение и посмотри, как оно изменит капитал. Понравившийся вариант можно сохранить и сравнить с другими.</p>
+</div>
+
+<section aria-labelledby="dec-title">
+  <h2 class="sr-only" id="dec-title">Жизненные решения</h2>
+  <div class="decision-list">
+    <button class="decision reveal" data-decision="none"><span class="em">—</span><strong>Ничего не менять</strong><small>Текущий план как есть</small></button>
+    <button class="decision reveal" style="--d:.06s" data-decision="save"><span class="em">−10%</span><strong>Тратить на 10% меньше</strong><small>Регулярные расходы ниже</small></button>
+    <button class="decision reveal" style="--d:.12s" data-decision="education"><span class="em">+15%</span><strong>Вложиться в обучение</strong><small>120 тыс. ₽ · доход +15%</small></button>
+    <button class="decision reveal" style="--d:.18s" data-decision="car"><span class="em">900к</span><strong>Купить автомобиль</strong><small>900 тыс. ₽ + 8 тыс. ₽/мес.</small></button>
+  </div>
+  <div class="insight" id="decision-insight" aria-live="polite"></div>
+</section>
+
+<section class="section" aria-labelledby="var-title">
+  <div class="section-head reveal"><div><h2 id="var-title">Варианты рядом</h2><p>Текущий план и до трёх сохранённых. Капитал — в сегодняшних рублях.</p></div></div>
+  <div class="grid g4" id="variants"></div>
+</section>
+
+<section class="section" aria-labelledby="table-title">
+  <div class="section-head reveal"><div><h2 id="table-title">Подробные расчёты</h2><p id="table-sub"></p></div>
+    <div class="btn-row"><button class="btn btn-ghost btn-small" id="export" type="button">Скачать CSV</button><button class="btn btn-ghost btn-small" id="share-image" type="button">Скачать картинку</button></div></div>
+  <div class="card surface reveal"><div class="table-scroll"><table><thead><tr><th>Год</th><th>Доход</th><th>Расходы</th><th>Доход на капитал</th><th>Капитал</th><th>В сегодняшних ₽</th></tr></thead><tbody id="year-table"></tbody></table></div></div>
+</section>
+
+</main>
+<script src="js/compare.js"></script>
+</body></html>
