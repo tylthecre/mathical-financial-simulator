@@ -80,10 +80,10 @@
     canvas.width = 1200; canvas.height = 630;
     const ctx = canvas.getContext('2d'), capital = view.mode === 'real' ? result.final.real : result.final.balance;
     ctx.fillStyle = '#141610'; ctx.fillRect(0, 0, 1200, 630);
-    ctx.fillStyle = '#ed7bdb'; ctx.font = '700 48px Onest, sans-serif'; ctx.fillText('mathical', 70, 90);
-    ctx.fillStyle = '#fff6c5'; ctx.font = '500 35px Onest, sans-serif'; ctx.fillText('Мой финансовый план', 70, 190);
+    ctx.fillStyle = '#e5bbc9'; ctx.font = '700 48px Onest, sans-serif'; ctx.fillText('mathical', 70, 90);
+    ctx.fillStyle = '#f6f0e3'; ctx.font = '500 35px Onest, sans-serif'; ctx.fillText('Мой финансовый план', 70, 190);
     ctx.font = '500 30px Onest, sans-serif'; ctx.fillText('Через ' + yearsLabel(params.years) + ' мой капитал', 70, 280);
-    ctx.fillStyle = '#def249'; ctx.font = '700 84px Onest, sans-serif'; ctx.fillText(money(capital), 70, 385, 1060);
+    ctx.fillStyle = '#cbd9b9'; ctx.font = '700 84px Onest, sans-serif'; ctx.fillText(money(capital), 70, 385, 1060);
     ctx.fillStyle = '#d7dccc'; ctx.font = '400 27px Onest, sans-serif';
     ctx.fillText((view.mode === 'real' ? 'В сегодняшних рублях' : 'В будущих рублях') + ' · ' + outcomes[view.scenario] + ' сценарий', 70, 450, 1060);
     ctx.font = '400 23px Onest, sans-serif'; ctx.fillText('Учебная модель, а не финансовый прогноз', 70, 550);

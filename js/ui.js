@@ -15,7 +15,7 @@
     if (access) access.setAttribute('aria-pressed', String(S.state.settings.accessible));
     doc.body.classList.toggle('no-anim', !animOn());
     const m = doc.querySelector('meta[name=theme-color]');
-    if (m) m.content = light ? '#f5f3e9' : '#10110f';
+    if (m) m.content = light ? '#f5f1ed' : '#19191b';
   }
   mq.addEventListener('change', applyTheme);
 

@@ -12,6 +12,6 @@ test('Линия цели использует будущую стоимость
   assert.match(a,/Цель выше шкалы графика/);
 });
 test('Коридор отсутствует, если сценарий не базовый',()=>{
-  assert.match(make('real',true),/fill="#8c7be9"/);
-  assert.doesNotMatch(make('real',false),/fill="#8c7be9"/);
+  assert.match(make('real',true),/fill="#aa9cb9"/);
+  assert.doesNotMatch(make('real',false),/fill="#aa9cb9"/);
 });
