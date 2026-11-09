@@ -11,7 +11,7 @@
     const path=points=>points.map(([a,b],i)=>(i?'L':'M')+a.toFixed(2)+' '+b.toFixed(2)).join(' ');
     const line=path(values.map((v,i)=>[x(i),y(v)]));
     const band=path(bands.map((b,i)=>[x(i),y(high(b))]).concat(bands.map((b,i)=>[x(i),y(low(b))]).reverse()))+' Z';
-    let svg=`<svg viewBox="0 0 390 235" role="img" aria-label="График капитала и диапазон учебных сценариев с ${startYear} по ${startYear+years} год"><defs><clipPath id="goal-clip"><rect x="70" y="25" width="305" height="180"/></clipPath><linearGradient id="chart-fill" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#e6c1a4" stop-opacity=".38"/><stop offset="1" stop-color="#e6c1a4" stop-opacity="0"/></linearGradient></defs>`;
+    let svg=`<svg viewBox="0 0 390 235" role="img" aria-label="График капитала и диапазон учебных сценариев с ${startYear} по ${startYear+years} год"><defs><clipPath id="goal-clip"><rect x="70" y="25" width="305" height="180"/></clipPath><linearGradient id="chart-fill" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#ffccad" stop-opacity=".38"/><stop offset="1" stop-color="#ffccad" stop-opacity="0"/></linearGradient></defs>`;
     [min,(min+max)/2,max].forEach(v=>{svg+=`<line x1="70" y1="${y(v)}" x2="375" y2="${y(v)}" stroke="#d4c99a" stroke-dasharray="3 4"/><text x="64" y="${y(v)+4}" text-anchor="end" font-size="11" fill="#675e40">${money(v).replace(/₽/g,'')}</text>`;});
     if(showBand) svg+=`<path d="${band}" fill="#aa9cb9" opacity=".18"/>`;
     svg+=`<path d="${line} L ${x(years)} ${y(0)} L ${x(0)} ${y(0)} Z" fill="url(#chart-fill)"/>`;
