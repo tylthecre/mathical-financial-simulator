@@ -260,9 +260,6 @@
     if (el) el.textContent = v;
   };
 
-  if (S.state.legacyDecisionRemoved)
-    toast("Ранее выбранный сценарий больше недоступен. Включён обычный план.");
-
   root.MUI = {
     applyTheme,
     reveal,

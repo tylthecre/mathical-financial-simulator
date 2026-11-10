@@ -1,17 +1,16 @@
-// Обновляет версии ресурсов и собирает автономные страницы в dist/.
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+// Создаёт сайт в dist/, не изменяя исходники. Внешних зависимостей нет.
+import { readFileSync, writeFileSync, mkdirSync, copyFileSync } from "node:fs";
 import { createHash } from "node:crypto";
-const read = (p) => readFileSync(new URL(p, import.meta.url), "utf8");
-const versioned = (path) => {
-  const hash = createHash("sha256")
-    .update(readFileSync(new URL(path, import.meta.url)))
+
+const root = new URL("./", import.meta.url);
+const read = (file) => readFileSync(new URL(file, root), "utf8");
+const versioned = (file) =>
+  file +
+  "?v=" +
+  createHash("sha256")
+    .update(readFileSync(new URL(file, root)))
     .digest("hex")
     .slice(0, 12);
-  return `${path}?v=${hash}`;
-};
-const font = readFileSync(new URL("Onest.ttf", import.meta.url)).toString(
-  "base64",
-);
 const pages = [
   "index",
   "plan",
@@ -21,34 +20,25 @@ const pages = [
   "method",
   "settings",
 ];
-const css = read("css/site.css").replace(
-  'url("../Onest.ttf")',
-  () => `url(data:font/ttf;base64,${font})`,
-);
-mkdirSync(new URL("dist/", import.meta.url), { recursive: true });
+const assets = new Set(["Onest.ttf", "Onest-LICENSE.txt"]);
+mkdirSync(new URL("dist/", root), { recursive: true });
+
 for (const name of pages) {
-  const path = new URL(`${name}.html`, import.meta.url);
-  const source = read(`${name}.html`)
-    .replace(
-      /href="css\/site\.css(?:\?[^" ]*)?"/g,
-      () => `href="${versioned("css/site.css")}"`,
-    )
-    .replace(
-      /<script\s+src="([^"?]+)(?:\?[^" ]*)?"\s*>\s*<\/script>/g,
-      (_, src) => `<script src="${versioned(src)}"></script>`,
-    );
-  writeFileSync(path, source, "utf8");
-  const html = source
-    .replace(
-      /<link\b[^>]*\brel="stylesheet"[^>]*\bhref="css\/site\.css(?:\?[^" ]*)?"[^>]*>/,
-      () => `<style>${css}</style>`,
-    )
-    .replace(
-      /<script\s+src="([^"?]+)(?:\?[^" ]*)?"\s*>\s*<\/script>/g,
-      (_, src) => `<script>${read(src)}</script>`,
-    );
-  writeFileSync(new URL(`dist/${name}.html`, import.meta.url), html, "utf8");
+  const html = read(name + ".html").replace(
+    /\b(href|src)="((?:css\/|js\/)[^"?]+|engine\.js|format\.js|chart\.js)(?:\?[^" ]*)?"/g,
+    (_, attribute, file) => {
+      assets.add(file);
+      return `${attribute}="${versioned(file)}"`;
+    },
+  );
+  writeFileSync(new URL(`dist/${name}.html`, root), html, "utf8");
 }
+for (const file of assets) {
+  const destination = new URL("dist/" + file, root);
+  mkdirSync(new URL("./", destination), { recursive: true });
+  copyFileSync(new URL(file, root), destination);
+}
+writeFileSync(new URL("dist/.nojekyll", root), "");
 console.log(
-  `Updated resource versions and built ${pages.length} standalone pages in dist/.`,
+  `Built ${pages.length} pages and ${assets.size} assets in dist/. Sources unchanged.`,
 );

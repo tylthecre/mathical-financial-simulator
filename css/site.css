@@ -1337,58 +1337,70 @@ body.theme-light .switch[aria-checked="true"]::after {
   letter-spacing: -0.6px;
   overflow-wrap: anywhere;
 }
-.feature {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  min-height: 252px;
-  text-decoration: none;
-  padding: 24px;
-}
-.feature h3 {
-  font-size: 21px;
-  font-weight: 600;
-  letter-spacing: -0.6px;
-  margin: 0;
-}
-.feature p {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.65;
-  color: var(--muted);
-}
-.ico {
-  width: 38px;
-  height: 38px;
-  border-radius: 9px;
-  background: var(--surface-2);
-  display: grid;
-  place-items: center;
-  color: var(--button-accent);
-  margin-bottom: 4px;
-}
-.ico svg {
-  width: 21px;
-  height: 21px;
-}
-body.theme-light .ico {
-  color: #56699e;
-}
-.feature .go {
-  margin-top: auto;
-  padding-top: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.home-goal-outcome {
+  font-size: 16px;
   font-weight: 500;
-  font-size: 13px;
+  line-height: 1.5;
+  color: var(--card-ink);
+  margin: 14px 0 0;
+}
+.section-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+.section-list a {
+  display: grid;
+  grid-template-columns: minmax(140px, 0.38fr) minmax(0, 1fr) 30px;
+  align-items: center;
+  gap: 24px;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--line);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.section-list strong {
+  font-size: 21px;
+  font-weight: 500;
+  letter-spacing: -0.5px;
+}
+.section-list p {
+  font-size: 15px;
+  line-height: 1.6;
   color: var(--muted);
+  margin: 0;
 }
-.feature .go span:last-child {
-  transition: transform 0.3s var(--ease);
+.section-list a > span {
+  font-size: 24px;
+  text-align: right;
+  color: var(--muted);
+  transition: transform 0.2s;
 }
-.feature:hover .go span:last-child {
-  transform: translateX(6px);
+.section-list a:hover > span {
+  transform: translateX(4px);
+  color: var(--ink);
+}
+body.accessible-mode .home-goal-outcome {
+  font-size: 18px;
+}
+@media (max-width: 640px) {
+  .section-list a {
+    grid-template-columns: minmax(0, 1fr) 24px;
+    gap: 8px 16px;
+    padding: 20px 0;
+  }
+  .section-list p {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .section-list a > span {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+  .section-list strong {
+    font-size: 20px;
+  }
 }
 .cta-band {
   display: flex;
@@ -1697,9 +1709,6 @@ body.no-anim *::after {
   .hero-note {
     margin-top: 18px;
   }
-  .feature {
-    min-height: 220px;
-  }
   .card.card-details {
     padding: 0;
   }
@@ -1893,7 +1902,7 @@ body.accessible-mode
     .plan-help-content p,
     .nav-links a,
     .foot,
-    .feature p,
+    .section-list p,
     .decision small,
     .decision strong,
     .chart-control,

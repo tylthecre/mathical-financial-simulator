@@ -62,65 +62,8 @@
       : [];
   }
 
-  // Старые корзины и помесячные записи сохраняются для обратимого экспорта.
-  function cleanInflation(value) {
-    const data = isRecord(value) ? value : {};
-    const rows = Array.isArray(data.rows)
-      ? data.rows.slice(0, 50).map((row) => ({
-          name: String(row?.name || "").slice(0, 80),
-          old: String(row?.old ?? "").slice(0, 16),
-          current: String(row?.current ?? "").slice(0, 16),
-        }))
-      : [];
-    return {
-      rows,
-      from: /^\d{4}-\d{2}$/.test(data.from || "") ? data.from : "",
-      to: /^\d{4}-\d{2}$/.test(data.to || "") ? data.to : "",
-      source: ["manual", "official", "personal"].includes(data.source)
-        ? data.source
-        : "manual",
-    };
-  }
-
-  function cleanMonthly(value) {
-    const result = {};
-    if (!isRecord(value)) return result;
-    for (const [month, row] of Object.entries(value)) {
-      if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month) || !isRecord(row)) continue;
-      const entry = {};
-      for (const key of [
-        "income",
-        "housing",
-        "living",
-        "leisure",
-        "other",
-        "unexpected",
-      ]) {
-        const number = Number(row[key]);
-        entry[key] =
-          Number.isFinite(number) && number >= 0 && number <= 1000000000
-            ? number
-            : 0;
-      }
-      const saved = row.savedGoal;
-      entry.savedGoal =
-        saved === undefined ||
-        saved === null ||
-        saved === "" ||
-        !Number.isFinite(Number(saved))
-          ? null
-          : Math.min(1000000000, Math.max(0, Number(saved)));
-      result[month] = entry;
-    }
-    return result;
-  }
-
   function cleanData(data, settings) {
     const params = M.normalize(isRecord(data.params) ? data.params : {});
-    const legacyDecisionRemoved = ["education", "car"].includes(
-      params.decision,
-    );
-    if (legacyDecisionRemoved) params.decision = "none";
     const config = cleanSettings(settings);
     const view = isRecord(data.view) ? data.view : {};
     return {
@@ -131,9 +74,13 @@
         mode: ["real", "nominal"].includes(view.mode) ? view.mode : config.mode,
         scenario: SCENARIOS.includes(view.scenario) ? view.scenario : "base",
       },
-      inflationInfo: cleanInflation(data.inflationInfo),
-      monthly: cleanMonthly(data.monthly),
-      legacyDecisionRemoved,
+      inflationInfo: {
+        source: ["manual", "official", "personal"].includes(
+          data.inflationInfo?.source,
+        )
+          ? data.inflationInfo.source
+          : "manual",
+      },
     };
   }
 
@@ -167,7 +114,6 @@
       settings: state.settings,
       view: state.view,
       inflationInfo: state.inflationInfo,
-      monthly: state.monthly,
     };
   }
 

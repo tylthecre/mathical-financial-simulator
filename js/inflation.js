@@ -2,7 +2,16 @@
   "use strict";
   const S = MStore,
     U = MUI,
-    data = S.state.inflationInfo;
+    data = S.state.inflationInfo,
+    official = MathicalInflation;
+  const officialRate = official.rate.toLocaleString("ru-RU");
+  U.text("official-rate", officialRate + "%");
+  U.text("official-index", (100 + official.rate).toLocaleString("ru-RU") + "%");
+  U.text("official-period", official.period);
+  U.text("official-published", official.published);
+  U.text("use-official", "Использовать " + officialRate + "%");
+  U.$("#official-rosstat").href = official.rosstat;
+  U.$("#official-bank").href = official.centralBank;
   function current() {
     const labels = {
       manual: "своё значение",
@@ -33,6 +42,6 @@
     if (input.value === "" || !input.reportValidity()) return;
     apply(Number(input.value), "manual");
   };
-  U.$("#use-official").onclick = () => apply(6.35, "official");
+  U.$("#use-official").onclick = () => apply(official.rate, "official");
   current();
 })();

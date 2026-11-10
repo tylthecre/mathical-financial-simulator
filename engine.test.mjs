@@ -73,18 +73,6 @@ test("Экономия даёт ровно 10% исходных расходов
       simulate(plain).final.balance,
     600000,
   ));
-test("Обучение: оплата во втором году, надбавка с третьего", () => {
-  const r = simulate({ ...plain, decision: "education" });
-  assert.equal(r.rows[1].expenses, 600000);
-  assert.equal(r.rows[2].expenses, 720000);
-  assert.ok(Math.abs(r.rows[3].income - 1380000) < 0.01);
-});
-test("Автомобиль: разовая цена и 8 лет содержания", () =>
-  assert.equal(
-    simulate(plain).final.balance -
-      simulate({ ...plain, decision: "car" }).final.balance,
-    900000 + 8000 * 12 * 8,
-  ));
 test("Цель может быть доступна сразу, позже или не достигаться", () => {
   assert.equal(simulate({ ...plain, goal: 100000 }).reached, 0);
   assert.equal(simulate({ ...plain, goal: 800000 }).reached, 1);

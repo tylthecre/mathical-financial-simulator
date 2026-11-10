@@ -102,14 +102,14 @@ test("Неудачный импорт оставляет прежний план
   assert.equal(store.exportData(), previous);
 });
 
-test("Архивные варианты, корзина и помесячные данные переживают импорт и экспорт", () => {
+test("Импорт игнорирует удалённые поля и нормализует неподдерживаемые решения", () => {
   const { store } = fixture();
   const data = {
     app: "mathical",
     version: 1,
-    params: { decision: "education" },
-    saved: [{ params: { decision: "car" }, scenario: "stress" }],
-    monthly: { "2026-10": { income: 90000, savedGoal: 5000 } },
+    params: { decision: "retired" },
+    saved: [{ params: { decision: "retired" }, scenario: "stress" }],
+    monthly: { "2026-10": { income: 90000 } },
     inflationInfo: {
       source: "personal",
       from: "2026-09",
@@ -120,12 +120,11 @@ test("Архивные варианты, корзина и помесячные 
   assert.equal(store.importData(JSON.stringify(data)), true);
   const exported = JSON.parse(store.exportData());
   assert.equal(exported.params.decision, "none");
-  assert.equal(store.state.legacyDecisionRemoved, true);
-  assert.equal(exported.saved[0].params.decision, "car");
-  assert.equal(exported.monthly["2026-10"].savedGoal, 5000);
-  assert.deepEqual(exported.inflationInfo, data.inflationInfo);
+  assert.equal(exported.saved[0].params.decision, "none");
+  assert.equal(Object.hasOwn(store.state, "monthly"), false);
+  assert.equal(Object.hasOwn(exported, "monthly"), false);
+  assert.deepEqual(exported.inflationInfo, { source: "personal" });
 });
-
 test("Повреждённый JSON и неподходящий файл не подменяют текущий план", () => {
   const { store } = fixture({ "mathical-v1": "broken json" });
   assert.equal(store.state.params.salary, 100000);

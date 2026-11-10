@@ -88,8 +88,7 @@
     p.goalYears = p.goalMonths / 12;
     p.loanMonths = Math.round(p.loanMonths);
     p.goalName = String(p.goalName || defaults.goalName).slice(0, 80);
-    if (!["none", "save", "education", "car"].includes(p.decision))
-      p.decision = "none";
+    if (!["none", "save"].includes(p.decision)) p.decision = "none";
     return p;
   }
   // Аннуитет: равный ежемесячный платёж, годовая ставка / 12.
@@ -222,30 +221,15 @@
       const monthlyInflation = Math.pow(1 + inf / 100, 1 / 12);
       let income = 0,
         expenses = 0,
-        interest = 0,
-        event = lost ? `${lost} мес. без дохода` : "";
+        interest = 0;
+      const event = lost ? `${lost} мес. без дохода` : "";
       for (let month = 1; month <= 12; month++) {
         // Salary is indexed at each year end; spending and target grow monthly.
         prices *= monthlyInflation;
-        const pay =
-          month <= lost
-            ? 0
-            : salary * (p.decision === "education" && year >= 3 ? 1.15 : 1);
+        const pay = month <= lost ? 0 : salary;
         let cost = spending * prices;
         if ((year - 1) * 12 + month <= loan.months) cost += loan.payment;
         if (year === 1 && month === 1) cost += p.oneTime;
-        // Эти два решения доступны только в архивных сохранённых вариантах.
-        if (p.decision === "education" && year === 2 && month === 1) {
-          cost += 120000 * prices;
-          event = "Обучение: 120 тыс. ₽ в начальных ценах";
-        }
-        if (p.decision === "car" && year >= 3) {
-          cost += 8000 * prices;
-          if (year === 3 && month === 1) {
-            cost += 900000 * prices;
-            event = "Покупка автомобиля";
-          }
-        }
         const earned = Math.max(0, balance) * monthlyRate;
         balance += earned + pay - cost;
         income += pay;

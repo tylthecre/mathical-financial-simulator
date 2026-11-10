@@ -12,15 +12,11 @@
 
   function variantCard(item, i) {
     const label = item.current ? "Сейчас" : "Вариант " + i;
-    const archived =
-      !item.current && ["education", "car"].includes(item.params.decision);
     const buttons = item.current
       ? '<button class="btn btn-dark btn-small" data-act="save" type="button">Сохранить вариант +</button>'
-      : (archived
-          ? ""
-          : '<button class="btn btn-dark btn-small" data-act="load" data-i="' +
-            (i - 1) +
-            '" type="button">Загрузить</button>') +
+      : '<button class="btn btn-dark btn-small" data-act="load" data-i="' +
+        (i - 1) +
+        '" type="button">Загрузить</button>' +
         '<button class="btn btn-ghost btn-small" style="color:inherit;box-shadow:inset 0 0 0 1.5px #0003" data-act="del" data-i="' +
         (i - 1) +
         '" type="button" aria-label="Удалить вариант ' +
@@ -34,11 +30,8 @@
       's"><span class="badge">' +
       label +
       "</span><h3>" +
-      (archived ? "Архивный вариант" : decisions[item.params.decision]) +
+      decisions[item.params.decision] +
       "</h3>" +
-      (archived
-        ? "<small>Старый сценарий сохранён для просмотра; загрузка недоступна.</small>"
-        : "") +
       "<small>" +
       outcomes[item.scenario] +
       " · " +

@@ -3,12 +3,13 @@
   const M = Mathical,
     S = MStore,
     U = MUI,
-    { money, yearsLabel } = MathicalFormat;
+    { money, yearsLabel, goalOutcome } = MathicalFormat;
   const d = M.budget(S.state.params),
     p = d.p;
   const res = M.simulate(p, "base"),
     dist = M.distribution(p);
   U.text("h-years", yearsLabel(p.years));
+  U.text("h-goal-outcome", goalOutcome(res.reached, p.years, S.startYear));
   U.countUp(U.$("#h-capital"), res.final.real, money, 1500);
   U.drawChart(
     U.$("#h-chart"),

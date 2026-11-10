@@ -31,5 +31,11 @@
   const pct = (n) =>
     new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 1 }).format(n) +
     "%";
-  root.MathicalFormat = { money, yearsLabel, durationLabel, pct };
+  function goalOutcome(reached, years, startYear) {
+    if (reached === 0) return "Цель уже достигнута на старте плана.";
+    if (reached === null)
+      return "За " + yearsLabel(years) + " цель не достигается.";
+    return "Цель будет достигнута в " + (startYear + reached) + " году.";
+  }
+  root.MathicalFormat = { money, yearsLabel, durationLabel, pct, goalOutcome };
 })(globalThis);
