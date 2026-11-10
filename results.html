@@ -1,6 +1,6 @@
 <!doctype html>
-<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#10172d"><meta name="description" content="Капитал, бюджет, цель и финансовое здоровье."><title>Результаты — mathical</title><link rel="stylesheet" href="css/site.css?v=8c46fe28258e"></head><body>
-<script src="engine.js?v=e6a7a9cab3e8"></script><script src="format.js?v=85e6c181177f"></script><script src="chart.js?v=02ffcf3cef5b"></script><script src="js/store.js?v=04bb49867f39"></script><script src="js/ui.js?v=dc17f6fcc019"></script>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#121b29"><meta name="description" content="Капитал, бюджет, цель и финансовое здоровье."><title>Результаты — mathical</title><link rel="stylesheet" href="css/site.css?v=bb8e558a3a28"></head><body>
+<script src="engine.js?v=e6a7a9cab3e8"></script><script src="format.js?v=85e6c181177f"></script><script src="chart.js?v=02ffcf3cef5b"></script><script src="js/store.js?v=04bb49867f39"></script><script src="js/ui.js?v=d2f7ea1467c8"></script>
 <main>
 
 <div class="page-head">
@@ -18,21 +18,21 @@
 </div>
 
 <div class="grid cols-main">
-  <section class="card reveal" aria-labelledby="cap-title"><div class="card-top"><h2 id="cap-title">Капитал во времени</h2><span class="sub-line" id="chart-unit" style="margin:0;min-height:0"></span></div>
+  <section class="card capital-card reveal" aria-labelledby="cap-title"><div class="card-top"><h2 id="cap-title">Капитал во времени</h2><span class="sub-line" id="chart-unit" style="margin:0;min-height:0"></span></div>
     <div class="big" id="final-capital">—</div><div class="sub-line" id="capital-subtitle"></div>
     <div id="capital-chart" class="chart" role="img" aria-label="График капитала по годам"></div>
     <label class="chart-control">Год на графике <input id="chart-year" type="range" min="0" value="0" step="1"><output id="chart-readout" aria-live="polite"></output></label>
     <div class="chart-foot"><span><i class="dot" style="background:#a9694d"></i>Капитал · <i class="dot" style="background:#90657a"></i>Цель <span id="chart-band-legend">· <i class="dot" style="background:#aa9cb9"></i>Диапазон модели</span></span></div>
     <p class="note" id="chart-goal-note"></p></section>
 
-  <section class="card pink goal-card reveal" style="--d:.1s" aria-label="Цель">
-    <div class="card-top"><span style="font-size:15px">Моя цель</span><a class="btn btn-dark btn-small" href="plan.html">Изменить</a></div>
+  <section class="card goal-card reveal" style="--d:.1s" aria-label="Цель">
+    <div class="card-top"><span class="goal-label">Моя цель</span><a class="btn btn-ghost btn-small" href="plan.html#plan-goal">Изменить</a></div>
     <div class="goal-icon" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3"><circle cx="32" cy="32" r="27"/><circle cx="32" cy="32" r="15"/><circle cx="32" cy="32" r="3" fill="currentColor"/></svg></div>
     <h2 id="goal-title"></h2><p class="goal-amt" id="goal-amount"></p>
     <div class="progress"><div id="goal-progress"></div></div>
     <div class="goal-result" id="goal-result"></div>
     <div class="goal-plan"><span>Чтобы накопить к сроку</span><strong id="goal-monthly"></strong><p id="goal-compare"></p>
-    <p>Взнос учитывает сумму накоплений, выбранную для цели, инфляцию и доходность; сценарии не учтены. Процент выше и график показывают весь капитал относительно цели. Бюджет со временем может измениться.</p></div></section>
+    <details class="goal-explanation"><summary>Как считается взнос</summary><p>Взнос учитывает сумму накоплений, выбранную для цели, инфляцию и доходность; сценарии не учтены. Процент выше и график показывают весь капитал относительно цели. Бюджет со временем может измениться.</p></details></div></section>
 </div>
 
 <div class="grid cols-main" style="margin-top:16px">

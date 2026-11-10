@@ -1,33 +1,35 @@
 <!doctype html>
-<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#10172d"><meta name="description" content="Mathical — финансовый симулятор жизненных решений."><title>mathical — финансовый симулятор</title><link rel="stylesheet" href="css/site.css?v=8c46fe28258e"></head><body>
-<script src="engine.js?v=e6a7a9cab3e8"></script><script src="format.js?v=85e6c181177f"></script><script src="chart.js?v=02ffcf3cef5b"></script><script src="js/store.js?v=04bb49867f39"></script><script src="js/ui.js?v=dc17f6fcc019"></script>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#121b29"><meta name="description" content="Mathical — рассчитай бюджет, срок накопления на цель и сравни финансовые решения."><title>mathical — финансовый симулятор</title><link rel="stylesheet" href="css/site.css?v=bb8e558a3a28"></head><body>
+<script src="engine.js?v=e6a7a9cab3e8"></script><script src="format.js?v=85e6c181177f"></script><script src="chart.js?v=02ffcf3cef5b"></script><script src="js/store.js?v=04bb49867f39"></script><script src="js/ui.js?v=d2f7ea1467c8"></script>
 <main>
 
 <section class="hero">
   <div>
     <span class="kicker reveal">Финансовый симулятор</span>
-    <h1 class="reveal" style="--d:.08s"><span>Твоё финансовое</span><span class="grad">будущее.</span></h1>
-    <p class="lead reveal" style="--d:.16s">Укажи доходы, расходы и цель — mathical покажет, как может измениться капитал и как на него повлияет экономия.</p>
+    <h1 class="reveal" style="--d:.08s">Когда ты накопишь<br>на свою цель?</h1>
+    <p class="lead reveal" style="--d:.16s">Разберись, сколько можешь откладывать, когда хватит на покупку и что изменится, если тратить чуть меньше.</p>
     <div class="cta reveal" style="--d:.24s">
-      <a class="btn btn-primary" href="plan.html">Собрать свой план <span class="arr">→</span></a>
-      <a class="btn btn-ghost" href="results.html">Смотреть результаты</a>
+      <a class="btn btn-primary" href="plan.html">Рассчитать свой план <span class="arr">→</span></a>
+      <a class="btn btn-link" href="results.html">Посмотреть расчёт <span class="arr">↗</span></a>
     </div>
-    <div class="chip-row reveal" style="--d:.32s"><span class="chip">Расчёты прямо в браузере</span><span class="chip">Инфляция учтена</span><span class="chip">Три сценария</span></div>
+    <p class="hero-note reveal" style="--d:.32s">Без регистрации. Данные остаются в твоём браузере.</p>
   </div>
   <div class="hero-stack reveal" style="--d:.2s">
-    <div class="card">
-      <div class="card-top"><h2>Капитал через <span id="h-years"></span></h2><span class="badge" style="margin:0">пример</span></div>
+    <div class="card capital-card hero-preview">
+      <div class="card-top"><h2>Капитал через <span id="h-years"></span></h2><span class="preview-label">Текущий план</span></div>
       <div class="big" id="h-capital">—</div>
       <div class="sub-line">В сегодняшних рублях · базовый сценарий</div>
-      <div class="chart" id="h-chart" style="height:220px"></div>
+      <div class="chart" id="h-chart"></div>
+      <div class="preview-metrics">
+        <div class="preview-metric"><small>Можно откладывать</small><strong id="h-free">—</strong></div>
+        <div class="preview-metric"><small id="h-goal-name">Цель</small><strong id="h-goal">—</strong></div>
+      </div>
     </div>
-    <div class="mini a"><small>Остаётся в месяц</small><strong id="h-free">—</strong></div>
-    <div class="mini b"><small id="h-goal-name">Цель</small><strong id="h-goal">—</strong></div>
   </div>
 </section>
 
 <section class="section" aria-labelledby="sec-pages">
-  <div class="section-head reveal"><div><h2 id="sec-pages">Что внутри</h2><p>Каждая часть симулятора — на своей странице.</p></div></div>
+  <div class="section-head reveal"><div><h2 id="sec-pages">От бюджета к решению</h2><p>Всё, чтобы понять свой план и проверить другие варианты.</p></div></div>
   <div class="grid g4">
     <a class="card feature purple hover-lift reveal" href="plan.html"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></span><h3>План</h3><p>Доходы, расходы, накопления, цель и кредит — с этого начинается расчёт.</p><span class="go"><span>Открыть</span><span>→</span></span></a>
     <a class="card feature lime hover-lift reveal" style="--d:.08s" href="results.html"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18M5 16l4-5 4 3 6-8"/><path d="M15 6h4v4"/></svg></span><h3>Результаты</h3><p>Капитал во времени, бюджет, прогресс цели и финансовое здоровье.</p><span class="go"><span>Открыть</span><span>→</span></span></a>
@@ -36,17 +38,8 @@
   </div>
 </section>
 
-<section class="section" aria-labelledby="sec-steps">
-  <div class="section-head reveal"><div><h2 id="sec-steps">Три шага</h2></div></div>
-  <div class="grid g3">
-    <div class="card surface step reveal"><b>1</b><h3>Введи бюджет</h3><p>Доход, обязательные и необязательные траты, накопления и, если есть, кредит.</p></div>
-    <div class="card surface step reveal" style="--d:.1s"><b>2</b><h3>Посмотри будущее</h3><p>График капитала, диапазон возможных исходов и взнос, который нужен для цели.</p></div>
-    <div class="card surface step reveal" style="--d:.2s"><b>3</b><h3>Сравни решения</h3><p>Сохрани до трёх вариантов и посмотри, как каждое решение меняет результат.</p></div>
-  </div>
-</section>
-
 <section class="section">
-  <div class="card purple cta-band reveal"><h2>Начни с бюджета — остальное посчитаем.</h2><a class="btn btn-cream" href="plan.html">Собрать план <span class="arr">→</span></a></div>
+  <div class="cta-band reveal"><div><h2>Начни со своего месяца.</h2><p>Доходы и расходы станут основой плана.</p></div><a class="btn btn-primary" href="plan.html">Заполнить бюджет <span class="arr">→</span></a></div>
 </section>
 
 </main>

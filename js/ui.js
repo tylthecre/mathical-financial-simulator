@@ -15,7 +15,7 @@
     if (access) access.setAttribute('aria-pressed', String(S.state.settings.accessible));
     doc.body.classList.toggle('no-anim', !animOn());
     const m = doc.querySelector('meta[name=theme-color]');
-    if (m) m.content = light ? '#f8f7fc' : '#10172d';
+    if (m) m.content = light ? '#f5f5f2' : '#121b29';
   }
   mq.addEventListener('change', applyTheme);
 
@@ -26,7 +26,6 @@
   const logo = '<svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 2v20M2 12h20M5 5l14 14M19 5L5 19"/></svg>';
 
   doc.body.insertAdjacentHTML('afterbegin',
-    '<div class="bg" aria-hidden="true"><i></i><i></i><i></i></div>' +
     '<header class="site-header" id="site-header"><div class="nav"><a href="index.html" class="wordmark" aria-label="Mathical — главная">mathical' + logo + '</a>' +
     '<nav class="nav-links" id="nav-links" aria-label="Разделы сайта"><span class="nav-ind" id="nav-ind"></span>' +
     links.map(([h, t]) => '<a href="' + h + '"' + (h === here ? ' class="active" aria-current="page"' : '') + '>' + t + '</a>').join('') + '</nav>' +

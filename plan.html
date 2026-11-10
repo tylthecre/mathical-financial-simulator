@@ -1,12 +1,12 @@
 <!doctype html>
-<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#10172d"><meta name="description" content="Укажи доходы, расходы, цель и кредит."><title>План — mathical</title><link rel="stylesheet" href="css/site.css?v=8c46fe28258e"></head><body>
-<script src="engine.js?v=e6a7a9cab3e8"></script><script src="format.js?v=85e6c181177f"></script><script src="chart.js?v=02ffcf3cef5b"></script><script src="js/store.js?v=04bb49867f39"></script><script src="js/ui.js?v=dc17f6fcc019"></script>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#121b29"><meta name="description" content="Укажи доходы, расходы, цель и кредит."><title>План — mathical</title><link rel="stylesheet" href="css/site.css?v=bb8e558a3a28"></head><body>
+<script src="engine.js?v=e6a7a9cab3e8"></script><script src="format.js?v=85e6c181177f"></script><script src="chart.js?v=02ffcf3cef5b"></script><script src="js/store.js?v=04bb49867f39"></script><script src="js/ui.js?v=d2f7ea1467c8"></script>
 <main>
 
 <div class="page-head">
   <span class="kicker reveal">Шаг 1 · План</span>
-  <h1 class="title reveal" style="--d:.07s">Всё начинается <span>с бюджета.</span></h1>
-  <p id="plan-lead" class="lead reveal" style="--d:.14s">Заполни поля — справа сразу видно, сколько остаётся в месяц. Когда будет готово, нажми «Применить».</p>
+  <h1 class="title reveal" style="--d:.07s">Собери свой бюджет</h1>
+  <p id="plan-lead" class="lead reveal" style="--d:.14s">Укажи доходы и расходы, добавь цель. Остаток в месяц пересчитается сразу.</p>
 </div>
 <div class="form-layout" id="ordinary-plan">
 <form id="plan-form" class="form-stack" novalidate>
@@ -40,17 +40,17 @@
 </form>
 
 <aside class="summary" aria-label="Итог по бюджету">
-  <div class="card purple reveal"><span style="color:var(--card-muted);font-size:15px">Остаётся в месяц</span>
+  <div class="card summary-card reveal"><span class="muted" style="font-size:15px">Остаётся в месяц</span>
     <div class="sum-free" id="sum-free">—</div>
     <div class="mini-bar" aria-hidden="true"><span class="exp" id="mb-exp"></span><span class="fr" id="mb-free"></span></div>
     <div class="sum-details"><div class="sum-row"><span>Доход</span><b id="sum-income"></b></div><div class="sum-row"><span>Расходы</span><b id="sum-expenses"></b></div></div>
     <p class="note" id="sum-note"></p>
-    <button class="btn btn-cream btn-block" type="submit" form="plan-form" style="margin-top:18px">Применить <span class="arr">→</span></button>
+    <button class="btn btn-primary btn-block" type="submit" form="plan-form" style="margin-top:18px">Посмотреть результат <span class="arr">→</span></button>
   </div>
   <button class="btn btn-ghost" type="button" id="plan-reset">Вернуть пример</button>
 </aside>
 </div>
 
 </main>
-<script src="js/plan.js?v=a9c2aeaef5c9"></script>
+<script src="js/plan.js?v=743615cb7b91"></script>
 </body></html>
