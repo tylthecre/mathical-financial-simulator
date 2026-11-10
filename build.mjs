@@ -1,43 +1,24 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { build } from "esbuild";
-
-const base = new URL(".", import.meta.url);
-const pages = [
-  "index",
-  "plan",
-  "results",
-  "compare",
-  "inflation",
-  "method",
-  "settings",
-];
-const read = (file) => readFile(new URL(file, base), "utf8");
-const font = await readFile(new URL("Onest.ttf", base), "base64");
-const css = (await read("css/site.css")).replace(
-  'url("../Onest.ttf")',
-  () => "url(data:font/ttf;base64," + font + ")",
-);
-
-await mkdir(new URL("dist/", base), { recursive: true });
-for (const page of pages) {
-  const html = await read(page + ".html");
-  const moduleTag = /<script type="module" src="([^"]+)"><\/script>/;
-  const [, entry] = html.match(moduleTag);
-  const bundle = await build({
-    entryPoints: [entry],
-    bundle: true,
-    format: "iife",
-    write: false,
-    target: "es2022",
-  });
-  const standalone = html
-    .replace(
-      /<link rel="stylesheet" href="css\/site\.css"\s*\/?>/,
-      () => "<style>" + css + "</style>",
-    )
-    .replace(
-      moduleTag,
-      () => "<script>" + bundle.outputFiles[0].text + "</script>",
-    );
-  await writeFile(new URL("dist/" + page + ".html", base), standalone);
+// Обновляет версии ресурсов и собирает автономные страницы в dist/.
+import {readFileSync, writeFileSync, mkdirSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+const read = p => readFileSync(new URL(p, import.meta.url), 'utf8');
+const versioned = path => {
+  const hash = createHash('sha256').update(readFileSync(new URL(path, import.meta.url))).digest('hex').slice(0, 12);
+  return `${path}?v=${hash}`;
+};
+const font = readFileSync(new URL('Onest.ttf', import.meta.url)).toString('base64');
+const pages = ['index', 'plan', 'results', 'compare', 'inflation', 'method', 'settings'];
+const css = read('css/site.css').replace('url("../Onest.ttf")', () => `url(data:font/ttf;base64,${font})`);
+mkdirSync(new URL('dist/', import.meta.url), {recursive: true});
+for (const name of pages) {
+  const path = new URL(`${name}.html`, import.meta.url);
+  const source = read(`${name}.html`)
+    .replace(/href="css\/site\.css(?:\?[^" ]*)?"/g, () => `href="${versioned('css/site.css')}"`)
+    .replace(/<script src="([^"?]+)(?:\?[^" ]*)?"><\/script>/g, (_, src) => `<script src="${versioned(src)}"></script>`);
+  writeFileSync(path, source, 'utf8');
+  const html = source
+    .replace(/<link rel="stylesheet" href="css\/site\.css(?:\?[^" ]*)?">/, () => `<style>${css}</style>`)
+    .replace(/<script src="([^"?]+)(?:\?[^" ]*)?"><\/script>/g, (_, src) => `<script>${read(src)}</script>`);
+  writeFileSync(new URL(`dist/${name}.html`, import.meta.url), html, 'utf8');
 }
+console.log(`Updated resource versions and built ${pages.length} standalone pages in dist/.`);

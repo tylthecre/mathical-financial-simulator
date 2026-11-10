@@ -1,31 +1,10 @@
 /* Форматирование значений для интерфейса. */
-function money(n, compact = true) {
-  return new Intl.NumberFormat("ru-RU", {
-    style: "currency",
-    currency: "RUB",
-    maximumFractionDigits: compact ? 1 : 0,
-    ...(compact ? { notation: "compact" } : {}),
-  }).format(n);
-}
-const yearsLabel = (n) =>
-  n +
-  " " +
-  { one: "год", few: "года", many: "лет", other: "лет" }[
-    new Intl.PluralRules("ru-RU").select(n)
-  ];
-const monthsLabel = (n) =>
-  n +
-  " " +
-  { one: "месяц", few: "месяца", many: "месяцев", other: "месяца" }[
-    new Intl.PluralRules("ru-RU").select(n)
-  ];
-const durationLabel = (months) => {
-  const years = Math.floor(months / 12),
-    rest = months % 12;
-  return [years ? yearsLabel(years) : "", rest ? monthsLabel(rest) : ""]
-    .filter(Boolean)
-    .join(" ");
-};
-const pct = (n) =>
-  new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 1 }).format(n) + "%";
-export { money, yearsLabel, monthsLabel, durationLabel, pct };
+(function(root){
+  'use strict';
+  function money(n,compact=true){return new Intl.NumberFormat('ru-RU',{style:'currency',currency:'RUB',maximumFractionDigits:compact?1:0,...(compact?{notation:'compact'}:{})}).format(n);}
+  const yearsLabel=n=>n+' '+({one:'год',few:'года',many:'лет',other:'лет'}[new Intl.PluralRules('ru-RU').select(n)]);
+  const monthsLabel = n => n + ' ' + ({one:'месяц',few:'месяца',many:'месяцев',other:'месяца'}[new Intl.PluralRules('ru-RU').select(n)]);
+  const durationLabel = months => { const years = Math.floor(months / 12), rest = months % 12; return [years ? yearsLabel(years) : '', rest ? monthsLabel(rest) : ''].filter(Boolean).join(' '); };
+  const pct=n=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:1}).format(n)+'%';
+  root.MathicalFormat={money,yearsLabel,monthsLabel,durationLabel,pct};
+})(globalThis);

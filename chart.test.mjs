@@ -1,9 +1,10 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import chart from './chart.js';
+import './format.js';
+import './chart.js';
 const rows=[{year:0,real:100,balance:100,goal:250},{year:1,real:200,balance:220,goal:400}];
 const bands=[{realLow:90,realHigh:110,nominalLow:90,nominalHigh:110},{realLow:180,realHigh:220,nominalLow:200,nominalHigh:240}];
-const make=(mode,showBand=true,goal=250)=>chart(rows,{years:1,mode,startYear:2026,bands,goal,showBand});
+const make=(mode,showBand=true,goal=250)=>globalThis.MathicalChart(rows,{years:1,mode,startYear:2026,bands,goal,showBand});
 test('Линия цели использует будущую стоимость в номинальном режиме',()=>{
   const a=make('real'), b=make('nominal');
   const path=s=>s.match(/<path d="([^"]+)" clip-path="url\(#goal-clip\)"/)[1];

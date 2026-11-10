@@ -1,17 +1,15 @@
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
-import {simulateSaved} from './js/archive.js';
-import * as Mathical from './engine.js';
-import {durationLabel} from './format.js';
-const {simulate,distribution,normalize,defaults}=Mathical;
+import './engine.js';
+const {simulate,distribution,normalize,defaults}=globalThis.Mathical;
 const plain={...defaults,salary:100000,housing:25000,living:15000,leisure:10000,initial:200000,rate:0,growth:0,inflation:0,years:10};
 test('Нулевые ставки: точный бюджет за 120 месяцев',()=>assert.equal(simulate(plain).final.balance,6200000));
 test('Эффективная годовая ставка соответствует сложному проценту',()=>{const r=simulate({...plain,salary:0,housing:0,living:0,leisure:0,rate:10});assert.ok(Math.abs(r.final.balance-200000*1.1**10)<.01);});
 test('Инфляция уменьшает реальную стоимость неизменного капитала',()=>{const r=simulate({...plain,salary:0,housing:0,living:0,leisure:0,inflation:5});assert.ok(Math.abs(r.final.real-200000/1.05**10)<.01);});
 test('Дефицит не исчезает и не получает доходность как вклад',()=>{const r=simulate({...plain,salary:0,initial:0,rate:7});assert.equal(r.final.balance,-6000000);});
 test('Экономия даёт ровно 10% исходных расходов при нулевых ставках',()=>assert.equal(simulate({...plain,decision:'save'}).final.balance-simulate(plain).final.balance,600000));
-test('Обучение: оплата во втором году, надбавка с третьего',()=>{const r=simulateSaved({...plain,decision:'education'});assert.equal(r.rows[1].expenses,600000);assert.equal(r.rows[2].expenses,720000);assert.ok(Math.abs(r.rows[3].income-1380000)<.01);});
-test('Автомобиль: разовая цена и 8 лет содержания',()=>assert.equal(simulate(plain).final.balance-simulateSaved({...plain,decision:'car'}).final.balance,900000+8000*12*8));
+test('Обучение: оплата во втором году, надбавка с третьего',()=>{const r=simulate({...plain,decision:'education'});assert.equal(r.rows[1].expenses,600000);assert.equal(r.rows[2].expenses,720000);assert.ok(Math.abs(r.rows[3].income-1380000)<.01);});
+test('Автомобиль: разовая цена и 8 лет содержания',()=>assert.equal(simulate(plain).final.balance-simulate({...plain,decision:'car'}).final.balance,900000+8000*12*8));
 test('Цель может быть доступна сразу, позже или не достигаться',()=>{assert.equal(simulate({...plain,goal:100000}).reached,0);assert.equal(simulate({...plain,goal:800000}).reached,1);assert.equal(simulate({...plain,goal:1000000000}).reached,null);});
 test('Стрессовый сценарий хуже, благоприятный лучше базового',()=>{const b=simulate(defaults).final.real;assert.ok(simulate(defaults,'stress').final.real<b);assert.ok(simulate(defaults,'optimistic').final.real>b);});
 test('Случайные прогоны воспроизводимы, перцентили упорядочены',()=>{const a=distribution(defaults);assert.deepEqual(a,distribution(defaults));assert.ok(a.low<=a.median&&a.median<=a.high);assert.ok(a.success>=0&&a.success<=1);});
@@ -46,13 +44,13 @@ test('Горизонт ограничивается диапазоном от 1 
 
 test('Запас учитывает жильё и необходимую часть уже введённых расходов',()=>{
   const p={...plain,initial:200000,oneTime:0,essentialOther:15000};
-  const h=Mathical.financialHealth(p);
+  const h=globalThis.Mathical.financialHealth(p);
   assert.equal(h.essential,40000);
   assert.equal(h.reserveMonths,5);
   assert.equal(simulate(p).final.balance,simulate({...p,essentialOther:0}).final.balance);
 });
 test('Запас не делится на ноль и классификация не превышает расходы',()=>{
-  const m=Mathical;
+  const m=globalThis.Mathical;
   assert.equal(m.financialHealth({...plain,housing:0,living:0,leisure:0,annual:0,essentialOther:0}).reserveMonths,null);
   assert.equal(m.normalize({...plain,essentialOther:999999}).essentialOther,25000);
   const h=m.financialHealth({...plain,initial:200000,oneTime:20000,essentialOther:15000,decision:'save'});
@@ -61,32 +59,32 @@ test('Запас не делится на ноль и классификация
 });
 
 test('Кредит без процентов: равный платёж и нулевая переплата',()=>{
-  const loan=Mathical.loanTerms({loanPrincipal:120000,loanRate:0,loanMonths:12});
+  const loan=globalThis.Mathical.loanTerms({loanPrincipal:120000,loanRate:0,loanMonths:12});
   assert.equal(loan.payment,10000); assert.equal(loan.overpayment,0);
 });
 test('Аннуитетный кредит: платёж и остаток долга',()=>{
-  const loan=Mathical.loanTerms({loanPrincipal:100000,loanRate:12,loanMonths:12});
+  const loan=globalThis.Mathical.loanTerms({loanPrincipal:100000,loanRate:12,loanMonths:12});
   assert.ok(Math.abs(loan.payment-8884.8788678)<0.001);
   assert.ok(Math.abs(loan.overpayment-6618.5464)<0.01);
 });
 test('Кредит списывается только в течение срока и входит в обязательные расходы',()=>{
   const p={...plain,salary:0,housing:0,living:0,leisure:0,initial:24000,loanPrincipal:12000,loanRate:0,loanMonths:12};
   const r=simulate(p); assert.equal(r.rows[1].expenses,12000); assert.equal(r.rows[2].expenses,0);
-  assert.equal(Mathical.financialHealth(p).essential,1000);
+  assert.equal(globalThis.Mathical.financialHealth(p).essential,1000);
 });
 test('Цель: ежемесячный взнос с инфляцией и без процентов',()=>{
-  const plan=Mathical.goalPlan({...plain,initial:0,goal:120000,goalYears:1,inflation:10,rate:0});
+  const plan=globalThis.Mathical.goalPlan({...plain,initial:0,goal:120000,goalYears:1,inflation:10,rate:0});
   assert.ok(Math.abs(plan.monthly-11000)<1e-6); assert.equal(plan.months,12);
 });
 test('Цель: учитываются накопления и разовая трата',()=>{
   const p={...plain,initial:100000,oneTime:20000,goal:140000,goalYears:1,inflation:0,rate:0};
-  assert.ok(Math.abs(Mathical.goalPlan(p).monthly-5000)<1e-6);
-  assert.equal(Mathical.goalPlan({...p,initial:200000}).monthly,0);
+  assert.ok(Math.abs(globalThis.Mathical.goalPlan(p).monthly-5000)<1e-6);
+  assert.equal(globalThis.Mathical.goalPlan({...p,initial:200000}).monthly,0);
 });
 
 test('Взнос на цель с доходностью и инфляцией приводит к нужной сумме',()=>{
   const p={...plain,initial:100000,oneTime:0,goal:200000,goalYears:1,inflation:5,rate:12};
-  const plan=Mathical.goalPlan(p), r=1.12**(1/12)-1;
+  const plan=globalThis.Mathical.goalPlan(p), r=1.12**(1/12)-1;
   let balance=100000; for(let i=0;i<12;i++) balance+=Math.max(0,balance)*r+plan.monthly;
   assert.ok(Math.abs(balance-210000)<0.0001);
 });
@@ -108,7 +106,7 @@ test('Диапазон случайных сценариев рассчитан 
 
 test('Цель: выбранная часть накоплений и совместимость со старыми планами',()=>{
   const p={...plain,initial:200000,oneTime:20000,goal:300000,goalYears:1,inflation:0,rate:0};
-  const goal=Mathical.goalPlan;
+  const goal=globalThis.Mathical.goalPlan;
   assert.ok(Math.abs(goal(p).monthly-10000)<1e-6);
   assert.ok(Math.abs(goal({...p,goalInitial:100000}).monthly-200000/12)<1e-6);
   assert.ok(Math.abs(goal({...p,goalInitial:0}).monthly-25000)<1e-6);
@@ -118,12 +116,12 @@ test('Цель: выбранная часть накоплений и совме
 
 test('Короткая цель: 27 000 рублей за 2 месяца',()=>{
   const p={...plain,initial:0,oneTime:0,goalInitial:0,goal:27000,goalMonths:2,inflation:0,rate:0};
-  const plan=Mathical.goalPlan(p);
+  const plan=globalThis.Mathical.goalPlan(p);
   assert.equal(plan.months,2); assert.equal(plan.target,27000);
   assert.ok(Math.abs(plan.monthly-13500)<1e-6);
 });
 test('Цель: месяцы учитывают инфляцию за часть года и сохраняют старые сроки',()=>{
-  const m=Mathical, old={...plain,goalYears:2,goal:27000,initial:0,oneTime:0,inflation:12,rate:0};
+  const m=globalThis.Mathical, old={...plain,goalYears:2,goal:27000,initial:0,oneTime:0,inflation:12,rate:0};
   assert.equal(m.normalize(old).goalMonths,24);
   const p=m.goalPlan({...old,goalMonths:2});
   assert.equal(p.months,2); assert.ok(Math.abs(p.target-27000*1.12**(2/12))<1e-8);
@@ -133,7 +131,8 @@ test('Цель: месяцы учитывают инфляцию за часть
 });
 
 test('Срок цели отображается понятными годами и месяцами', async()=>{
-  const label=durationLabel;
+  await import('./format.js');
+  const label=globalThis.MathicalFormat.durationLabel;
   assert.equal(label(1),'1 месяц');
   assert.equal(label(2),'2 месяца');
   assert.equal(label(12),'1 год');
