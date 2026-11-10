@@ -1,56 +1,529 @@
 <!doctype html>
-<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#121b29"><meta name="description" content="Укажи доходы, расходы, цель и кредит."><title>План — mathical</title><link rel="stylesheet" href="css/site.css?v=bb8e558a3a28"></head><body>
-<script src="engine.js?v=e6a7a9cab3e8"></script><script src="format.js?v=85e6c181177f"></script><script src="chart.js?v=02ffcf3cef5b"></script><script src="js/store.js?v=04bb49867f39"></script><script src="js/ui.js?v=d2f7ea1467c8"></script>
-<main>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#121b29" />
+    <meta name="description" content="Укажи доходы, расходы, цель и кредит." />
+    <title>План — mathical</title>
+    <link rel="stylesheet" href="css/site.css?v=403e62d62deb" />
+  </head>
+  <body>
+    <script src="engine.js?v=f5cd2ea864af"></script>
+    <script src="format.js?v=dedc89af28c7"></script>
+    <script src="js/store.js?v=7c49cc4d4ec0"></script>
+    <script src="js/ui.js?v=354573d71c5c"></script>
+    <main>
+      <div class="page-head">
+        <span class="kicker reveal">Шаг 1 · План</span>
+        <h1 class="title reveal" style="--d: 0.07s">Собери свой бюджет</h1>
+        <p class="lead reveal" style="--d: 0.14s">
+          Укажи доходы и расходы, добавь цель. Остаток в месяц пересчитается
+          сразу.
+        </p>
+      </div>
+      <div class="form-layout">
+        <form id="plan-form" class="form-stack" novalidate>
+          <section class="card form-card reveal">
+            <h2>Доходы и накопления</h2>
+            <p class="sub">Доход указывай после налогов.</p>
+            <div class="form-grid">
+              <label class="field wide"
+                ><span class="lbl">Доход в месяц</span
+                ><span class="input-wrap"
+                  ><input
+                    name="salary"
+                    type="number"
+                    inputmode="decimal"
+                    min="0"
+                    max="10000000"
+                    step="1"
+                    required
+                  /><span class="unit">₽</span></span
+                ></label
+              ><label class="field wide"
+                ><span class="lbl">Уже накоплено</span
+                ><span class="input-wrap"
+                  ><input
+                    name="initial"
+                    type="number"
+                    inputmode="decimal"
+                    min="0"
+                    max="1000000000"
+                    step="1"
+                    required
+                  /><span class="unit">₽</span></span
+                ></label
+              >
+            </div>
+          </section>
 
-<div class="page-head">
-  <span class="kicker reveal">Шаг 1 · План</span>
-  <h1 class="title reveal" style="--d:.07s">Собери свой бюджет</h1>
-  <p id="plan-lead" class="lead reveal" style="--d:.14s">Укажи доходы и расходы, добавь цель. Остаток в месяц пересчитается сразу.</p>
-</div>
-<div class="form-layout" id="ordinary-plan">
-<form id="plan-form" class="form-stack" novalidate>
-  <section class="card surface form-card reveal"><h2>Доходы и накопления</h2><p class="sub">Доход указывай после налогов.</p>
-    <div class="form-grid"><label class="field wide"><span class="lbl">Доход в месяц</span><span class="input-wrap"><input name="salary" type="number" inputmode="decimal" min="0" max="10000000" step="1" required ><span class="unit">₽</span></span></label><label class="field wide"><span class="lbl">Уже накоплено</span><span class="input-wrap"><input name="initial" type="number" inputmode="decimal" min="0" max="1000000000" step="1" required ><span class="unit">₽</span></span></label></div></section>
+          <section class="card form-card reveal">
+            <h2>Расходы</h2>
+            <p class="sub">Ежемесячные траты и то, что бывает раз в год.</p>
+            <div class="form-grid">
+              <label class="field"
+                ><span class="lbl">Жильё и коммунальные</span
+                ><span class="input-wrap"
+                  ><input
+                    name="housing"
+                    type="number"
+                    inputmode="decimal"
+                    min="0"
+                    max="10000000"
+                    step="1"
+                    required
+                  /><span class="unit">₽/мес.</span></span
+                ></label
+              ><label class="field"
+                ><span class="lbl">Еда, транспорт и быт</span
+                ><span class="input-wrap"
+                  ><input
+                    name="living"
+                    type="number"
+                    inputmode="decimal"
+                    min="0"
+                    max="10000000"
+                    step="1"
+                    required
+                  /><span class="unit">₽/мес.</span></span
+                ></label
+              ><label class="field"
+                ><span class="lbl">Досуг и покупки</span
+                ><span class="input-wrap"
+                  ><input
+                    name="leisure"
+                    type="number"
+                    inputmode="decimal"
+                    min="0"
+                    max="10000000"
+                    step="1"
+                    required
+                  /><span class="unit">₽/мес.</span></span
+                ></label
+              ><label class="field"
+                ><span class="lbl">Другие расходы за год</span
+                ><span class="input-wrap"
+                  ><input
+                    name="annual"
+                    type="number"
+                    inputmode="decimal"
+                    min="0"
+                    max="120000000"
+                    step="1"
+                    required
+                  /><span class="unit">₽/год</span></span
+                ></label
+              ><label class="field wide"
+                ><span class="lbl">Разовая трата в первый месяц</span
+                ><span class="input-wrap"
+                  ><input
+                    name="oneTime"
+                    type="number"
+                    inputmode="decimal"
+                    min="0"
+                    max="1000000000"
+                    step="1"
+                    required
+                  /><span class="unit">₽</span></span
+                ></label
+              >
+            </div>
+            <div class="annual-items">
+              <p>Дополнительные годовые платежи <span>(необязательно)</span></p>
+              <div id="annual-items-list"></div>
+              <button
+                type="button"
+                class="btn btn-ghost btn-small"
+                id="add-annual-item"
+              >
+                + Добавить платёж
+              </button>
+              <p class="field-note" style="margin-top: 12px">
+                Добавляются к другим расходам за год.
+              </p>
+            </div>
+            <details class="plan-help">
+              <summary>Подробнее <span aria-hidden="true">+</span></summary>
+              <div class="plan-help-content">
+                <p>
+                  <strong>Другие расходы за год</strong> — общая сумма
+                  нерегулярных трат за год, например подарков или страховки. Для
+                  прогноза она делится на 12 месяцев.
+                </p>
+                <p>
+                  <strong>Дополнительные годовые платежи</strong> позволяют
+                  записать отдельные суммы с названиями. Они прибавляются к
+                  сумме выше, поэтому не вводи одну и ту же трату дважды.
+                </p>
+                <p>
+                  <strong>Разовая трата в первый месяц</strong> учитывается один
+                  раз в самом начале прогноза, например покупка ноутбука. Если
+                  траты нет или ты уже её оплатил и указал остаток накоплений
+                  после покупки, оставь 0.
+                </p>
+              </div>
+            </details>
+          </section>
 
-  <section class="card surface form-card reveal"><h2>Расходы</h2><p class="sub">Ежемесячные траты и то, что бывает раз в год.</p>
-    <div class="form-grid"><label class="field "><span class="lbl">Жильё и коммунальные</span><span class="input-wrap"><input name="housing" type="number" inputmode="decimal" min="0" max="10000000" step="1" required ><span class="unit">₽/мес.</span></span></label><label class="field "><span class="lbl">Еда, транспорт и быт</span><span class="input-wrap"><input name="living" type="number" inputmode="decimal" min="0" max="10000000" step="1" required ><span class="unit">₽/мес.</span></span></label><label class="field "><span class="lbl">Досуг и покупки</span><span class="input-wrap"><input name="leisure" type="number" inputmode="decimal" min="0" max="10000000" step="1" required ><span class="unit">₽/мес.</span></span></label><label class="field "><span class="lbl">Другие расходы за год</span><span class="input-wrap"><input name="annual" type="number" inputmode="decimal" min="0" max="120000000" step="1" required ><span class="unit">₽/год</span></span></label><label class="field wide"><span class="lbl">Разовая трата в первый месяц</span><span class="input-wrap"><input name="oneTime" type="number" inputmode="decimal" min="0" max="1000000000" step="1" required ><span class="unit">₽</span></span></label></div>
-    <div class="annual-items"><p>Дополнительные годовые платежи <span>(необязательно)</span></p><div id="annual-items-list"></div>
-      <button type="button" class="btn btn-ghost btn-small" id="add-annual-item">+ Добавить платёж</button>
-      <p class="field-note" style="margin-top:12px">Добавляются к другим расходам за год.</p></div><details class="plan-help"><summary>Подробнее <span aria-hidden="true">+</span></summary><div class="plan-help-content"><p><strong>Другие расходы за год</strong> — общая сумма нерегулярных трат за год, например подарков или страховки. Для прогноза она делится на 12 месяцев.</p><p><strong>Дополнительные годовые платежи</strong> позволяют записать отдельные суммы с названиями. Они прибавляются к сумме выше, поэтому не вводи одну и ту же трату дважды.</p><p><strong>Разовая трата в первый месяц</strong> учитывается один раз в самом начале прогноза, например покупка ноутбука. Если траты нет или ты уже её оплатил и указал остаток накоплений после покупки, оставь 0.</p></div></details></section>
+          <section class="card form-card reveal">
+            <h2>Обязательные расходы</h2>
+            <p class="sub">
+              Нужны, чтобы посчитать запас средств. Жильё учитывается отдельно.
+            </p>
+            <div class="form-grid">
+              <label class="field wide"
+                ><span class="lbl">Обязательная часть других расходов</span
+                ><span class="input-wrap"
+                  ><input
+                    name="essentialOther"
+                    type="number"
+                    inputmode="decimal"
+                    min="0"
+                    max="1000000000"
+                    step="1"
+                    required
+                    aria-describedby="essential-hint essential-error"
+                  /><span class="unit">₽/мес.</span></span
+                ></label
+              >
+            </div>
+            <p class="field-note" id="essential-hint" style="margin-top: 12px">
+              Из уже указанных расходов на быт, досуг и годовые платежи.
+            </p>
+            <p class="field-error" id="essential-error" role="alert" hidden></p>
+            <details class="plan-help">
+              <summary>Подробнее <span aria-hidden="true">+</span></summary>
+              <div class="plan-help-content">
+                <p>
+                  Укажи только ту часть уже введённых расходов, без которой
+                  трудно обойтись. Например, если еда и быт стоят 30 000 ₽, из
+                  которых на необходимое уходит 20 000 ₽, введи 20 000 ₽.
+                </p>
+                <p>
+                  Эта сумма не добавляется к расходам повторно: она нужна для
+                  расчёта запаса средств. Жильё и платёж по указанному кредиту
+                  учитываются отдельно — не включай их сюда.
+                </p>
+              </div>
+            </details>
+          </section>
 
-  <section class="card surface form-card reveal"><h2>Обязательные расходы</h2><p class="sub">Нужны, чтобы посчитать запас средств. Жильё учитывается отдельно.</p>
-    <div class="form-grid"><label class="field wide"><span class="lbl">Обязательная часть других расходов</span><span class="input-wrap"><input name="essentialOther" type="number" inputmode="decimal" min="0" max="1000000000" step="1" required aria-describedby="essential-hint essential-error"><span class="unit">₽/мес.</span></span></label></div>
-    <p class="field-note" id="essential-hint" style="margin-top:12px">Из уже указанных расходов на быт, досуг и годовые платежи.</p>
-    <p class="field-error" id="essential-error" role="alert" hidden></p><details class="plan-help"><summary>Подробнее <span aria-hidden="true">+</span></summary><div class="plan-help-content"><p>Укажи только ту часть уже введённых расходов, без которой трудно обойтись. Например, если еда и быт стоят 30 000 ₽, из которых на необходимое уходит 20 000 ₽, введи 20 000 ₽.</p><p>Эта сумма не добавляется к расходам повторно: она нужна для расчёта запаса средств. Жильё и платёж по указанному кредиту учитываются отдельно — не включай их сюда.</p></div></details></section>
+          <section class="card form-card reveal" id="plan-goal">
+            <h2>На что копим</h2>
+            <p class="sub">
+              Цель считается в сегодняшних ценах — инфляцию добавим сами.
+            </p>
+            <div class="form-grid">
+              <label class="field wide"
+                ><span class="lbl">Название цели</span
+                ><span class="input-wrap"
+                  ><input
+                    name="goalName"
+                    maxlength="80"
+                    required /></span></label
+              ><label class="field"
+                ><span class="lbl">Стоимость сегодня</span
+                ><span class="input-wrap"
+                  ><input
+                    name="goal"
+                    type="number"
+                    inputmode="decimal"
+                    min="1"
+                    max="1000000000"
+                    step="1"
+                    required
+                  /><span class="unit">₽</span></span
+                ></label
+              ><label class="field wide"
+                ><span class="lbl">Сколько из накоплений направить на цель</span
+                ><span class="input-wrap"
+                  ><input
+                    name="goalInitial"
+                    type="number"
+                    inputmode="decimal"
+                    min="0"
+                    max="1000000000"
+                    step="1"
+                    placeholder="Все доступные накопления"
+                    aria-describedby="goal-initial-hint goal-initial-error"
+                  /><span class="unit">₽</span></span
+                ><span class="field-note" id="goal-initial-hint"
+                  >Оставь пустым, чтобы учесть все накопления после разовой
+                  траты.</span
+                ><span
+                  class="field-error"
+                  id="goal-initial-error"
+                  role="alert"
+                  hidden
+                ></span
+              ></label>
+              <fieldset
+                class="goal-duration wide"
+                aria-describedby="goal-duration-hint goal-duration-error"
+              >
+                <legend class="lbl">За сколько времени накопить</legend>
+                <div class="goal-duration-fields">
+                  <label class="field"
+                    ><span class="lbl">Лет</span
+                    ><span class="input-wrap"
+                      ><input
+                        name="goalYears"
+                        type="number"
+                        inputmode="numeric"
+                        min="0"
+                        max="50"
+                        step="1"
+                        required
+                      /><span class="unit">лет</span></span
+                    ></label
+                  ><label class="field"
+                    ><span class="lbl">Месяцев</span
+                    ><span class="input-wrap"
+                      ><input
+                        name="goalMonthsPart"
+                        type="number"
+                        inputmode="numeric"
+                        min="0"
+                        max="600"
+                        step="1"
+                        required
+                      /><span class="unit">мес.</span></span
+                    ></label
+                  >
+                </div>
+                <p class="field-note" id="goal-duration-hint">
+                  Например, для двух месяцев укажи 0 лет и 2 месяца.
+                </p>
+                <p
+                  class="field-error"
+                  id="goal-duration-error"
+                  role="alert"
+                  hidden
+                ></p>
+              </fieldset>
+            </div>
+            <details class="plan-help">
+              <summary>Подробнее <span aria-hidden="true">+</span></summary>
+              <div class="plan-help-content">
+                <p>
+                  Укажи годы и месяцы до цели. Например, для подарков через 2
+                  месяца введи 0 лет и 2 месяца; для покупки через полтора года
+                  — 1 год и 6 месяцев. По этому сроку сайт рассчитывает нужный
+                  ежемесячный взнос.
+                </p>
+                <p>
+                  Можно выделить на цель только часть накоплений. Например, из
+                  200 000 ₽ направить 100 000 ₽, а остальные оставить на другие
+                  нужды. Разовая трата сначала вычитается из общей суммы.
+                </p>
+                <p>
+                  Цена указывается сегодняшняя: при расчёте сайт учитывает
+                  заданную инфляцию. Срок цели можно задать отдельно от срока
+                  прогноза ниже.
+                </p>
+              </div>
+            </details>
+          </section>
 
-  <section class="card surface form-card reveal" id="plan-goal"><h2>На что копим</h2><p class="sub">Цель считается в сегодняшних ценах — инфляцию добавим сами.</p>
-    <div class="form-grid"><label class="field wide"><span class="lbl">Название цели</span><span class="input-wrap"><input name="goalName" maxlength="80" required></span></label><label class="field "><span class="lbl">Стоимость сегодня</span><span class="input-wrap"><input name="goal" type="number" inputmode="decimal" min="1" max="1000000000" step="1" required ><span class="unit">₽</span></span></label><label class="field wide"><span class="lbl">Сколько из накоплений направить на цель</span><span class="input-wrap"><input name="goalInitial" type="number" inputmode="decimal" min="0" max="1000000000" step="1" placeholder="Все доступные накопления" aria-describedby="goal-initial-hint goal-initial-error"><span class="unit">₽</span></span><span class="field-note" id="goal-initial-hint">Оставь пустым, чтобы учесть все накопления после разовой траты.</span><span class="field-error" id="goal-initial-error" role="alert" hidden></span></label><fieldset class="goal-duration wide" aria-describedby="goal-duration-hint goal-duration-error"><legend class="lbl">За сколько времени накопить</legend><div class="goal-duration-fields"><label class="field"><span class="lbl">Лет</span><span class="input-wrap"><input name="goalYears" type="number" inputmode="numeric" min="0" max="50" step="1" required><span class="unit">лет</span></span></label><label class="field"><span class="lbl">Месяцев</span><span class="input-wrap"><input name="goalMonthsPart" type="number" inputmode="numeric" min="0" max="600" step="1" required><span class="unit">мес.</span></span></label></div><p class="field-note" id="goal-duration-hint">Например, для двух месяцев укажи 0 лет и 2 месяца.</p><p class="field-error" id="goal-duration-error" role="alert" hidden></p></fieldset></div><details class="plan-help"><summary>Подробнее <span aria-hidden="true">+</span></summary><div class="plan-help-content"><p>Укажи годы и месяцы до цели. Например, для подарков через 2 месяца введи 0 лет и 2 месяца; для покупки через полтора года — 1 год и 6 месяцев. По этому сроку сайт рассчитывает нужный ежемесячный взнос.</p><p>Можно выделить на цель только часть накоплений. Например, из 200 000 ₽ направить 100 000 ₽, а остальные оставить на другие нужды. Разовая трата сначала вычитается из общей суммы.</p><p>Цена указывается сегодняшняя: при расчёте сайт учитывает заданную инфляцию. Срок цели можно задать отдельно от срока прогноза ниже.</p></div></details></section>
+          <section class="card form-card reveal">
+            <h2>На сколько лет показать прогноз</h2>
+            <p class="sub">Выбери срок или введи свой — от 1 до 50 лет.</p>
+            <div class="horizon-row">
+              <div class="field">
+                <span class="lbl">Быстрый выбор</span>
+                <div
+                  class="seg"
+                  id="years-quick"
+                  role="group"
+                  aria-label="Быстрый выбор срока"
+                >
+                  <button type="button" data-years="10">10 лет</button
+                  ><button type="button" data-years="15">15 лет</button
+                  ><button type="button" data-years="20">20 лет</button>
+                </div>
+              </div>
+              <label class="field"
+                ><span class="lbl">Свой срок</span
+                ><span class="input-wrap"
+                  ><input
+                    name="years"
+                    type="number"
+                    inputmode="numeric"
+                    min="1"
+                    max="50"
+                    step="1"
+                    required
+                  /><span class="unit">лет</span></span
+                ></label
+              >
+            </div>
+            <details class="plan-help">
+              <summary>Подробнее <span aria-hidden="true">+</span></summary>
+              <div class="plan-help-content">
+                <p>
+                  Этот срок определяет, на сколько лет вперёд показать общий
+                  прогноз и график накоплений. Он не меняет срок твоей цели.
+                </p>
+                <p>
+                  Например, можно копить на кладовку 2 года и одновременно
+                  посмотреть прогноз на 10 лет. Если хочешь увидеть прогноз
+                  только до покупки, поставь 2 года в обоих полях.
+                </p>
+              </div>
+            </details>
+          </section>
 
-  <section class="card surface form-card reveal"><h2>На сколько лет показать прогноз</h2><p class="sub">Выбери срок или введи свой — от 1 до 50 лет.</p>
-    <div class="horizon-row"><div class="field"><span class="lbl">Быстрый выбор</span><div class="seg" id="years-quick" role="group" aria-label="Быстрый выбор срока"><button type="button" data-years="10">10 лет</button><button type="button" data-years="15">15 лет</button><button type="button" data-years="20">20 лет</button></div></div>
-    <label class="field"><span class="lbl">Свой срок</span><span class="input-wrap"><input name="years" type="number" inputmode="numeric" min="1" max="50" step="1" required><span class="unit">лет</span></span></label></div><details class="plan-help"><summary>Подробнее <span aria-hidden="true">+</span></summary><div class="plan-help-content"><p>Этот срок определяет, на сколько лет вперёд показать общий прогноз и график накоплений. Он не меняет срок твоей цели.</p><p>Например, можно копить на кладовку 2 года и одновременно посмотреть прогноз на 10 лет. Если хочешь увидеть прогноз только до покупки, поставь 2 года в обоих полях.</p></div></details></section>
+          <details class="card card-details reveal" id="credit-card">
+            <summary>
+              <div>
+                <h2>Кредит</h2>
+                <small>Учти действующий долг в бюджете</small>
+              </div>
+              <span class="plus" aria-hidden="true">+</span>
+            </summary>
+            <div class="inner">
+              <div class="form-grid">
+                <label class="field"
+                  ><span class="lbl">Остаток долга</span
+                  ><span class="input-wrap"
+                    ><input
+                      name="loanPrincipal"
+                      type="number"
+                      inputmode="decimal"
+                      min="0"
+                      max="1000000000"
+                      step="1"
+                      required
+                    /><span class="unit">₽</span></span
+                  ></label
+                ><label class="field"
+                  ><span class="lbl">Ставка в год</span
+                  ><span class="input-wrap"
+                    ><input
+                      name="loanRate"
+                      type="number"
+                      inputmode="decimal"
+                      min="0"
+                      max="100"
+                      step="0.01"
+                      required
+                    /><span class="unit">%</span></span
+                  ></label
+                ><label class="field"
+                  ><span class="lbl">Осталось месяцев</span
+                  ><span class="input-wrap"
+                    ><input
+                      name="loanMonths"
+                      type="number"
+                      inputmode="decimal"
+                      min="1"
+                      max="600"
+                      step="1"
+                      required
+                    /><span class="unit">мес.</span></span
+                  ></label
+                >
+              </div>
+              <p class="field-note" style="margin-top: 14px">
+                Платёж добавится к бюджету. Не включай его повторно в другие
+                расходы.
+              </p>
+            </div>
+          </details>
 
-  <details class="card surface card-details reveal" id="credit-card"><summary><div><h2>Кредит</h2><small>Учти действующий долг в бюджете</small></div><span class="plus" aria-hidden="true">+</span></summary>
-    <div class="inner"><div class="form-grid"><label class="field "><span class="lbl">Остаток долга</span><span class="input-wrap"><input name="loanPrincipal" type="number" inputmode="decimal" min="0" max="1000000000" step="1" required ><span class="unit">₽</span></span></label><label class="field "><span class="lbl">Ставка в год</span><span class="input-wrap"><input name="loanRate" type="number" inputmode="decimal" min="0" max="100" step="0.01" required ><span class="unit">%</span></span></label><label class="field "><span class="lbl">Осталось месяцев</span><span class="input-wrap"><input name="loanMonths" type="number" inputmode="decimal" min="1" max="600" step="1" required ><span class="unit">мес.</span></span></label></div>
-    <p class="field-note" style="margin-top:14px">Платёж добавится к бюджету. Не включай его повторно в другие расходы.</p></div></details>
+          <details class="card card-details reveal">
+            <summary>
+              <div>
+                <h2>Инфляция и доходность</h2>
+                <small>Допущения модели</small>
+              </div>
+              <span class="plus" aria-hidden="true">+</span>
+            </summary>
+            <div class="inner assumptions">
+              <p class="field-note">
+                Выбери официальный показатель или задай свой в разделе
+                <a href="inflation.html">«Инфляция»</a>. Здесь можно задать своё
+                значение.
+              </p>
+              <div class="form-grid">
+                <label class="field"
+                  ><span class="lbl">Инфляция в год</span
+                  ><span class="input-wrap"
+                    ><input
+                      name="inflation"
+                      type="number"
+                      inputmode="decimal"
+                      min="0"
+                      max="30"
+                      step="0.01"
+                      required
+                    /><span class="unit">%</span></span
+                  ></label
+                ><label class="field"
+                  ><span class="lbl">Рост дохода в год</span
+                  ><span class="input-wrap"
+                    ><input
+                      name="growth"
+                      type="number"
+                      inputmode="decimal"
+                      min="-20"
+                      max="30"
+                      step="0.1"
+                      required
+                    /><span class="unit">%</span></span
+                  ></label
+                ><label class="field"
+                  ><span class="lbl">Доходность накоплений</span
+                  ><span class="input-wrap"
+                    ><input
+                      name="rate"
+                      type="number"
+                      inputmode="decimal"
+                      min="-20"
+                      max="30"
+                      step="0.1"
+                      required
+                    /><span class="unit">%</span></span
+                  ></label
+                >
+              </div>
+            </div>
+          </details>
+        </form>
 
-  <details class="card surface card-details reveal"><summary><div><h2>Инфляция и доходность</h2><small>Допущения модели</small></div><span class="plus" aria-hidden="true">+</span></summary>
-    <div class="inner assumptions"><p class="field-note">Выбери официальный показатель или задай свой в разделе <a href="inflation.html">«Инфляция»</a>. Здесь можно задать своё значение.</p><div class="form-grid"><label class="field "><span class="lbl">Инфляция в год</span><span class="input-wrap"><input name="inflation" type="number" inputmode="decimal" min="0" max="30" step="0.01" required ><span class="unit">%</span></span></label><label class="field "><span class="lbl">Рост дохода в год</span><span class="input-wrap"><input name="growth" type="number" inputmode="decimal" min="-20" max="30" step="0.1" required ><span class="unit">%</span></span></label><label class="field "><span class="lbl">Доходность накоплений</span><span class="input-wrap"><input name="rate" type="number" inputmode="decimal" min="-20" max="30" step="0.1" required ><span class="unit">%</span></span></label></div></div></details>
-</form>
-
-<aside class="summary" aria-label="Итог по бюджету">
-  <div class="card summary-card reveal"><span class="muted" style="font-size:15px">Остаётся в месяц</span>
-    <div class="sum-free" id="sum-free">—</div>
-    <div class="mini-bar" aria-hidden="true"><span class="exp" id="mb-exp"></span><span class="fr" id="mb-free"></span></div>
-    <div class="sum-details"><div class="sum-row"><span>Доход</span><b id="sum-income"></b></div><div class="sum-row"><span>Расходы</span><b id="sum-expenses"></b></div></div>
-    <p class="note" id="sum-note"></p>
-    <button class="btn btn-primary btn-block" type="submit" form="plan-form" style="margin-top:18px">Посмотреть результат <span class="arr">→</span></button>
-  </div>
-  <button class="btn btn-ghost" type="button" id="plan-reset">Вернуть пример</button>
-</aside>
-</div>
-
-</main>
-<script src="js/plan.js?v=743615cb7b91"></script>
-</body></html>
+        <aside class="summary" aria-label="Итог по бюджету">
+          <div class="card summary-card reveal">
+            <span class="muted" style="font-size: 15px">Остаётся в месяц</span>
+            <div class="sum-free" id="sum-free">—</div>
+            <div class="mini-bar" aria-hidden="true">
+              <span class="exp" id="mb-exp"></span
+              ><span class="fr" id="mb-free"></span>
+            </div>
+            <div>
+              <div class="sum-row">
+                <span>Доход</span><b id="sum-income"></b>
+              </div>
+              <div class="sum-row">
+                <span>Расходы</span><b id="sum-expenses"></b>
+              </div>
+            </div>
+            <p class="note" id="sum-note"></p>
+            <button
+              class="btn btn-primary btn-block"
+              type="submit"
+              form="plan-form"
+              style="margin-top: 18px"
+            >
+              Посмотреть результат <span class="arr">→</span>
+            </button>
+          </div>
+          <button class="btn btn-ghost" type="button" id="plan-reset">
+            Вернуть пример
+          </button>
+        </aside>
+      </div>
+    </main>
+    <script src="js/plan.js?v=cb6cb6ce069b"></script>
+  </body>
+</html>
