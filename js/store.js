@@ -7,7 +7,7 @@
     TKEY = "mathical-theme";
   const SCENARIOS = ["base", "optimistic", "stress"];
   const DEFAULT_SETTINGS = {
-    theme: "system",
+    theme: "light",
     mode: "real",
     animations: true,
     band: true,
@@ -38,7 +38,7 @@
     return {
       theme: ["system", "light", "dark"].includes(settings.theme)
         ? settings.theme
-        : "system",
+        : DEFAULT_SETTINGS.theme,
       mode: ["real", "nominal"].includes(settings.mode)
         ? settings.mode
         : "real",

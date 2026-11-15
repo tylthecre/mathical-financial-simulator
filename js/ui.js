@@ -13,6 +13,7 @@
     const t = S.state.settings.theme,
       light = t === "system" ? mq.matches : t === "light";
     doc.body.classList.toggle("theme-light", light);
+    doc.documentElement.style.colorScheme = light ? "light" : "dark";
     doc.body.classList.toggle("accessible-mode", S.state.settings.accessible);
     const access = doc.getElementById("accessibility-toggle");
     if (access)
@@ -114,7 +115,7 @@
       );
     doc.body.insertAdjacentHTML(
       "beforeend",
-      '<footer class="site-footer"><div class="foot"><span>mathical · учебная модель</span><p>Расчёт помогает сравнить варианты, но не предсказывает будущее.</p><a href="method.html#limits">Ограничения модели ↗</a></div></footer>',
+      '<footer class="site-footer"><div class="foot"><span>mathical · автор <a href="https://github.com/tylthecre" target="_blank" rel="noopener">tylthecre</a></span><p>Расчёт помогает сравнить варианты, но не предсказывает будущее.</p><a href="method.html#limits">Ограничения модели ↗</a></div></footer>',
     );
     reveal();
   });
