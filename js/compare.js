@@ -236,20 +236,22 @@
     canvas.height = 630;
     const ctx = canvas.getContext("2d"),
       capital = view.mode === "real" ? result.final.real : result.final.balance;
-    ctx.fillStyle = "#10172d";
+    const palette = getComputedStyle(document.body);
+    const color = (role) => palette.getPropertyValue(role).trim();
+    ctx.fillStyle = color("--bg");
     ctx.fillRect(0, 0, 1200, 630);
-    ctx.fillStyle = "#f5bdd8";
+    ctx.fillStyle = color("--ink");
     ctx.font = "700 48px Onest, sans-serif";
     ctx.fillText("mathical", 70, 90);
-    ctx.fillStyle = "#fff3dc";
+    ctx.fillStyle = color("--ink");
     ctx.font = "500 35px Onest, sans-serif";
     ctx.fillText("Мой финансовый план", 70, 190);
     ctx.font = "500 30px Onest, sans-serif";
     ctx.fillText("Через " + yearsLabel(params.years) + " мой капитал", 70, 280);
-    ctx.fillStyle = "#afe6d1";
+    ctx.fillStyle = color("--accent");
     ctx.font = "700 84px Onest, sans-serif";
     ctx.fillText(money(capital), 70, 385, 1060);
-    ctx.fillStyle = "#d7dccc";
+    ctx.fillStyle = color("--muted");
     ctx.font = "400 27px Onest, sans-serif";
     ctx.fillText(
       (view.mode === "real" ? "В сегодняшних рублях" : "В будущих рублях") +

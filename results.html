@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#121b29" />
+    <meta name="theme-color" content="#19181e" />
     <meta
       name="description"
       content="Капитал, бюджет, цель и финансовое здоровье."
@@ -17,7 +17,7 @@
     <script src="chart.js"></script>
     <script src="js/store.js"></script>
     <script src="js/ui.js"></script>
-    <main>
+    <main id="main-content" tabindex="-1">
       <div class="page-head">
         <span class="kicker reveal">Шаг 2 · Результаты</span>
         <h1 class="title reveal" style="--d: 0.07s">
@@ -100,11 +100,10 @@
           ></label>
           <div class="chart-foot">
             <span
-              ><i class="dot" style="background: #a9694d"></i>Капитал ·
-              <i class="dot" style="background: #90657a"></i>Цель
+              ><i class="dot dot-capital"></i>Капитал ·
+              <i class="dot dot-goal"></i>Цель
               <span id="chart-band-legend"
-                >· <i class="dot" style="background: #aa9cb9"></i>Диапазон
-                модели</span
+                >· <i class="dot dot-band"></i>Диапазон модели</span
               ></span
             >
           </div>

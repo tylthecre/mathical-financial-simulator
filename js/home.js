@@ -8,6 +8,8 @@
     p = d.p;
   const res = M.simulate(p, "base"),
     dist = M.distribution(p);
+  U.text("h-income", money(p.salary, false));
+  U.text("h-expenses", money(d.spent, false));
   U.text("h-years", yearsLabel(p.years));
   U.text("h-goal-outcome", goalOutcome(res.reached, p.years, S.startYear));
   U.countUp(U.$("#h-capital"), res.final.real, money, 1500);
@@ -22,7 +24,7 @@
       showBand: S.state.settings.band,
     }),
   );
-  U.countUp(U.$("#h-free"), d.free, (n) => money(n, false) + "/мес.", 1400);
+  U.countUp(U.$("#h-free"), d.free, (n) => money(n, false), 1400);
   U.text("h-goal-name", p.goalName);
   U.text("h-goal", money(p.goal));
 })();

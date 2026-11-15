@@ -19,7 +19,8 @@
       access.setAttribute("aria-pressed", String(S.state.settings.accessible));
     doc.body.classList.toggle("no-anim", !animOn());
     const m = doc.querySelector("meta[name=theme-color]");
-    if (m) m.content = light ? "#f5f5f2" : "#121b29";
+    if (m)
+      m.content = getComputedStyle(doc.body).getPropertyValue("--bg").trim();
   }
   mq.addEventListener("change", applyTheme);
 
@@ -38,36 +39,34 @@
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>';
   const menu =
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>';
-  const logo =
-    '<svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 2v20M2 12h20M5 5l14 14M19 5L5 19"/></svg>';
-
+  const logo = '<span class="brand-mark" aria-hidden="true">m</span>';
   doc.body.insertAdjacentHTML(
     "afterbegin",
-    '<header class="site-header" id="site-header"><div class="nav"><a href="index.html" class="wordmark" aria-label="Mathical — главная">mathical' +
+    '<a class="skip-link" href="#main-content">Перейти к содержимому</a>' +
+      '<header class="site-header" id="site-header"><div class="nav"><a href="index.html" class="wordmark" aria-label="Mathical — главная">' +
       logo +
-      "</a>" +
-      '<nav class="nav-links" id="nav-links" aria-label="Разделы сайта"><span class="nav-ind" id="nav-ind"></span>' +
+      "mathical</a>" +
+      '<nav class="nav-links" id="nav-links" aria-label="Разделы сайта">' +
       links
         .map(
-          ([h, t]) =>
+          ([href, title]) =>
             '<a href="' +
-            h +
+            href +
             '"' +
-            (h === here ? ' class="active" aria-current="page"' : "") +
+            (href === here ? ' class="active" aria-current="page"' : "") +
             ">" +
-            t +
+            title +
             "</a>",
         )
         .join("") +
       "</nav>" +
-      '<div class="nav-actions"><button class="icon-btn accessibility-toggle" id="accessibility-toggle" type="button" aria-label="Режим для слабовидящих" aria-pressed="false" title="Режим для слабовидящих">Аа</button><a class="icon-btn' +
+      '<div class="nav-bottom"><p>Твой план.<br>На твоём устройстве.</p><div class="nav-actions"><button class="icon-btn accessibility-toggle" id="accessibility-toggle" type="button" aria-label="Режим для слабовидящих" aria-pressed="false" title="Режим для слабовидящих">Аа</button><a class="icon-btn' +
       (here === "settings.html" ? " active" : "") +
       '" href="settings.html" aria-label="Настройки" title="Настройки">' +
       gear +
-      "</a>" +
-      '<button class="icon-btn menu-btn" id="menu-btn" type="button" aria-label="Меню" aria-expanded="false" aria-controls="nav-links">' +
+      '</a><button class="icon-btn menu-btn" id="menu-btn" type="button" aria-label="Меню" aria-expanded="false" aria-controls="nav-links">' +
       menu +
-      "</button></div></div></header>" +
+      "</button></div></div></div></header>" +
       '<div class="toast" id="toast" role="status"></div>',
   );
   applyTheme();
@@ -86,45 +85,36 @@
     );
   };
 
-  const header = doc.getElementById("site-header"),
-    ind = doc.getElementById("nav-ind"),
-    navLinks = doc.getElementById("nav-links");
-  const active = navLinks.querySelector("a.active");
-  function place(el) {
-    if (!el) {
-      ind.style.opacity = 0;
-      return;
-    }
-    ind.style.opacity = 1;
-    ind.style.width = el.offsetWidth + "px";
-    ind.style.transform = "translateX(" + el.offsetLeft + "px)";
-  }
-  navLinks
-    .querySelectorAll("a")
-    .forEach((a) => a.addEventListener("mouseenter", () => place(a)));
-  navLinks.addEventListener("mouseleave", () => place(active));
-  addEventListener("resize", () => place(active));
-  if (doc.fonts && doc.fonts.ready) doc.fonts.ready.then(() => place(active));
-  place(active);
+  const header = doc.getElementById("site-header");
   const menuBtn = doc.getElementById("menu-btn");
+  function closeMenu() {
+    header.classList.remove("open");
+    menuBtn.setAttribute("aria-expanded", "false");
+  }
   menuBtn.onclick = () => {
     const open = header.classList.toggle("open");
     menuBtn.setAttribute("aria-expanded", String(open));
   };
   doc.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
-      header.classList.remove("open");
-      menuBtn.setAttribute("aria-expanded", "false");
+      closeMenu();
     }
   });
 
-  /* Подвал */
+  /* Общий контекст и подвал. */
   doc.addEventListener("DOMContentLoaded", () => {
+    const title = links.find(([href]) => href === here)?.[1] || "Настройки";
+    doc
+      .querySelector("main")
+      .insertAdjacentHTML(
+        "afterbegin",
+        '<div class="workspace-bar"><div class="breadcrumb"><a href="index.html">Личный план</a><span aria-hidden="true">/</span><span>' +
+          title +
+          '</span></div><a class="context-link" href="method.html">Как работает модель ↗</a></div>',
+      );
     doc.body.insertAdjacentHTML(
       "beforeend",
-      '<footer class="site-footer"><div class="foot"><span>mathical · учебная модель, а не финансовый прогноз</span><nav aria-label="Ссылки внизу">' +
-        links.map(([h, t]) => '<a href="' + h + '">' + t + "</a>").join("") +
-        '<a href="settings.html">Настройки</a></nav></div></footer>',
+      '<footer class="site-footer"><div class="foot"><span>mathical · учебная модель</span><p>Расчёт помогает сравнить варианты, но не предсказывает будущее.</p><a href="method.html#limits">Ограничения модели ↗</a></div></footer>',
     );
     reveal();
   });
@@ -150,13 +140,14 @@
     if (url.pathname === location.pathname && url.hash) return;
     if (!animOn()) return;
     e.preventDefault();
-    header.classList.remove("open");
+    closeMenu();
     doc.body.classList.add("leaving");
     setTimeout(() => {
       location.href = a.href;
     }, 230);
   });
   addEventListener("pageshow", (e) => {
+    closeMenu();
     if (e.persisted) doc.body.classList.remove("leaving");
   });
   function go(url) {
@@ -219,7 +210,6 @@
   function drawChart(box, svg) {
     box.innerHTML = svg;
     const line = box.querySelector(".capital-line");
-    box.classList.remove("chart-in");
     if (!line || !animOn() || !line.getTotalLength) return;
     const len = line.getTotalLength();
     line.style.transition = "none";
@@ -228,8 +218,6 @@
     line.getBoundingClientRect();
     line.style.transition = "stroke-dashoffset 1.5s cubic-bezier(.3,.7,.2,1)";
     line.style.strokeDashoffset = 0;
-    void box.offsetWidth;
-    box.classList.add("chart-in");
   }
 
   let toastTimer = 0;

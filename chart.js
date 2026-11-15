@@ -21,10 +21,10 @@
   }
 
   function goalAnnotation(goalPoints, capitalPoints, status) {
-    const width = 40,
-      height = 18;
+    const width = 48,
+      height = 20;
     const label = (box, text, leader = "") =>
-      `<g class="goal-annotation" data-label-x="${box.x}" data-label-y="${box.y}" data-label-width="${box.width}" data-label-height="${box.height}">${leader}<rect x="${box.x}" y="${box.y}" width="${box.width}" height="${box.height}" rx="3" fill="var(--cream, #f5f1e8)"/><text x="${box.x + 5}" y="${box.y + 13}" font-size="11" fill="#795267">${text}</text></g>`;
+      `<g class="goal-annotation" data-label-x="${box.x}" data-label-y="${box.y}" data-label-width="${box.width}" data-label-height="${box.height}">${leader}<rect x="${box.x}" y="${box.y}" width="${box.width}" height="${box.height}" rx="3" fill="var(--surface, #ffffff)"/><text x="${box.x + 5}" y="${box.y + 14}" font-size="12" fill="var(--chart-goal-text, #985074)">${text}</text></g>`;
     const candidates = [];
     // Берём середины видимых отрезков: подпись работает и при выходе части цели за шкалу.
     for (let i = 1; i < goalPoints.length; i++) {
@@ -45,7 +45,7 @@
       candidates.push([x1 + (x2 - x1) * t, y1 + (y2 - y1) * t]);
     }
     for (const [x, y] of candidates)
-      for (const offset of [-24, 6]) {
+      for (const offset of [-26, 6]) {
         const box = {
           x: Math.max(80, Math.min(369 - width, x - width / 2)),
           y: y + offset,
@@ -67,7 +67,7 @@
     return label(
       { x: bx, y: 2, width, height },
       "Цель",
-      `<path d="M ${bx + width / 2} 20 L ${x} ${y}" fill="none" stroke="#90657a" stroke-width="1" stroke-dasharray="2 3"/>`,
+      `<path d="M ${bx + width / 2} 20 L ${x} ${y}" fill="none" stroke="var(--chart-goal, #c36b99)" stroke-width="1" stroke-dasharray="2 3"/>`,
     );
   }
   function chart(
@@ -104,22 +104,23 @@
           .map((b, i) => [x(i), y(high(b))])
           .concat(bands.map((b, i) => [x(i), y(low(b))]).reverse()),
       ) + " Z";
-    let svg = `<svg viewBox="0 0 390 235" role="img" aria-label="График капитала и диапазон учебных сценариев с ${startYear} по ${startYear + years} год"><defs><clipPath id="goal-clip"><rect x="70" y="25" width="305" height="180"/></clipPath><linearGradient id="chart-fill" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#ffccad" stop-opacity=".38"/><stop offset="1" stop-color="#ffccad" stop-opacity="0"/></linearGradient></defs>`;
+    let svg = `<svg viewBox="0 0 390 235" role="img" aria-label="График капитала и диапазон учебных сценариев с ${startYear} по ${startYear + years} год"><defs><clipPath id="goal-clip"><rect x="70" y="25" width="305" height="180"/></clipPath><linearGradient id="chart-fill" x1="0" x2="0" y1="0" y2="1"><stop stop-color="var(--button-accent, #d2b2ff)" stop-opacity=".38"/><stop offset="1" stop-color="var(--button-accent, #d2b2ff)" stop-opacity="0"/></linearGradient></defs>`;
     [min, (min + max) / 2, max].forEach((v) => {
-      svg += `<line x1="70" y1="${y(v)}" x2="375" y2="${y(v)}" stroke="#d4c99a" stroke-dasharray="3 4"/><text x="64" y="${y(v) + 4}" text-anchor="end" font-size="11" fill="#675e40">${money(v).replace(/₽/g, "")}</text>`;
+      svg += `<line x1="70" y1="${y(v)}" x2="375" y2="${y(v)}" class="chart-grid" stroke="var(--line, #e7e0ec)" stroke-dasharray="3 4"/><text x="64" y="${y(v) + 4}" text-anchor="end" font-size="11" class="chart-axis-label" fill="var(--muted, #75677e)">${money(v).replace(/₽/g, "")}</text>`;
     });
-    if (showBand) svg += `<path d="${band}" fill="#aa9cb9" opacity=".18"/>`;
-    svg += `<path d="${line} L ${x(years)} ${y(0)} L ${x(0)} ${y(0)} Z" fill="url(#chart-fill)"/>`;
+    if (showBand)
+      svg += `<path d="${band}" class="chart-band" fill="var(--chart-band, #c9acec)" opacity=".18"/>`;
+    svg += `<path d="${line} L ${x(years)} ${y(0)} L ${x(0)} ${y(0)} Z" class="chart-area" fill="url(#chart-fill)"/>`;
     const goalPath = path(goalValues.map((v, i) => [x(i), y(v)]));
-    svg += `<path d="${goalPath}" clip-path="url(#goal-clip)" fill="none" stroke="#90657a" stroke-width="1.5" stroke-dasharray="5 4"/>`;
-    svg += `<path class="capital-line" d="${line}" fill="none" stroke="#a9694d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`;
+    svg += `<path d="${goalPath}" clip-path="url(#goal-clip)" class="goal-line" fill="none" stroke="var(--chart-goal, #c36b99)" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+    svg += `<path class="capital-line" d="${line}" fill="none" stroke="var(--chart-line, #9971c6)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`;
     rows.forEach((r, i) => {
-      svg += `<circle data-year="${i}" cx="${x(i)}" cy="${y(val(r))}" r="4" fill="#87513c"><title>${startYear + i}: ${money(val(r), false)}</title></circle>`;
+      svg += `<circle data-year="${i}" cx="${x(i)}" cy="${y(val(r))}" r="4" fill="var(--chart-line, #9971c6)"><title>${startYear + i}: ${money(val(r), false)}</title></circle>`;
     });
     const count = Math.min(5, years + 1);
     for (let i = 0; i < count; i++) {
       const n = Math.round((i * years) / (count - 1));
-      svg += `<text x="${x(n)}" y="228" text-anchor="middle" font-size="11" fill="#675e40">${startYear + n}</text>`;
+      svg += `<text x="${x(n)}" y="228" text-anchor="middle" font-size="11" class="chart-axis-label" fill="var(--muted, #75677e)">${startYear + n}</text>`;
     }
     const below = goalValues.every((v) => v < min),
       above = goalValues.every((v) => v > max),

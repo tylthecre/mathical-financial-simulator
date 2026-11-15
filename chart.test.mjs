@@ -28,8 +28,8 @@ test("Линия цели использует будущую стоимость
   assert.match(a, /Цель выше шкалы графика/);
 });
 test("Коридор отсутствует, если сценарий не базовый", () => {
-  assert.match(make("real", true), /fill="#aa9cb9"/);
-  assert.doesNotMatch(make("real", false), /fill="#aa9cb9"/);
+  assert.match(make("real", true), /class="chart-band"/);
+  assert.doesNotMatch(make("real", false), /class="chart-band"/);
 });
 
 const minimum = (svg) => Number(svg.match(/data-scale-min="([^"]+)"/)[1]);

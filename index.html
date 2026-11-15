@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#121b29" />
+    <meta name="theme-color" content="#19181e" />
     <meta
       name="description"
       content="Mathical — рассчитай бюджет, срок накопления на цель и сравни финансовые решения."
@@ -17,56 +17,70 @@
     <script src="chart.js"></script>
     <script src="js/store.js"></script>
     <script src="js/ui.js"></script>
-    <main>
-      <section class="hero">
+    <main id="main-content" tabindex="-1">
+      <section class="home-intro">
         <div>
-          <h1 class="reveal" style="--d: 0.08s">
-            Когда ты накопишь<br />на свою цель?
-          </h1>
-          <p class="lead reveal" style="--d: 0.16s">
-            Разберись, сколько можешь откладывать, когда хватит на покупку и что
-            изменится, если тратить чуть меньше.
-          </p>
-          <div class="cta reveal" style="--d: 0.24s">
-            <a class="btn btn-primary" href="plan.html"
-              >Рассчитать свой план <span class="arr">→</span></a
-            >
-            <a class="btn btn-link" href="results.html"
-              >Посмотреть расчёт <span class="arr">↗</span></a
-            >
-          </div>
-          <p class="hero-note reveal" style="--d: 0.32s">
-            Без регистрации. Данные остаются в твоём браузере.
+          <h1>Когда ты накопишь<br />на свою цель?</h1>
+          <p class="lead">
+            Твой бюджет сегодня. Возможности завтра.<br />Посмотри, как
+            ежедневные решения приближают большую покупку.
           </p>
         </div>
-        <div class="hero-stack reveal" style="--d: 0.2s">
-          <div class="card capital-card hero-preview">
-            <div class="card-top">
-              <h2>Капитал через <span id="h-years"></span></h2>
-              <span class="preview-label">Текущий план</span>
-            </div>
-            <div class="big" id="h-capital">—</div>
-            <div class="sub-line">В сегодняшних рублях · базовый сценарий</div>
-            <p
-              class="home-goal-outcome"
-              id="h-goal-outcome"
-              aria-live="polite"
-            ></p>
-            <div class="chart" id="h-chart"></div>
-            <div class="preview-metrics">
-              <div class="preview-metric">
-                <small>Можно откладывать</small><strong id="h-free">—</strong>
-              </div>
-              <div class="preview-metric">
-                <small id="h-goal-name">Цель</small
-                ><strong id="h-goal">—</strong>
-              </div>
-            </div>
-          </div>
+        <div class="home-actions">
+          <a class="btn btn-primary" href="plan.html"
+            >Рассчитать свой план <span class="arr">↗</span></a
+          ><span>Без регистрации. Всё остаётся у тебя.</span>
         </div>
       </section>
+      <section class="overview-layout" aria-label="Обзор текущего плана">
+        <div class="card capital-card hero-preview">
+          <div class="card-top">
+            <h2>Капитал через <span id="h-years"></span></h2>
+            <span class="preview-label">Базовый сценарий</span>
+          </div>
+          <div class="big" id="h-capital">—</div>
+          <div class="sub-line">В сегодняшних рублях, с учётом инфляции</div>
+          <div class="chart" id="h-chart"></div>
+          <div class="chart-foot">
+            <span><i class="dot dot-capital"></i>Капитал</span
+            ><span><i class="dot dot-goal"></i>Цель</span
+            ><span><i class="dot dot-band"></i>Диапазон модели</span>
+          </div>
+          <p
+            class="home-goal-outcome"
+            id="h-goal-outcome"
+            aria-live="polite"
+          ></p>
+        </div>
+        <aside class="overview-side" aria-label="Бюджет и цель">
+          <section class="card cashflow-card">
+            <div class="card-top">
+              <h2>Можно откладывать</h2>
+              <span class="metric-period">в месяц</span>
+            </div>
+            <strong class="cashflow-value" id="h-free">—</strong>
+            <p class="note">Столько остаётся после текущих расходов.</p>
+            <div class="cashflow-rows">
+              <div><span>Доход</span><strong id="h-income">—</strong></div>
+              <div><span>Расходы</span><strong id="h-expenses">—</strong></div>
+            </div>
+            <a class="text-link" href="plan.html"
+              >Уточнить бюджет <span>→</span></a
+            >
+          </section>
+          <section class="card home-goal-card">
+            <span class="goal-label">Моя цель</span>
+            <h2 id="h-goal-name">Цель</h2>
+            <strong class="home-goal-value" id="h-goal">—</strong>
+            <p class="note">Стоимость в сегодняшних ценах.</p>
+            <a class="text-link" href="plan.html#plan-goal"
+              >Изменить цель <span>→</span></a
+            >
+          </section>
+        </aside>
+      </section>
 
-      <section class="section" aria-labelledby="sec-pages">
+      <section class="section section-directory" aria-labelledby="sec-pages">
         <div class="section-head reveal">
           <div>
             <h2 id="sec-pages">От бюджета к решению</h2>
@@ -109,18 +123,6 @@
             </li>
           </ul>
         </nav>
-      </section>
-
-      <section class="section">
-        <div class="cta-band reveal">
-          <div>
-            <h2>Начни со своего месяца.</h2>
-            <p>Доходы и расходы станут основой плана.</p>
-          </div>
-          <a class="btn btn-primary" href="plan.html"
-            >Заполнить бюджет <span class="arr">→</span></a
-          >
-        </div>
       </section>
     </main>
     <script src="js/home.js"></script>
