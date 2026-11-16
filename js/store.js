@@ -1,176 +1,106 @@
-/* План, варианты и настройки сохраняются одной записью localStorage. */
+/* Общее хранилище: параметры плана, сохранённые варианты, настройки сайта. */
 (function (root) {
-  "use strict";
-  const M = root.Mathical;
-  const KEY = "mathical-v1",
-    SKEY = "mathical-settings",
-    TKEY = "mathical-theme";
-  const SCENARIOS = ["base", "optimistic", "stress"];
-  const DEFAULT_SETTINGS = {
-    theme: "light",
-    mode: "real",
-    animations: true,
-    band: true,
-    accessible: false,
-  };
-  const decisions = { none: "Без изменений", save: "Экономия 10%" };
-  const outcomes = {
-    base: "Базовый",
-    optimistic: "Благоприятный",
-    stress: "Стрессовый",
-  };
-  const state = {};
+  'use strict';
+  const M = root.Mathical, KEY = 'mathical-v1', SKEY = 'mathical-settings', TKEY = 'mathical-theme';
+  const SCEN = ['base', 'optimistic', 'stress'];
+  const DEFAULT_SETTINGS = {theme: 'system', mode: 'real', animations: true, band: true, accessible: false};
+  const decisions = {none: 'Без изменений', save: 'Экономия 10%', education: 'Обучение', car: 'Автомобиль'};
+  const outcomes = {base: 'Базовый', optimistic: 'Благоприятный', stress: 'Стрессовый'};
+  const startYear = new Date().getFullYear();
   let storageOK = true;
+  const state = {};
 
-  const isRecord = (value) =>
-    value !== null && typeof value === "object" && !Array.isArray(value);
-  const read = (key) => {
-    try {
-      return JSON.parse(localStorage.getItem(key) || "null");
-    } catch {
-      storageOK = false;
-      return null;
-    }
-  };
+  const read = k => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch { storageOK = false; return null; } };
+  const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { storageOK = false; return false; } };
 
-  function cleanSettings(value) {
-    const settings = { ...DEFAULT_SETTINGS, ...(isRecord(value) ? value : {}) };
+  function cleanSettings(s) {
+    const o = {...DEFAULT_SETTINGS, ...(s && typeof s === 'object' ? s : {})};
     return {
-      theme: ["system", "light", "dark"].includes(settings.theme)
-        ? settings.theme
-        : DEFAULT_SETTINGS.theme,
-      mode: ["real", "nominal"].includes(settings.mode)
-        ? settings.mode
-        : "real",
-      animations: settings.animations !== false,
-      band: settings.band !== false,
-      accessible: settings.accessible === true,
+      theme: ['system', 'light', 'dark'].includes(o.theme) ? o.theme : 'system',
+      mode: ['real', 'nominal'].includes(o.mode) ? o.mode : 'real',
+      animations: o.animations !== false,
+      band: o.band !== false,
+      accessible: o.accessible === true
     };
   }
-
   function cleanSaved(list) {
     return Array.isArray(list)
-      ? list
-          .filter((item) => item && isRecord(item.params))
-          .slice(0, 3)
-          .map((item) => ({
-            params: M.normalize(item.params),
-            scenario: SCENARIOS.includes(item.scenario)
-              ? item.scenario
-              : "base",
-          }))
+      ? list.slice(0, 3).filter(x => x && x.params && typeof x.params === 'object')
+          .map(x => ({params: M.normalize(x.params), scenario: SCEN.includes(x.scenario) ? x.scenario : 'base'}))
       : [];
   }
-
-  function cleanData(data, settings) {
-    const params = M.normalize(isRecord(data.params) ? data.params : {});
-    const config = cleanSettings(settings);
-    const view = isRecord(data.view) ? data.view : {};
-    return {
-      params,
-      saved: cleanSaved(data.saved),
-      settings: config,
-      view: {
-        mode: ["real", "nominal"].includes(view.mode) ? view.mode : config.mode,
-        scenario: SCENARIOS.includes(view.scenario) ? view.scenario : "base",
-      },
-      inflationInfo: {
-        source: ["manual", "official", "personal"].includes(
-          data.inflationInfo?.source,
-        )
-          ? data.inflationInfo.source
-          : "manual",
-      },
-    };
+  function cleanInflation(value) {
+    const v = value && typeof value === 'object' ? value : {};
+    const rows = Array.isArray(v.rows) ? v.rows.slice(0, 50).map(r => ({name: String(r?.name || '').slice(0, 80), old: String(r?.old ?? '').slice(0, 16), current: String(r?.current ?? '').slice(0, 16)})) : [];
+    return {rows, from: /^\d{4}-\d{2}$/.test(v.from || '') ? v.from : '', to: /^\d{4}-\d{2}$/.test(v.to || '') ? v.to : '', source: ['manual','official','personal'].includes(v.source) ? v.source : 'manual'};
   }
-
-  function load() {
-    storageOK = true;
-    const stored = read(KEY),
-      data = isRecord(stored) ? stored : {};
-    // До объединения записи тема и настройки хранились отдельно.
-    const oldSettings = data.settings === undefined ? read(SKEY) : null;
-    const settings = isRecord(data.settings)
-      ? data.settings
-      : isRecord(oldSettings)
-        ? { ...oldSettings }
-        : {};
-    if (!settings.theme) {
-      try {
-        const legacyTheme = localStorage.getItem(TKEY);
-        if (legacyTheme === "light" || legacyTheme === "dark")
-          settings.theme = legacyTheme;
-      } catch {
-        storageOK = false;
+  function cleanMonthly(value) {
+    const out = {};
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return out;
+    for (const [month, row] of Object.entries(value)) {
+      if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month) || !row || typeof row !== 'object') continue;
+      out[month] = {};
+      for (const key of ['income','housing','living','leisure','other','unexpected']) {
+        const n = Number(row[key]); out[month][key] = Number.isFinite(n) && n >= 0 && n <= 1000000000 ? n : 0;
       }
+      const saved = row.savedGoal;
+      out[month].savedGoal = saved === undefined || saved === null || saved === '' || !Number.isFinite(Number(saved)) ? null : Math.min(1000000000, Math.max(0, Number(saved)));
     }
-    Object.assign(state, cleanData(data, settings));
+    return out;
   }
-
-  function snapshot() {
-    return {
-      params: state.params,
-      saved: state.saved,
-      settings: state.settings,
-      view: state.view,
-      inflationInfo: state.inflationInfo,
+  function load() {
+    const data = read(KEY) || {}, s = read(SKEY) || {};
+    let legacy = null;
+    try { legacy = localStorage.getItem(TKEY); } catch {}
+    if (!s.theme && (legacy === 'light' || legacy === 'dark')) s.theme = legacy;
+    state.settings = cleanSettings(s);
+    state.params = M.normalize(data.params && typeof data.params === 'object' ? data.params : {});
+    state.legacyDecisionRemoved = ['education', 'car'].includes(state.params.decision);
+    if (state.legacyDecisionRemoved) state.params = M.normalize({...state.params, decision: 'none'});
+    state.saved = cleanSaved(data.saved);
+    state.monthly = cleanMonthly(data.monthly);
+    state.inflationInfo = cleanInflation(data.inflationInfo);
+    const v = data.view && typeof data.view === 'object' ? data.view : {};
+    state.view = {
+      mode: ['real', 'nominal'].includes(v.mode) ? v.mode : state.settings.mode,
+      scenario: SCEN.includes(v.scenario) ? v.scenario : 'base'
     };
   }
-
   function persist() {
-    try {
-      localStorage.setItem(KEY, JSON.stringify(snapshot()));
-      storageOK = true;
-      return true;
-    } catch {
-      storageOK = false;
-      return false;
-    }
+    storageOK = true;
+    write(KEY, {params: state.params, saved: state.saved, view: state.view, inflationInfo: state.inflationInfo, monthly: state.monthly});
+    write(SKEY, state.settings);
+    return storageOK;
   }
-
+  /* Производные значения бюджета для текущих параметров. */
+  function derive(input) {
+    const p = M.normalize(input);
+    const annualTotal = p.annual + p.annualItems.reduce((s, x) => s + x.amount, 0);
+    const factor = p.decision === 'save' ? .9 : 1;
+    const loan = M.loanTerms(p);
+    const expense = p.housing + p.living + p.leisure + annualTotal / 12;
+    const spent = expense * factor + loan.payment;
+    return {p, annualTotal, factor, loan, expense, spent, free: p.salary - spent};
+  }
   function exportData() {
-    return JSON.stringify(
-      { app: "mathical", version: 1, ...snapshot() },
-      null,
-      2,
-    );
+    return JSON.stringify({app: 'mathical', version: 1, params: state.params, saved: state.saved, settings: state.settings, inflationInfo: state.inflationInfo, monthly: state.monthly}, null, 2);
   }
-
   function importData(text) {
     const data = JSON.parse(text);
-    if (!isRecord(data) || data.app !== "mathical")
-      throw new Error("Это не файл Mathical");
-    const previous = { ...state };
-    Object.assign(state, cleanData(data, data.settings ?? state.settings));
-    if (persist()) return true;
-    Object.assign(state, previous);
-    return false;
+    if (!data || typeof data !== 'object' || data.app !== 'mathical') throw new Error('Это не файл Mathical');
+    state.params = M.normalize(data.params && typeof data.params === 'object' ? data.params : {});
+    state.legacyDecisionRemoved = ['education', 'car'].includes(state.params.decision);
+    if (state.legacyDecisionRemoved) state.params = M.normalize({...state.params, decision: 'none'});
+    state.saved = cleanSaved(data.saved);
+    state.monthly = cleanMonthly(data.monthly);
+    state.inflationInfo = cleanInflation(data.inflationInfo);
+    if (data.settings) state.settings = cleanSettings(data.settings);
+    state.view = {mode: state.settings.mode, scenario: 'base'};
+    return persist();
   }
-
   function resetAll() {
-    let removed = true;
-    for (const key of [KEY, SKEY, TKEY]) {
-      try {
-        localStorage.removeItem(key);
-      } catch {
-        removed = false;
-      }
-    }
+    try { localStorage.removeItem(KEY); localStorage.removeItem(SKEY); localStorage.removeItem(TKEY); } catch {}
     load();
-    if (!removed) storageOK = false;
-    return removed;
   }
-
-  root.MStore = {
-    state,
-    load,
-    persist,
-    exportData,
-    importData,
-    resetAll,
-    decisions,
-    outcomes,
-    startYear: new Date().getFullYear(),
-    ok: () => storageOK,
-  };
+  root.MStore = {state, load, persist, derive, exportData, importData, resetAll, cleanSettings, decisions, outcomes, startYear, ok: () => storageOK};
 })(globalThis);
